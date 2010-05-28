@@ -1,8 +1,8 @@
 === BuddyPress Followers ===
 Contributors: apeatling
 Tags: buddypress, following, followers, connections
-Requires at least: WordPress 2.9.1 / BuddyPress 1.2
-Tested up to: WordPress 2.9.2 / BuddyPress 1.2
+Requires at least: 2.9.1 / 1.2.4
+Tested up to: 3.0 / 1.2.4.1
 Stable Tag: 1.0
 
 == Description ==

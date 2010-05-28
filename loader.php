@@ -3,8 +3,8 @@
 Plugin Name: BuddyPress Follow
 Plugin URI: http://apeatling.wordpress.com/
 Description: Allow your site members to follow other members' activity.
-Version: 0.1
-Requires at least: 2.9.2 / 1.2.4.1
+Version: 1.0
+Requires at least: 2.9.2 / 1.2.4
 Tested up to: 3.0 / 1.2.4.1
 License: GNU/GPL 2
 Author: Andy Peatling
