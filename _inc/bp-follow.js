@@ -4,9 +4,14 @@ jQuery(document).ready( function() {
 		var type = link.attr('class');
 		var uid = link.attr('id');
 		var nonce = link.attr('href');
+		var action = '';
 
-		link.addClass('loading');
+		// add the loading class for BP 1.2.x only
+		if ( BP_DTheme.mention_explain )
+			link.addClass('loading');
+
 		uid = uid.split('-');
+		action = uid[0];
 		uid = uid[1];
 
 		nonce = nonce.split('?_wpnonce=');
@@ -14,7 +19,7 @@ jQuery(document).ready( function() {
 		nonce = nonce[0];
 
 		jQuery.post( ajaxurl, {
-			action: 'bp_' + type,
+			action: 'bp_' + action,
 			'cookie': encodeURIComponent(document.cookie),
 			'uid': uid,
 			'_wpnonce': nonce
@@ -22,7 +27,11 @@ jQuery(document).ready( function() {
 		function(response) {
 			jQuery(link.parent()).fadeOut(200, function() {
 				link.html( response );
-				link.removeClass('loading');
+
+				// remove the loading class for BP 1.2.x only
+				if ( BP_DTheme.mention_explain )
+					link.removeClass('loading');
+
 				link.removeClass('follow');
 				link.removeClass('unfollow');
 				link.parent().addClass('pending');

@@ -1,5 +1,21 @@
 <?php
+/**
+ * BP Follow Classes
+ *
+ * @package BP-Follow
+ * @subpackage Classes
+ */
 
+// Exit if accessed directly
+if ( !defined( 'ABSPATH' ) ) exit;
+
+/**
+ * Class: BP_Follow
+ *
+ * Handles populating and saving BP follow requests.
+ *
+ * @subpackage Classes
+ */
 class BP_Follow {
 	var $id;
 	var $leader_id;
@@ -26,7 +42,7 @@ class BP_Follow {
 		$this->leader_id = apply_filters( 'bp_follow_leader_id_before_save', $this->leader_id, $this->id );
 		$this->follower_id = apply_filters( 'bp_follow_follower_id_before_save', $this->follower_id, $this->id );
 
-		do_action( 'bp_follow_before_save', $this );
+		do_action_ref_array( 'bp_follow_before_save', &$this );
 
 		if ( $this->id )
 			$result = $wpdb->query( $wpdb->prepare( "UPDATE {$bp->follow->table_name} SET leader_id = %d, follower_id = %d WHERE id = %d", $this->leader_id, $this->follower_id, $this->id ) );
@@ -36,7 +52,7 @@ class BP_Follow {
 			$this->id = $wpdb->insert_id;
 		}
 
-		do_action( 'bp_follow_after_save', $this );
+		do_action_ref_array( 'bp_follow_after_save', &$this );
 
 		return $result;
 	}
@@ -78,4 +94,13 @@ class BP_Follow {
 
 		return $wpdb->get_results( $wpdb->prepare( "SELECT leader_id, id FROM {$bp->follow->table_name} WHERE follower_id = %d AND leader_id IN ($leader_ids)", $user_id ) );
 	}
+
+	function delete_all_for_user( $user_id ) {
+		global $bp, $wpdb;
+
+		// Delete all follow relationships related to $user_id
+		$wpdb->query( $wpdb->prepare( "DELETE FROM {$bp->follow->table_name} WHERE leader_id = %d OR follower_id = %d", $user_id, $user_id ) );
+	}
 }
+
+?>

@@ -3,63 +3,84 @@
 Plugin Name: BuddyPress Follow
 Plugin URI: http://apeatling.wordpress.com/
 Description: Allow your site members to follow other members' activity.
-Version: 1.0
-Requires at least: 2.9.2 / 1.2.4
-Tested up to: 3.0 / 1.2.4.1
+Version: 1.1
+Requires at least: WP 3.0 / BP 1.2.6
+Tested up to: WP 3.2.1 / BP 1.5.1
 License: GNU/GPL 2
 Author: Andy Peatling
 Author URI: http://apeatling.wordpress.com
 */
 
 /**
- * bp_follow_init()
- *
- * Only load the plugin code if BuddyPress is activated.
+ * BP Follow
  *
  * @package BP-Follow
+ * @subpackage Loader
+ */
+
+// Exit if accessed directly
+if ( !defined( 'ABSPATH' ) ) exit;
+
+/**
+ * Only load the plugin code if BuddyPress is activated.
  */
 function bp_follow_init() {
     require( dirname( __FILE__ ) . '/bp-follow.php' );
 }
-add_action( 'bp_init', 'bp_follow_init' );
+add_action( 'bp_include', 'bp_follow_init' );
 
 /**
- * bp_follow_activate()
- *
  * Run the activation routine when BP-Follow is activated.
  *
- * @package BP-Follow
  * @uses dbDelta() Executes queries and performs selective upgrades on existing tables.
  */
 function bp_follow_activate() {
-	global $wpdb;
+	global $bp, $wpdb;
 
-	require_once( ABSPATH . 'wp-admin/upgrade-functions.php' );
+	$charset_collate = !empty( $wpdb->charset ) ? "DEFAULT CHARACTER SET $wpdb->charset" : '';
+	if ( !$table_prefix = $bp->table_prefix )
+		$table_prefix = apply_filters( 'bp_core_get_table_prefix', $wpdb->base_prefix );
 
-	$charset_collate = '';
-	if ( !empty($wpdb->charset) )
-		$charset_collate = "DEFAULT CHARACTER SET $wpdb->charset";
-
-	$sql[] = "CREATE TABLE {$wpdb->base_prefix}bp_follow (
-	  		    id bigint(20) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-			    leader_id bigint(20) NOT NULL,
-			    follower_id bigint(20) NOT NULL,
+	$sql[] = "CREATE TABLE {$table_prefix}bp_follow (
+			id bigint(20) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+			leader_id bigint(20) NOT NULL,
+			follower_id bigint(20) NOT NULL,
 		        KEY followers (leader_id, follower_id)
-		       ) {$charset_collate};";
+		) {$charset_collate};";
 
+	require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 	dbDelta( $sql );
 }
 register_activation_hook( __FILE__, 'bp_follow_activate' );
 
 /**
- * bp_follow_deactivate()
- *
  * Run the deactivation routine when BP-Follow is deactivated.
- *
- * @package BP-Follow
+ * Not used currently.
  */
 function bp_follow_deactivate() {
 	// Cleanup.
 }
-register_deactivation_hook( __FILE__, 'bp_follow_deactivate' );
+//register_deactivation_hook( __FILE__, 'bp_follow_deactivate' );
+
+/**
+ * Custom textdomain loader.
+ *
+ * Checks WP_LANG_DIR for the .mo file first, then the plugin's language folder.
+ * Allows for a custom language file other than those packaged with the plugin.
+ *
+ * @uses load_textdomain() Loads a .mo file into WP
+ */
+function bp_follow_localization() {
+	$mofile		= sprintf( 'bp-follow-%s.mo', get_locale() );
+	$mofile_global	= trailingslashit( WP_LANG_DIR ) . $mofile;
+	$mofile_local	= plugin_dir_path( __FILE__ ) . 'languages/' . $mofile;
+
+	if ( is_readable( $mofile_global ) )
+		return load_textdomain( 'bp-follow', $mofile_global );
+	elseif ( is_readable( $mofile_local ) )
+		return load_textdomain( 'bp-follow', $mofile_local );
+	else
+		return false;
+}
+add_action( 'plugins_loaded', 'bp_follow_localization' );
 ?>

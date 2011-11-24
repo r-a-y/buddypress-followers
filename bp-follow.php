@@ -1,15 +1,25 @@
 <?php
+/**
+ * BP Follow Core
+ *
+ * @package BP-Follow
+ * @subpackage Core
+ */
+
+// Exit if accessed directly
+if ( !defined( 'ABSPATH' ) ) exit;
+
+if ( version_compare( BP_VERSION, '1.3' ) < 0 )
+	require ( dirname( __FILE__ ) . '/_inc/bp-follow-backpat.php' );
+
 require ( dirname( __FILE__ ) . '/_inc/bp-follow-templatetags.php' );
 require ( dirname( __FILE__ ) . '/_inc/bp-follow-classes.php' );
 require ( dirname( __FILE__ ) . '/_inc/bp-follow-hooks.php' );
 require ( dirname( __FILE__ ) . '/_inc/bp-follow-widgets.php' );
 
 /**
- * bp_follow_setup_globals()
- *
  * Append the globals this component will use to the $bp global.
  *
- * @package BP-Follow
  * @global $bp The global BuddyPress settings variable created in bp_core_setup_globals()
  * @global $wpdb The global WordPress database access object.
  */
@@ -22,27 +32,31 @@ function bp_follow_setup_globals() {
 	if ( !defined( 'BP_FOLLOWING_SLUG' ) )
 		define( 'BP_FOLLOWING_SLUG', 'following' );
 
-	/* For internal identification */
-	$bp->follow->id = 'follow';
+	// For internal identification
+	$bp->follow->id              = 'follow';
 
-	$bp->follow->table_name = $wpdb->base_prefix . 'bp_follow';
-	$bp->follow->format_notification_function = 'bp_follow_format_notifications';
+	$bp->follow->table_name      = $bp->table_prefix . 'bp_follow';
 	$bp->follow->followers->slug = BP_FOLLOWERS_SLUG;
 	$bp->follow->following->slug = BP_FOLLOWING_SLUG;
 
 	/* Register this in the active components array */
-	$bp->active_components[$bp->follow->followers->slug] = $bp->follow->id;
+	$bp->active_components[$bp->follow->id] = $bp->follow->id;
+
+	// BP 1.2.x only
+	if ( version_compare( BP_VERSION, '1.3' ) < 0 ) {
+		$bp->follow->format_notification_function = 'bp_follow_format_notifications';
+	}
+	// BP 1.5-specific
+	else {
+		$bp->follow->notification_callback        = 'bp_follow_format_notifications';
+	}
 }
-add_action( 'init', 'bp_follow_setup_globals', 9 );
-add_action( 'admin_init', 'bp_follow_setup_globals', 9 );
+add_action( 'bp_setup_globals', 'bp_follow_setup_globals' );
 
 /**
- * bp_follow_setup_nav()
- *
  * Add the "Following (X)", "Followers (X)" nav elements to user profiles and a "Following" sub
  * nav item to the activity tab on user profiles.
  *
- * @package BP-Follow
  * @global $bp The global BuddyPress settings variable created in bp_core_setup_globals()
  * @uses bp_follow_total_follow_counts() Get the following/followers counts for a user.
  * @uses bp_core_new_nav_item() Create a new top level navigation tab on user profile pages.
@@ -52,36 +66,215 @@ add_action( 'admin_init', 'bp_follow_setup_globals', 9 );
 function bp_follow_setup_nav() {
 	global $bp;
 
-	$counts = bp_follow_total_follow_counts( array( 'user_id' => $bp->displayed_user->id ) );
-
-	if ( !empty( $counts['followers'] ) ) {
-		bp_core_new_nav_item( array( 'name' => sprintf( __( 'Followers <span>(%d)</span>', 'buddypress' ), $counts['followers'] ), 'slug' => $bp->follow->followers->slug, 'position' => 60, 'screen_function' => 'bp_follow_screen_my_followers', 'default_subnav_slug' => 'followers', 'item_css_id' => $bp->follow->id ) );
-		bp_core_new_subnav_item( array( 'name' => __( 'Followers', 'buddypress' ), 'slug' => 'followers', 'parent_url' =>  $bp->loggedin_user->domain . $bp->follow->followers->slug . '/', 'parent_slug' => $bp->follow->followers->slug, 'screen_function' => 'bp_follow_screen_my_followers', 'position' => 10, 'item_css_id' => 'followers' ) );
-	}
+	// Need to change the user ID, so if we're not on a member page, $counts variable is still calculated
+	$user_id = bp_is_user() ? bp_displayed_user_id() : bp_loggedin_user_id();
+	$counts  = bp_follow_total_follow_counts( array( 'user_id' => $user_id ) );
 
 	if ( !empty( $counts['following'] ) ) {
-		bp_core_new_nav_item( array( 'name' => sprintf( __( 'Following <span>(%d)</span>', 'buddypress' ), $counts['following'] ), 'slug' => $bp->follow->following->slug, 'position' => 61, 'screen_function' => 'bp_follow_screen_following', 'default_subnav_slug' => 'following', 'item_css_id' => 'following' ) );
-		bp_core_new_subnav_item( array( 'name' => __( 'Following', 'buddypress' ), 'slug' => 'following', 'parent_url' =>  $bp->loggedin_user->domain . $bp->follow->following->slug . '/', 'parent_slug' => $bp->follow->following->slug, 'screen_function' => 'bp_follow_screen_following', 'position' => 10, 'item_css_id' => 'following' ) );
+		bp_core_new_nav_item( array(
+			'name'                => sprintf( __( 'Following <span>%d</span>', 'bp-follow' ), $counts['following'] ), 
+			'slug'                => $bp->follow->following->slug, 
+			'position'            => apply_filters( 'bp_follow_following_nav_position', 61 ), 
+			'screen_function'     => 'bp_follow_screen_following', 
+			'default_subnav_slug' => 'following', 
+			'item_css_id'         => 'following' 
+		) );
+
+		bp_core_new_subnav_item( array( 
+			'name'                => __( 'Following', 'bp-follow' ), 
+			'slug'                => 'following', 
+			'parent_url'          => trailingslashit( bp_loggedin_user_domain() . $bp->follow->following->slug ),
+			'parent_slug'         => $bp->follow->following->slug, 
+			'screen_function'     => 'bp_follow_screen_following', 
+			'position'            => 10, 
+			'item_css_id'         => 'following' 
+		) );
 	}
 
-	/* Add activity sub nav item */
+	if ( !empty( $counts['followers'] ) ) {
+		bp_core_new_nav_item( array( 
+			'name'                => sprintf( __( 'Followers <span>%d</span>', 'bp-follow' ), $counts['followers'] ), 
+			'slug'                => $bp->follow->followers->slug, 
+			'position'            => apply_filters( 'bp_follow_followers_nav_position', 62 ), 
+			'screen_function'     => 'bp_follow_screen_my_followers', 
+			'default_subnav_slug' => 'followers', 
+			'item_css_id'         => 'followers' 
+		) );
+
+		bp_core_new_subnav_item( array( 
+			'name'                => __( 'Followers', 'bp-follow' ), 
+			'slug'                => 'followers', 
+			'parent_url'          => trailingslashit( bp_loggedin_user_domain() . $bp->follow->followers->slug ),
+			'parent_slug'         => $bp->follow->followers->slug, 
+			'screen_function'     => 'bp_follow_screen_my_followers', 
+			'position'            => 10, 
+			'item_css_id'         => 'followers' 
+		) );
+	}
+
+	// Add activity sub nav item
 	if ( bp_is_active( 'activity' ) && !empty( $counts['following'] ) ) {
-		$user_domain = ( !empty( $bp->displayed_user->domain ) ) ? $bp->displayed_user->domain : $bp->loggedin_user->domain;
-		bp_core_new_subnav_item( array( 'name' => __( 'Following', 'buddypress' ), 'slug' => BP_FOLLOWING_SLUG, 'parent_url' => $user_domain . $bp->activity->slug . '/', 'parent_slug' => $bp->activity->slug, 'screen_function' => 'bp_follow_screen_activity_following', 'position' => 21, 'item_css_id' => 'activity-following' ) );
+
+		// Need to change the user domain, so if we're not on a member page,
+		// the BuddyBar renders the activity subnav properly
+		$user_domain = bp_is_user() ? bp_displayed_user_domain() : bp_loggedin_user_domain();
+
+		bp_core_new_subnav_item( array( 
+			'name'                => __( 'Following', 'bp-follow' ), 
+			'slug'                => BP_FOLLOWING_SLUG, 
+			'parent_url'          => trailingslashit( $user_domain . $bp->activity->slug ), 
+			'parent_slug'         => $bp->activity->slug, 
+			'screen_function'     => 'bp_follow_screen_activity_following', 
+			'position'            => 21, 
+			'item_css_id'         => 'activity-following' 
+		) );
 	}
 
 	do_action( 'bp_follow_setup_nav' );
 }
-add_action( 'init', 'bp_follow_setup_nav' );
-add_action( 'admin_init', 'bp_follow_setup_nav' );
+add_action( 'bp_setup_nav', 'bp_follow_setup_nav' );
 
 /**
- * bp_follow_load_template_filter()
+ * Groups follow nav items together in the BuddyBar.
  *
+ * Because of the way BuddyPress renders both the BuddyBar and profile nav with the same code,
+ * to alter just the BuddyBar, you need to resort to hacking the $bp global later on.
+ *
+ * This will probably break in future versions of BP, but for now, this will have to do.
+ * If you're using the WP Admin Bar, you don't have to worry about this at all!
+ *
+ * @global object $bp BuddyPress global settings
+ * @uses bp_follow_total_follow_counts() Get the following/followers counts for a user.
+ * @since 1.1
+ * @author r-a-y
+ */
+function bp_follow_group_buddybar_items() {
+	global $bp;
+
+	if ( !bp_loggedin_user_id() )
+		return;
+
+	// get follow nav positions
+	$following_position = apply_filters( 'bp_follow_following_nav_position', 61 );
+	$followers_position = apply_filters( 'bp_follow_followers_nav_position', 62 );
+
+	// clobberin' time!
+	unset( $bp->bp_nav[$following_position] );
+	unset( $bp->bp_nav[$followers_position] );
+	unset( $bp->bp_options_nav['following'] );
+	unset( $bp->bp_options_nav['followers'] );
+
+	$counts = bp_follow_total_follow_counts( array( 'user_id' => bp_loggedin_user_id() ) );
+
+	if ( empty( $counts ) )
+		return;
+
+	// Add the "Follow" nav menu
+	if ( !empty( $counts['followers'] ) || !empty( $counts['following'] ) ) {
+		$default_subnav = !empty( $counts['following'] ) ? $bp->follow->following->slug : $bp->follow->followers->slug;
+
+		$bp->bp_nav[$following_position] = array(
+			'name'   => __( 'Follow', 'bp-follow' ),
+			'link'   => trailingslashit( bp_loggedin_user_domain() . $default_subnav ),
+			'slug'   => 'follow',
+			'css_id' => 'follow',
+			'position' => $following_position,
+			'show_for_displayed_user' => 1,
+			'screen_function' => 'bp_follow_screen_my_followers'
+		);
+	}
+
+	// "Following" subnav item
+	if ( !empty( $counts['following'] ) ) {
+		$bp->bp_options_nav['follow'][10] = array(
+			'name'   => __( "Users I'm following", 'bp-follow' ),
+			'link'   => trailingslashit( bp_loggedin_user_domain() . $bp->follow->following->slug ),
+			'slug'   => $bp->follow->following->slug,
+			'css_id' => 'following',
+			'position' => 10,
+			'user_has_access' => 1,
+			'screen_function' => 'bp_follow_screen_my_followers'
+		);
+	}
+
+	// "Followers" subnav item
+	if ( !empty( $counts['followers'] ) ) {
+		$bp->bp_options_nav['follow'][20] = array(
+			'name'   => __( 'Users following me', 'bp-follow' ),
+			'link'   => trailingslashit( bp_loggedin_user_domain() . $bp->follow->followers->slug ),
+			'slug'   => $bp->follow->followers->slug,
+			'css_id' => 'followers',
+			'position' => 20,
+			'user_has_access' => 1,
+			'screen_function' => 'bp_follow_screen_my_followers'
+		);
+	}
+
+	// Resort the nav items to account for the late change made above
+	ksort( $bp->bp_nav );
+}
+add_action( 'bp_adminbar_menus', 'bp_follow_group_buddybar_items', 3 );
+
+/**
+ * Add WP Admin Bar support
+ *
+ * @global object $bp BuddyPress global settings
+ * @global object $wp_admin_bar WP Admin Bar object
+ * @since 1.1
+ * @author r-a-y
+ */
+function bp_follow_setup_admin_bar() {
+	global $bp, $wp_admin_bar;
+
+	// Prevent debug notices
+	$wp_admin_nav = array();
+
+	// Menus for logged in user
+	if ( is_user_logged_in() ) {
+
+		$counts = bp_follow_total_follow_counts( array( 'user_id' => bp_loggedin_user_id() ) );
+
+		// Add the "Follow" nav menu
+		if ( !empty( $counts['followers'] ) || !empty( $counts['following'] ) ) {
+			$default_subnav = !empty( $counts['followers'] ) ? $bp->follow->followers->slug : $bp->follow->following->slug;
+
+			$wp_admin_nav[] = array(
+				'parent' => $bp->my_account_menu_id,
+				'id'     => 'my-account-' . $bp->follow->id,
+				'title'  => __( 'Follow', 'bp-follow' ),
+				'href'   => trailingslashit( bp_loggedin_user_domain() . $default_subnav )
+			);
+		}
+
+		// "Following" subnav item
+		if ( !empty( $counts['following'] ) ) {
+			$wp_admin_nav[] = array(
+				'parent' => 'my-account-' . $bp->follow->id,
+				'title'  => __( "Users I'm following", 'bp-follow' ),
+				'href'   => trailingslashit( bp_loggedin_user_domain() . $bp->follow->following->slug )
+			);
+		}
+
+		// "Followers" subnav item
+		if ( !empty( $counts['followers'] ) ) {
+			$wp_admin_nav[] = array(
+				'parent' => 'my-account-' . $bp->follow->id,
+				'title'  => __( 'Users following me', 'bp-follow' ),
+				'href'   => trailingslashit( bp_loggedin_user_domain() . $bp->follow->followers->slug )
+			);
+		}
+
+		foreach( $wp_admin_nav as $admin_menu )
+			$wp_admin_bar->add_menu( $admin_menu );
+
+	}
+}
+add_action( 'bp_setup_admin_bar', 'bp_follow_setup_admin_bar' );
+
+/**
  * Filter the template location so that templates can be stored in the plugin folder, but
  * overridden by templates of the same name and sub folder location in the theme.
  *
- * @package BP-Follow
  * @global $bp The global BuddyPress settings variable created in bp_core_setup_globals()
  */
 function bp_follow_load_template_filter( $found_template, $templates ) {
@@ -90,7 +283,7 @@ function bp_follow_load_template_filter( $found_template, $templates ) {
 	/**
 	 * Only filter the template location when we're on the follow component pages.
 	 */
-	if ( $bp->current_component != $bp->follow->followers->slug && $bp->current_component != $bp->follow->following->slug )
+	if ( !bp_is_current_component( $bp->follow->followers->slug ) && !bp_is_current_component( $bp->follow->following->slug ) )
 		return $found_template;
 
 	foreach ( (array) $templates as $template ) {
@@ -102,50 +295,43 @@ function bp_follow_load_template_filter( $found_template, $templates ) {
 
 	$found_template = $filtered_templates[0];
 
-	return apply_filters( 'bp_example_load_template_filter', $found_template );
+	return apply_filters( 'bp_follow_load_template_filter', $found_template );
 }
 add_filter( 'bp_located_template', 'bp_follow_load_template_filter', 10, 2 );
 
 /**
- * bp_follow_add_js()
+ * Enqueues the javascript.
  *
- * Enqueue the javascript so it is output in the <head> of the page. The JS is used to add AJAX
- * functionality like clicking follow buttons and saving a page refresh.
- *
- * @package BP-Follow
- * @global $bp The global BuddyPress settings variable created in bp_core_setup_globals()
+ * The JS is used to add AJAX functionality like clicking follow buttons and saving a page refresh.
  */
 function bp_follow_add_js() {
-	wp_enqueue_script( 'bp-follow-js', str_replace( WP_CONTENT_DIR, WP_CONTENT_URL, dirname( __FILE__ ) . '/_inc/bp-follow.js' ), array( 'jquery' ) );
+	wp_enqueue_script( 'bp-follow-js', plugin_dir_url( __FILE__ ) . '_inc/bp-follow.js', array( 'jquery' ) );
 }
-add_action( 'init', 'bp_follow_add_js' );
+add_action( 'wp_enqueue_scripts', 'bp_follow_add_js' );
 
 /********************************************************************************
  * Notification Functions
  */
 
 /**
- * bp_follow_screen_notification_settings()
- *
  * Adds user configurable notification settings for the component.
  *
- * @package BP-Follow
  * @global $bp The global BuddyPress settings variable created in bp_core_setup_globals()
  */
 function bp_follow_screen_notification_settings() {
-	global $bp; ?>
+?>
 	<table class="notification-settings" id="follow-notification-settings">
 		<tr>
 			<th class="icon"></th>
-			<th class="title"><?php _e( 'Followers/Following', 'buddypress' ) ?></th>
+			<th class="title"><?php _e( 'Followers/Following', 'bp-follow' ) ?></th>
 			<th class="yes"><?php _e( 'Yes', 'buddypress' ) ?></th>
 			<th class="no"><?php _e( 'No', 'buddypress' )?></th>
 		</tr>
 		<tr>
 			<td></td>
-			<td><?php _e( 'A member starts following your activity', 'buddypress' ) ?></td>
-			<td class="yes"><input type="radio" name="notifications[notification_starts_following]" value="yes" <?php if ( !get_usermeta( $bp->loggedin_user->id,'notification_starts_following') || 'yes' == get_usermeta( $bp->loggedin_user->id,'notification_starts_following') ) { ?>checked="checked" <?php } ?>/></td>
-			<td class="no"><input type="radio" name="notifications[notification_starts_following]" value="no" <?php if ( get_usermeta( $bp->loggedin_user->id,'notification_starts_following') == 'no' ) { ?>checked="checked" <?php } ?>/></td>
+			<td><?php _e( 'A member starts following your activity', 'bp-follow' ) ?></td>
+			<td class="yes"><input type="radio" name="notifications[notification_starts_following]" value="yes" <?php if ( !bp_get_user_meta( bp_displayed_user_id(),'notification_starts_following') || 'yes' == bp_get_user_meta( bp_displayed_user_id(),'notification_starts_following') ) { ?>checked="checked" <?php } ?>/></td>
+			<td class="no"><input type="radio" name="notifications[notification_starts_following]" value="no" <?php if ( bp_get_user_meta( bp_displayed_user_id(),'notification_starts_following') == 'no' ) { ?>checked="checked" <?php } ?>/></td>
 		</tr>
 
 		<?php do_action( 'bp_follow_screen_notification_settings' ); ?>
@@ -155,36 +341,52 @@ function bp_follow_screen_notification_settings() {
 add_action( 'bp_notification_settings', 'bp_follow_screen_notification_settings' );
 
 /**
- * bp_follow_format_notifications()
- *
  * Format on screen notifications into something readable by users.
  *
- * @package BP-Follow
  * @global $bp The global BuddyPress settings variable created in bp_core_setup_globals()
  */
-function bp_follow_format_notifications( $action, $item_id, $secondary_item_id, $total_items ) {
+function bp_follow_format_notifications( $action, $item_id, $secondary_item_id, $total_items, $format = 'string' ) {
 	global $bp;
+
+	do_action( 'bp_follow_format_notifications', $action, $item_id, $secondary_item_id, $total_items, $format );
 
 	switch ( $action ) {
 		case 'new_follow':
-			if ( 1 == $total_items )
-				return apply_filters( 'bp_follow_new_followers_notification', '<a href="' . $bp->loggedin_user->domain . $bp->follow->followers->slug . '/?new" title="' . __( 'Your list of followers', 'bp-follow' ) . '">' . __( '1 more user is now following you', 'bp-follow' ) . '</a>', $total_items );
-			else
-				return apply_filters( 'bp_follow_new_followers_notification', '<a href="' . $bp->loggedin_user->domain . $bp->follow->followers->slug . '/?new" title="' . __( 'Your list of followers', 'bp-follow' ) . '">' . sprintf( __( '%d more users are now following you', 'bp-follow' ), $total_items ) . '</a>', $total_items );
+			$link = bp_loggedin_user_domain() . $bp->follow->followers->slug . '/?new';
+
+			if ( 1 == $total_items ) {
+				$text = __( '1 more user is now following you', 'bp-follow' );
+			}
+			else {
+				$text = sprintf( __( '%d more users are now following you', 'bp-follow' ), $total_items );
+			}
+		break;
+
+		default :
+			$link = apply_filters( 'bp_follow_extend_notification_link', false, $action, $item_id, $secondary_item_id, $total_items );
+			$text = apply_filters( 'bp_follow_extend_notification_text', false, $action, $item_id, $secondary_item_id, $total_items );
 		break;
 	}
 
-	do_action( 'bp_follow_format_notifications', $action, $item_id, $secondary_item_id, $total_items );
+	if ( !$link || !$text )
+		return false;
 
-	return false;
+	if ( 'string' == $format ) {
+		return apply_filters( 'bp_follow_new_followers_notification', '<a href="' . $link . '" title="' . __( 'Your list of followers', 'bp-follow' ) . '">' . $text . '</a>', $total_items, $link, $text, $item_id, $secondary_item_id );
+	}
+	else {
+		$array = array(
+			'text' => $text,
+			'link' => $link
+		);
+
+		return apply_filters( 'bp_follow_new_followers_return_notification', $array, $item_id, $secondary_item_id, $total_items );
+	}
 }
 
 /**
- * bp_follow_new_follow_email_notification()
- *
  * Send an email to the leader when someone follows them.
  *
- * @package BP-Follow
  * @uses bp_core_get_user_displayname() Get the display name for a user
  * @uses bp_core_get_user_domain() Get the profile url for a user
  * @uses bp_core_get_core_userdata() Get the core userdata for a user without extra usermeta
@@ -192,28 +394,27 @@ function bp_follow_format_notifications( $action, $item_id, $secondary_item_id, 
  * @global $bp The global BuddyPress settings variable created in bp_core_setup_globals()
  */
 function bp_follow_new_follow_email_notification( $args = '' ) {
-	global $bp;
 
 	$defaults = array(
-		'leader_id' => $bp->displayed_user->id,
-		'follower_id' => $bp->loggedin_user->id
+		'leader_id'   => bp_displayed_user_id(),
+		'follower_id' => bp_loggedin_user_id()
 	);
 
 	$r = wp_parse_args( $args, $defaults );
 	extract( $r, EXTR_SKIP );
 
-	if ( 'no' == get_usermeta( (int)$leader_id, 'notification_starts_following' ) )
+	if ( 'no' == bp_get_user_meta( (int)$leader_id, 'notification_starts_following' ) )
 		return false;
 
 	/* Check to see if this leader has already been notified of this follower before */
-	$has_notified = get_usermeta( $follower_id, 'bp_follow_has_notified' );
+	$has_notified = bp_get_user_meta( $follower_id, 'bp_follow_has_notified' );
 
 	if ( in_array( $leader_id, (array)$has_notified ) )
 		return false;
 
 	/* Not been notified before, update usermeta and continue to mail */
 	$has_notified[] = $leader_id;
-	update_usermeta( $follower_id, 'bp_follow_has_notified', $has_notified );
+	bp_update_user_meta( $follower_id, 'bp_follow_has_notified', $has_notified );
 
 	$follower_name = bp_core_get_user_displayname( $follower_id );
 	$follower_link = bp_core_get_user_domain( $follower_id );
@@ -223,7 +424,7 @@ function bp_follow_new_follow_email_notification( $args = '' ) {
 
 	// Set up and send the message
 	$to = $leader_ud->user_email;
-	$subject = '[' . get_option( 'blogname' ) . '] ' . sprintf( __( '%s is now following you', 'buddypress' ), $follower_name );
+	$subject = '[' . get_option( 'blogname' ) . '] ' . sprintf( __( '%s is now following you', 'bp-follow' ), $follower_name );
 
 	$message = sprintf( __(
 '%s is now following your activity.
@@ -249,11 +450,8 @@ To view %s\'s profile: %s
  */
 
 /**
- * bp_follow_screen_my_followers()
- *
  * Catches any visits to the "Followers (X)" tab on a users profile.
  *
- * @package BP-Follow
  * @uses bp_core_load_template() Loads a template file.
  */
 function bp_follow_screen_my_followers() {
@@ -262,17 +460,14 @@ function bp_follow_screen_my_followers() {
 	do_action( 'bp_follow_screen_my_followers' );
 
 	if ( isset( $_GET['new'] ) )
-		bp_core_delete_notifications_for_user_by_type( $bp->loggedin_user->id, $bp->follow->id, 'new_follow' );
+		bp_core_delete_notifications_for_user_by_type( bp_loggedin_user_id(), $bp->follow->id, 'new_follow' );
 
 	bp_core_load_template( 'members/single/followers' );
 }
 
 /**
- * bp_follow_screen_following()
- *
  * Catches any visits to the "Following (X)" tab on a users profile.
  *
- * @package BP-Follow
  * @uses bp_core_load_template() Loads a template file.
  */
 function bp_follow_screen_following() {
@@ -292,11 +487,8 @@ function bp_follow_screen_activity_following() {
  */
 
 /**
- * bp_follow_action_start()
- *
  * Catches clicks on a "Follow User" button and tries to make that happen.
  *
- * @package BP-Follow
  * @global $bp The global BuddyPress settings variable created in bp_core_setup_globals()
  * @uses check_admin_referer() Checks to make sure the WP security nonce matches.
  * @uses bp_follow_is_following() Checks to see if a user is following another user already.
@@ -308,35 +500,34 @@ function bp_follow_screen_activity_following() {
 function bp_follow_action_start() {
 	global $bp;
 
-	if ( $bp->current_component != $bp->follow->followers->slug || $bp->current_action != 'start' )
+	if ( !bp_is_current_component( $bp->follow->followers->slug ) || !bp_is_current_action( 'start' ) )
 		return false;
 
-	if ( $bp->displayed_user->id == $bp->loggedin_user->id )
+	if ( !bp_is_my_profile() )
 		return false;
 
 	check_admin_referer( 'start_following' );
 
-	if ( bp_follow_is_following( array( 'leader_id' => $bp->displayed_user->id, 'follower_id' => $bp->loggedin_user->id ) ) )
-		bp_core_add_message( sprintf( __( 'You are already following %s.', 'buddypress' ), $bp->displayed_user->fullname ), 'error' );
+	if ( bp_follow_is_following( array( 'leader_id' => bp_displayed_user_id(), 'follower_id' => bp_loggedin_user_id() ) ) )
+		bp_core_add_message( sprintf( __( 'You are already following %s.', 'bp-follow' ), bp_get_displayed_user_fullname() ), 'error' );
 	else {
-		if ( !bp_follow_start_following( array( 'leader_id' => $bp->displayed_user->id, 'follower_id' => $bp->loggedin_user->id ) ) )
-			bp_core_add_message( sprintf( __( 'There was a problem when trying to follow %s, please try again.', 'buddypress' ), $bp->displayed_user->fullname ), 'error' );
+		if ( !bp_follow_start_following( array( 'leader_id' => bp_displayed_user_id(), 'follower_id' => bp_loggedin_user_id() ) ) )
+			bp_core_add_message( sprintf( __( 'There was a problem when trying to follow %s, please try again.', 'bp-follow' ), bp_get_displayed_user_fullname() ), 'error' );
 		else
-			bp_core_add_message( sprintf( __( 'You are now following %s.', 'buddypress' ), $bp->displayed_user->fullname ) );
+			bp_core_add_message( sprintf( __( 'You are now following %s.', 'bp-follow' ), bp_get_displayed_user_fullname() ) );
 	}
 
-	bp_core_redirect( wp_get_referer() );
+	// it's possible that wp_get_referer() returns false, so let's fallback to the displayed user's page
+	$redirect = wp_get_referer() ? wp_get_referer() : bp_displayed_user_domain();
+	bp_core_redirect( $redirect );
 
 	return false;
 }
-add_action( 'wp', 'bp_follow_action_start', 3 );
+add_action( 'bp_actions', 'bp_follow_action_start' );
 
 /**
- * bp_follow_action_stop()
- *
  * Catches clicks on a "Stop Following User" button and tries to make that happen.
  *
- * @package BP-Follow
  * @global $bp The global BuddyPress settings variable created in bp_core_setup_globals()
  * @uses check_admin_referer() Checks to make sure the WP security nonce matches.
  * @uses bp_follow_is_following() Checks to see if a user is following another user already.
@@ -348,35 +539,34 @@ add_action( 'wp', 'bp_follow_action_start', 3 );
 function bp_follow_action_stop() {
 	global $bp;
 
-	if ( $bp->current_component != $bp->follow->followers->slug || $bp->current_action != 'stop' )
+	if ( !bp_is_current_component( $bp->follow->followers->slug ) || !bp_is_current_action( 'stop' ) )
 		return false;
 
-	if ( $bp->displayed_user->id == $bp->loggedin_user->id )
+	if ( !bp_is_my_profile() )
 		return false;
 
 	check_admin_referer( 'stop_following' );
 
-	if ( !bp_follow_is_following( array( 'leader_id' => $bp->displayed_user->id, 'follower_id' => $bp->loggedin_user->id ) ) )
-		bp_core_add_message( sprintf( __( 'You are not following %s.', 'buddypress' ), $bp->displayed_user->fullname ), 'error' );
+	if ( bp_follow_is_following( array( 'leader_id' => bp_displayed_user_id(), 'follower_id' => bp_loggedin_user_id() ) ) )
+		bp_core_add_message( sprintf( __( 'You are not following %s.', 'bp-follow' ), bp_get_displayed_user_fullname() ), 'error' );
 	else {
-		if ( !bp_follow_stop_following( array( 'leader_id' => $bp->displayed_user->id, 'follower_id' => $bp->loggedin_user->id ) ) )
-			bp_core_add_message( sprintf( __( 'There was a problem when trying to stop following %s, please try again.', 'buddypress' ), $bp->displayed_user->fullname ), 'error' );
+		if ( !bp_follow_start_following( array( 'leader_id' => bp_displayed_user_id(), 'follower_id' => bp_loggedin_user_id() ) ) )
+			bp_core_add_message( sprintf( __( 'There was a problem when trying to stop following %s, please try again.', 'bp-follow' ), bp_get_displayed_user_fullname() ), 'error' );
 		else
-			bp_core_add_message( sprintf( __( 'You are no longer following %s.', 'buddypress' ), $bp->displayed_user->fullname ) );
+			bp_core_add_message( sprintf( __( 'You are no longer following %s.', 'bp-follow' ), bp_get_displayed_user_fullname() ) );
 	}
 
-	bp_core_redirect( wp_get_referer() );
+	// it's possible that wp_get_referer() returns false, so let's fallback to the displayed user's page
+	$redirect = wp_get_referer() ? wp_get_referer() : bp_displayed_user_domain();
+	bp_core_redirect( $redirect );
 
 	return false;
 }
-add_action( 'wp', 'bp_follow_action_stop', 3 );
+add_action( 'bp_actions', 'bp_follow_action_stop' );
 
 /**
- * bp_follow_ajax_action_start()
- *
  * Allow a user to start following another user by catching an AJAX request.
  *
- * @package BP-Follow
  * @global $bp The global BuddyPress settings variable created in bp_core_setup_globals()
  * @uses check_admin_referer() Checks to make sure the WP security nonce matches.
  * @uses bp_follow_is_following() Checks to see if a user is following another user already.
@@ -384,29 +574,27 @@ add_action( 'wp', 'bp_follow_action_stop', 3 );
  * @return bool false
  */
 function bp_follow_ajax_action_start() {
-	global $bp;
 
 	check_admin_referer( 'start_following' );
 
-	if ( bp_follow_is_following( array( 'leader_id' => $_POST['uid'], 'follower_id' => $bp->loggedin_user->id ) ) )
-		$message = __( 'Already following', 'buddypress' );
+	if ( bp_follow_is_following( array( 'leader_id' => $_POST['uid'], 'follower_id' => bp_loggedin_user_id() ) ) )
+		$message = __( 'Already following', 'bp-follow' );
 	else {
-		if ( !bp_follow_start_following( array( 'leader_id' => $_POST['uid'], 'follower_id' => $bp->loggedin_user->id ) ) )
-			$message = __( 'Error following user', 'buddypress' );
+		if ( !bp_follow_start_following( array( 'leader_id' => $_POST['uid'], 'follower_id' => bp_loggedin_user_id() ) ) )
+			$message = __( 'Error following user', 'bp-follow' );
 		else
-			$message = __( 'You are now following', 'buddypress' );
+			$message = __( 'You are now following', 'bp-follow' );
 	}
 
 	echo $message;
+
+	exit();
 }
 add_action( 'wp_ajax_bp_follow', 'bp_follow_ajax_action_start' );
 
 /**
- * bp_follow_ajax_action_stop()
- *
  * Allow a user to stop following another user by catching an AJAX request.
  *
- * @package BP-Follow
  * @global $bp The global BuddyPress settings variable created in bp_core_setup_globals()
  * @uses check_admin_referer() Checks to make sure the WP security nonce matches.
  * @uses bp_follow_is_following() Checks to see if a user is following another user already.
@@ -414,20 +602,21 @@ add_action( 'wp_ajax_bp_follow', 'bp_follow_ajax_action_start' );
  * @return bool false
  */
 function bp_follow_ajax_action_stop() {
-	global $bp;
 
 	check_admin_referer( 'stop_following' );
 
-	if ( !bp_follow_is_following( array( 'leader_id' => $_POST['uid'], 'follower_id' => $bp->loggedin_user->id ) ) )
-		$message = __( 'Not following', 'buddypress' );
+	if ( !bp_follow_is_following( array( 'leader_id' => $_POST['uid'], 'follower_id' => bp_loggedin_user_id() ) ) )
+		$message = __( 'Not following', 'bp-follow' );
 	else {
-		if ( !bp_follow_stop_following( array( 'leader_id' => $_POST['uid'], 'follower_id' => $bp->loggedin_user->id ) ) )
-			$message = __( 'Error unfollowing user', 'buddypress' );
+		if ( !bp_follow_stop_following( array( 'leader_id' => $_POST['uid'], 'follower_id' => bp_loggedin_user_id() ) ) )
+			$message = __( 'Error unfollowing user', 'bp-follow' );
 		else
-			$message = __( 'Stopped following', 'buddypress' );
+			$message = __( 'Stopped following', 'bp-follow' );
 	}
 
 	echo $message;
+	
+	exit();
 }
 add_action( 'wp_ajax_bp_unfollow', 'bp_follow_ajax_action_stop' );
 
@@ -437,11 +626,8 @@ add_action( 'wp_ajax_bp_unfollow', 'bp_follow_ajax_action_stop' );
  */
 
 /**
- * bp_follow_start_following()
- *
  * Start following a user's activity
  *
- * @package BP-Follow
  * @global $bp The global BuddyPress settings variable created in bp_core_setup_globals()
  * @uses wp_parse_args() Parses arguments from an array or request string.
  * @param $args/leader_id - user ID of user to follow
@@ -452,8 +638,8 @@ function bp_follow_start_following( $args = '' ) {
 	global $bp;
 
 	$defaults = array(
-		'leader_id' => $bp->displayed_user->id,
-		'follower_id' => $bp->loggedin_user->id
+		'leader_id'   => bp_displayed_user_id(),
+		'follower_id' => bp_loggedin_user_id()
 	);
 
 	$r = wp_parse_args( $args, $defaults );
@@ -472,17 +658,14 @@ function bp_follow_start_following( $args = '' ) {
 	/* Add a more specific email notification */
 	bp_follow_new_follow_email_notification( array( 'leader_id' => $leader_id, 'follower_id' => $follower_id ) );
 
-	do_action( 'bp_follow_start_following', &$follow );
+	do_action_ref_array( 'bp_follow_start_following', &$follow );
 
 	return true;
 }
 
 /**
- * bp_follow_stop_following()
- *
  * Stop following a user's activity
  *
- * @package BP-Follow
  * @global $bp The global BuddyPress settings variable created in bp_core_setup_globals()
  * @uses wp_parse_args() Parses arguments from an array or request string.
  * @param $args/leader_id - user ID of user to stop following
@@ -490,11 +673,10 @@ function bp_follow_start_following( $args = '' ) {
  * @return bool
  */
 function bp_follow_stop_following( $args = '' ) {
-	global $bp;
 
 	$defaults = array(
-		'leader_id' => $bp->displayed_user->id,
-		'follower_id' => $bp->loggedin_user->id
+		'leader_id'   => bp_displayed_user_id(),
+		'follower_id' => bp_loggedin_user_id()
 	);
 
 	$r = wp_parse_args( $args, $defaults );
@@ -505,17 +687,14 @@ function bp_follow_stop_following( $args = '' ) {
 	if ( !$follow->delete() )
 		return false;
 
-	do_action( 'bp_follow_stop_following', &$follow );
+	do_action_ref_array( 'bp_follow_stop_following', &$follow );
 
 	return true;
 }
 
 /**
- * bp_follow_is_following()
- *
  * Check if a user is already following another user.
  *
- * @package BP-Follow
  * @global $bp The global BuddyPress settings variable created in bp_core_setup_globals()
  * @uses wp_parse_args() Parses arguments from an array or request string.
  * @param $args/leader_id - user ID of user to check is being followed
@@ -523,11 +702,10 @@ function bp_follow_stop_following( $args = '' ) {
  * @return bool
  */
 function bp_follow_is_following( $args = '' ) {
-	global $bp;
 
 	$defaults = array(
-		'leader_id' => $bp->displayed_user->id,
-		'follower_id' => $bp->loggedin_user->id
+		'leader_id'   => bp_displayed_user_id(),
+		'follower_id' => bp_loggedin_user_id()
 	);
 
 	$r = wp_parse_args( $args, $defaults );
@@ -538,21 +716,17 @@ function bp_follow_is_following( $args = '' ) {
 }
 
 /**
- * bp_follow_get_followers()
- *
  * Fetch the user_ids of all the followers of a particular user.
  *
- * @package BP-Follow
  * @global $bp The global BuddyPress settings variable created in bp_core_setup_globals()
  * @uses wp_parse_args() Parses arguments from an array or request string.
  * @param $args/user_id - the user ID of the user to get followers for.
  * @return array of user ids
  */
 function bp_follow_get_followers( $args = '' ) {
-	global $bp;
 
 	$defaults = array(
-		'user_id' => $bp->displayed_user->id
+		'user_id' => bp_displayed_user_id()
 	);
 
 	$r = wp_parse_args( $args, $defaults );
@@ -562,21 +736,17 @@ function bp_follow_get_followers( $args = '' ) {
 }
 
 /**
- * bp_follow_get_following()
- *
  * Fetch the user_ids of all the users a particular user is following.
  *
- * @package BP-Follow
  * @global $bp The global BuddyPress settings variable created in bp_core_setup_globals()
  * @uses wp_parse_args() Parses arguments from an array or request string.
  * @param $args/user_id - the user ID of the user to get a list of users followed for.
  * @return array of user ids
  */
 function bp_follow_get_following( $args = '' ) {
-	global $bp;
 
 	$defaults = array(
-		'user_id' => $bp->displayed_user->id
+		'user_id' => bp_displayed_user_id()
 	);
 
 	$r = wp_parse_args( $args, $defaults );
@@ -586,21 +756,17 @@ function bp_follow_get_following( $args = '' ) {
 }
 
 /**
- * bp_follow_total_follow_counts()
- *
  * Get the total followers and total following counts for a user.
  *
- * @package BP-Follow
  * @global $bp The global BuddyPress settings variable created in bp_core_setup_globals()
  * @uses wp_parse_args() Parses arguments from an array or request string.
  * @param $args/user_id - the user ID of the user to get counts for.
  * @return array [ followers => int, following => int ]
  */
 function bp_follow_total_follow_counts( $args = '' ) {
-	global $bp;
 
 	$defaults = array(
-		'user_id' => $bp->loggedin_user->id
+		'user_id' => bp_loggedin_user_id()
 	);
 
 	$r = wp_parse_args( $args, $defaults );
@@ -609,5 +775,25 @@ function bp_follow_total_follow_counts( $args = '' ) {
 	return apply_filters( 'bp_follow_total_follow_counts', BP_Follow::get_counts( $user_id ) );
 }
 
+/**
+ * Removes follow relationships for all users from a user who is deleted or spammed
+ *
+ * @uses BP_Follow::delete_all_for_user() Deletes user ID from all following / follower records
+ */
+function bp_follow_remove_data( $user_id ) {
+	global $bp;
+
+	do_action( 'bp_follow_before_remove_data', $user_id );
+
+	BP_Follow::delete_all_for_user( $user_id );
+
+	// Remove following notifications from user
+	bp_core_delete_notifications_from_user( $user_id, $bp->follow->id, 'new_follow' );
+
+	do_action( 'bp_follow_remove_data', $user_id );
+}
+add_action( 'wpmu_delete_user',	'bp_follow_remove_data' );
+add_action( 'delete_user',	'bp_follow_remove_data' );
+add_action( 'make_spam_user',	'bp_follow_remove_data' );
 
 ?>

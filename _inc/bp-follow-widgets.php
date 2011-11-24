@@ -1,18 +1,32 @@
 <?php
+/**
+ * BP Follow Wodgets
+ *
+ * @package BP-Follow
+ * @subpackage Widgets
+ */
+
+// Exit if accessed directly
+if ( !defined( 'ABSPATH' ) ) exit;
+
+/**
+ * Add a "Users I'm following" widget for the logged-in user
+ *
+ * @subpackage Widgets
+ */
 class BP_Follow_Following_Widget extends WP_Widget {
 	function bp_follow_following_widget() {
-		parent::WP_Widget( false, $name = __( "Users I'm Following Avatars", 'bp-follow' ) );
+		parent::WP_Widget( false, $name = __( "Users I'm Following", 'bp-follow' ) );
 	}
 
 	function widget( $args, $instance ) {
-		global $bp;
 
-	    extract( $args );
+		extract( $args );
 
 		if ( empty( $instance['max_users'] ) )
 			$instance['max_users'] = 25;
 
-		if ( !$following = bp_get_following_ids( array( 'user_id' => $bp->loggedin_user->id ) ) )
+		if ( !$following = bp_get_following_ids( array( 'user_id' => bp_loggedin_user_id() ) ) )
 			return false;
 
 		if ( bp_has_members( 'include=' . $following . '&max=' . $instance['max_users'] ) ) {

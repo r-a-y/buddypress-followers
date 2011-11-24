@@ -1,9 +1,9 @@
 === BuddyPress Followers ===
-Contributors: apeatling
+Contributors: apeatling, r-a-y
 Tags: buddypress, following, followers, connections
-Requires at least: 2.9.1 / 1.2.4
-Tested up to: 3.0 / 1.2.4.1
-Stable Tag: 1.0
+Requires at least: WP 3.0 / BP 1.2.6
+Tested up to: WP 3.2.1 / BP 1.5.1
+Stable Tag: 1.1
 
 == Description ==
 
@@ -13,11 +13,29 @@ The plugin integrates seamlessly with your site, adding a new activity stream ta
 
 == Installation ==
 
- 1. Copy buddypress-followers to /wp-content/plugins/
- 2. In the Wordpress Admin panel, visit the plugins page and Activate the plugin.
- 3. To follow a user, visit their profile and hit the follow button under their name.
+1. Download, install and activate the plugin.
+1. To follow a user, simply visit their profile and hit the follow button under their name.
+
+== Frequently Asked Questions ==
+
+#### Where to find support? ####
+
+Please post on the [BuddyPress Followers support forum](http://buddypress.org/community/groups/buddypress-followers/forum/) at buddypress.org.
+The forums on wordpress.org are rarely checked.
 
 == Changelog ==
+
+= 1.1 =
+* Add BuddyPress 1.5 compatibility.
+* Add WP Admin Bar support.
+* Add localization support.
+* Add AJAX functionality to all follow buttons.
+* Add follow button to group members page.
+* Fix following count when a user is deleted.
+* Fix dropdown activity filter for following tabs.
+* Fix member profile following pagination
+* Fix BuddyBar issues when a logged-in user is on another member's page.
+* Thanks to mrjarbenne for sponsoring this release.
 
 = 1.0 =
 * Initial release.
