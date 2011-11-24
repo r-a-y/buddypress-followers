@@ -3,7 +3,7 @@ Contributors: apeatling, r-a-y
 Tags: buddypress, following, followers, connections
 Requires at least: WP 3.0 / BP 1.2.6
 Tested up to: WP 3.2.1 / BP 1.5.1
-Stable Tag: 1.1
+Stable tag: 1.1
 
 == Description ==
 
