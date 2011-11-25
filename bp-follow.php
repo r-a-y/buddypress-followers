@@ -70,63 +70,59 @@ function bp_follow_setup_nav() {
 	$user_id = bp_is_user() ? bp_displayed_user_id() : bp_loggedin_user_id();
 	$counts  = bp_follow_total_follow_counts( array( 'user_id' => $user_id ) );
 
-	if ( !empty( $counts['following'] ) ) {
-		bp_core_new_nav_item( array(
-			'name'                => sprintf( __( 'Following <span>%d</span>', 'bp-follow' ), $counts['following'] ), 
-			'slug'                => $bp->follow->following->slug, 
-			'position'            => apply_filters( 'bp_follow_following_nav_position', 61 ), 
-			'screen_function'     => 'bp_follow_screen_following', 
-			'default_subnav_slug' => 'following', 
-			'item_css_id'         => 'following' 
-		) );
+	bp_core_new_nav_item( array(
+		'name'                => sprintf( __( 'Following <span>%d</span>', 'bp-follow' ), $counts['following'] ), 
+		'slug'                => $bp->follow->following->slug, 
+		'position'            => apply_filters( 'bp_follow_following_nav_position', 61 ), 
+		'screen_function'     => 'bp_follow_screen_following', 
+		'default_subnav_slug' => 'following', 
+		'item_css_id'         => 'following' 
+	) );
 
-		bp_core_new_subnav_item( array( 
-			'name'                => __( 'Following', 'bp-follow' ), 
-			'slug'                => 'following', 
-			'parent_url'          => trailingslashit( bp_loggedin_user_domain() . $bp->follow->following->slug ),
-			'parent_slug'         => $bp->follow->following->slug, 
-			'screen_function'     => 'bp_follow_screen_following', 
-			'position'            => 10, 
-			'item_css_id'         => 'following' 
-		) );
-	}
+	bp_core_new_subnav_item( array( 
+		'name'                => __( 'Following', 'bp-follow' ), 
+		'slug'                => 'following', 
+		'parent_url'          => trailingslashit( bp_loggedin_user_domain() . $bp->follow->following->slug ),
+		'parent_slug'         => $bp->follow->following->slug, 
+		'screen_function'     => 'bp_follow_screen_following', 
+		'position'            => 10, 
+		'item_css_id'         => 'following' 
+	) );
 
-	if ( !empty( $counts['followers'] ) ) {
-		bp_core_new_nav_item( array( 
-			'name'                => sprintf( __( 'Followers <span>%d</span>', 'bp-follow' ), $counts['followers'] ), 
-			'slug'                => $bp->follow->followers->slug, 
-			'position'            => apply_filters( 'bp_follow_followers_nav_position', 62 ), 
-			'screen_function'     => 'bp_follow_screen_my_followers', 
-			'default_subnav_slug' => 'followers', 
-			'item_css_id'         => 'followers' 
-		) );
+	bp_core_new_nav_item( array( 
+		'name'                => sprintf( __( 'Followers <span>%d</span>', 'bp-follow' ), $counts['followers'] ), 
+		'slug'                => $bp->follow->followers->slug, 
+		'position'            => apply_filters( 'bp_follow_followers_nav_position', 62 ), 
+		'screen_function'     => 'bp_follow_screen_my_followers', 
+		'default_subnav_slug' => 'followers', 
+		'item_css_id'         => 'followers' 
+	) );
 
-		bp_core_new_subnav_item( array( 
-			'name'                => __( 'Followers', 'bp-follow' ), 
-			'slug'                => 'followers', 
-			'parent_url'          => trailingslashit( bp_loggedin_user_domain() . $bp->follow->followers->slug ),
-			'parent_slug'         => $bp->follow->followers->slug, 
-			'screen_function'     => 'bp_follow_screen_my_followers', 
-			'position'            => 10, 
-			'item_css_id'         => 'followers' 
-		) );
-	}
+	bp_core_new_subnav_item( array( 
+		'name'                => __( 'Followers', 'bp-follow' ), 
+		'slug'                => 'followers', 
+		'parent_url'          => trailingslashit( bp_loggedin_user_domain() . $bp->follow->followers->slug ),
+		'parent_slug'         => $bp->follow->followers->slug, 
+		'screen_function'     => 'bp_follow_screen_my_followers', 
+		'position'            => 10, 
+		'item_css_id'         => 'followers' 
+	) );
 
 	// Add activity sub nav item
-	if ( bp_is_active( 'activity' ) && !empty( $counts['following'] ) ) {
+	if ( bp_is_active( 'activity' ) && apply_filters( 'bp_follow_show_activity_subnav_if_empty', true && !empty( $counts['following'] ) ) ) {
 
 		// Need to change the user domain, so if we're not on a member page,
 		// the BuddyBar renders the activity subnav properly
 		$user_domain = bp_is_user() ? bp_displayed_user_domain() : bp_loggedin_user_domain();
 
 		bp_core_new_subnav_item( array( 
-			'name'                => __( 'Following', 'bp-follow' ), 
-			'slug'                => BP_FOLLOWING_SLUG, 
-			'parent_url'          => trailingslashit( $user_domain . $bp->activity->slug ), 
-			'parent_slug'         => $bp->activity->slug, 
-			'screen_function'     => 'bp_follow_screen_activity_following', 
-			'position'            => 21, 
-			'item_css_id'         => 'activity-following' 
+			'name'            => __( 'Following', 'bp-follow' ), 
+			'slug'            => BP_FOLLOWING_SLUG, 
+			'parent_url'      => trailingslashit( $user_domain . $bp->activity->slug ), 
+			'parent_slug'     => $bp->activity->slug, 
+			'screen_function' => 'bp_follow_screen_activity_following', 
+			'position'        => 21, 
+			'item_css_id'     => 'activity-following' 
 		) );
 	}
 
@@ -164,51 +160,38 @@ function bp_follow_group_buddybar_items() {
 	unset( $bp->bp_options_nav['following'] );
 	unset( $bp->bp_options_nav['followers'] );
 
-	$counts = bp_follow_total_follow_counts( array( 'user_id' => bp_loggedin_user_id() ) );
-
-	if ( empty( $counts ) )
-		return;
-
 	// Add the "Follow" nav menu
-	if ( !empty( $counts['followers'] ) || !empty( $counts['following'] ) ) {
-		$default_subnav = !empty( $counts['following'] ) ? $bp->follow->following->slug : $bp->follow->followers->slug;
-
-		$bp->bp_nav[$following_position] = array(
-			'name'   => __( 'Follow', 'bp-follow' ),
-			'link'   => trailingslashit( bp_loggedin_user_domain() . $default_subnav ),
-			'slug'   => 'follow',
-			'css_id' => 'follow',
-			'position' => $following_position,
-			'show_for_displayed_user' => 1,
-			'screen_function' => 'bp_follow_screen_my_followers'
-		);
-	}
+	$bp->bp_nav[$following_position] = array(
+		'name'                    => __( 'Follow', 'bp-follow' ),
+		'link'                    => trailingslashit( bp_loggedin_user_domain() . $bp->follow->following->slug ),
+		'slug'                    => 'follow',
+		'css_id'                  => 'follow',
+		'position'                => $following_position,
+		'show_for_displayed_user' => 1,
+		'screen_function'         => 'bp_follow_screen_my_followers'
+	);
 
 	// "Following" subnav item
-	if ( !empty( $counts['following'] ) ) {
-		$bp->bp_options_nav['follow'][10] = array(
-			'name'   => __( "Users I'm following", 'bp-follow' ),
-			'link'   => trailingslashit( bp_loggedin_user_domain() . $bp->follow->following->slug ),
-			'slug'   => $bp->follow->following->slug,
-			'css_id' => 'following',
-			'position' => 10,
-			'user_has_access' => 1,
-			'screen_function' => 'bp_follow_screen_my_followers'
-		);
-	}
+	$bp->bp_options_nav['follow'][10] = array(
+		'name'            => __( 'Following', 'bp-follow' ),
+		'link'            => trailingslashit( bp_loggedin_user_domain() . $bp->follow->following->slug ),
+		'slug'            => $bp->follow->following->slug,
+		'css_id'          => 'following',
+		'position'        => 10,
+		'user_has_access' => 1,
+		'screen_function' => 'bp_follow_screen_my_followers'
+	);
 
 	// "Followers" subnav item
-	if ( !empty( $counts['followers'] ) ) {
-		$bp->bp_options_nav['follow'][20] = array(
-			'name'   => __( 'Users following me', 'bp-follow' ),
-			'link'   => trailingslashit( bp_loggedin_user_domain() . $bp->follow->followers->slug ),
-			'slug'   => $bp->follow->followers->slug,
-			'css_id' => 'followers',
-			'position' => 20,
-			'user_has_access' => 1,
-			'screen_function' => 'bp_follow_screen_my_followers'
-		);
-	}
+	$bp->bp_options_nav['follow'][20] = array(
+		'name'            => __( 'Followers', 'bp-follow' ),
+		'link'            => trailingslashit( bp_loggedin_user_domain() . $bp->follow->followers->slug ),
+		'slug'            => $bp->follow->followers->slug,
+		'css_id'          => 'followers',
+		'position'        => 20,
+		'user_has_access' => 1,
+		'screen_function' => 'bp_follow_screen_my_followers'
+	);
 
 	// Resort the nav items to account for the late change made above
 	ksort( $bp->bp_nav );
@@ -235,34 +218,26 @@ function bp_follow_setup_admin_bar() {
 		$counts = bp_follow_total_follow_counts( array( 'user_id' => bp_loggedin_user_id() ) );
 
 		// Add the "Follow" nav menu
-		if ( !empty( $counts['followers'] ) || !empty( $counts['following'] ) ) {
-			$default_subnav = !empty( $counts['followers'] ) ? $bp->follow->followers->slug : $bp->follow->following->slug;
-
-			$wp_admin_nav[] = array(
-				'parent' => $bp->my_account_menu_id,
-				'id'     => 'my-account-' . $bp->follow->id,
-				'title'  => __( 'Follow', 'bp-follow' ),
-				'href'   => trailingslashit( bp_loggedin_user_domain() . $default_subnav )
-			);
-		}
+		$wp_admin_nav[] = array(
+			'parent' => $bp->my_account_menu_id,
+			'id'     => 'my-account-' . $bp->follow->id,
+			'title'  => __( 'Follow', 'bp-follow' ),
+			'href'   => trailingslashit( bp_loggedin_user_domain() . $bp->follow->following->slug )
+		);
 
 		// "Following" subnav item
-		if ( !empty( $counts['following'] ) ) {
-			$wp_admin_nav[] = array(
-				'parent' => 'my-account-' . $bp->follow->id,
-				'title'  => __( "Users I'm following", 'bp-follow' ),
-				'href'   => trailingslashit( bp_loggedin_user_domain() . $bp->follow->following->slug )
-			);
-		}
+		$wp_admin_nav[] = array(
+			'parent' => 'my-account-' . $bp->follow->id,
+			'title'  => sprintf( __( 'Following <span class="count">%d</span>', 'bp-follow' ), $counts['following'] ),
+			'href'   => trailingslashit( bp_loggedin_user_domain() . $bp->follow->following->slug )
+		);
 
 		// "Followers" subnav item
-		if ( !empty( $counts['followers'] ) ) {
-			$wp_admin_nav[] = array(
-				'parent' => 'my-account-' . $bp->follow->id,
-				'title'  => __( 'Users following me', 'bp-follow' ),
-				'href'   => trailingslashit( bp_loggedin_user_domain() . $bp->follow->followers->slug )
-			);
-		}
+		$wp_admin_nav[] = array(
+			'parent' => 'my-account-' . $bp->follow->id,
+			'title'  => sprintf( __( 'Followers <span class="count">%d</span>', 'bp-follow' ), $counts['followers'] ),
+			'href'   => trailingslashit( bp_loggedin_user_domain() . $bp->follow->followers->slug )
+		);
 
 		foreach( $wp_admin_nav as $admin_menu )
 			$wp_admin_bar->add_menu( $admin_menu );
@@ -503,7 +478,7 @@ function bp_follow_action_start() {
 	if ( !bp_is_current_component( $bp->follow->followers->slug ) || !bp_is_current_action( 'start' ) )
 		return false;
 
-	if ( !bp_is_my_profile() )
+	if ( bp_displayed_user_id() == bp_loggedin_user_id() )
 		return false;
 
 	check_admin_referer( 'start_following' );
@@ -542,15 +517,15 @@ function bp_follow_action_stop() {
 	if ( !bp_is_current_component( $bp->follow->followers->slug ) || !bp_is_current_action( 'stop' ) )
 		return false;
 
-	if ( !bp_is_my_profile() )
+	if ( bp_displayed_user_id() == bp_loggedin_user_id() )
 		return false;
 
 	check_admin_referer( 'stop_following' );
 
-	if ( bp_follow_is_following( array( 'leader_id' => bp_displayed_user_id(), 'follower_id' => bp_loggedin_user_id() ) ) )
+	if ( !bp_follow_is_following( array( 'leader_id' => bp_displayed_user_id(), 'follower_id' => bp_loggedin_user_id() ) ) )
 		bp_core_add_message( sprintf( __( 'You are not following %s.', 'bp-follow' ), bp_get_displayed_user_fullname() ), 'error' );
 	else {
-		if ( !bp_follow_start_following( array( 'leader_id' => bp_displayed_user_id(), 'follower_id' => bp_loggedin_user_id() ) ) )
+		if ( !bp_follow_stop_following( array( 'leader_id' => bp_displayed_user_id(), 'follower_id' => bp_loggedin_user_id() ) ) )
 			bp_core_add_message( sprintf( __( 'There was a problem when trying to stop following %s, please try again.', 'bp-follow' ), bp_get_displayed_user_fullname() ), 'error' );
 		else
 			bp_core_add_message( sprintf( __( 'You are no longer following %s.', 'bp-follow' ), bp_get_displayed_user_fullname() ) );

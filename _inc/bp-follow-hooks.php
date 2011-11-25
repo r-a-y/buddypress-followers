@@ -186,7 +186,13 @@ function bp_follow_add_activity_scope_filter( $qs, $object, $filter, $scope, $pa
 		return $qs;
 
 	$user_id = bp_displayed_user_id() ? bp_displayed_user_id() : bp_loggedin_user_id();
-	$qs .= '&user_id=' . bp_get_following_ids( array( 'user_id' => $user_id ) );
+
+	$following_ids = bp_get_following_ids( array( 'user_id' => $user_id ) );
+	
+	// if $following_ids is empty, pass a negative number so no activity can be found
+	$following_ids = empty( $following_ids ) ? -1 : $following_ids;
+
+	$qs .= '&user_id=' . $following_ids;
 
 	return apply_filters( 'bp_follow_add_activity_scope_filter', $qs );
 }
