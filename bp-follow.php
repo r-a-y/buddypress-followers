@@ -381,13 +381,13 @@ function bp_follow_new_follow_email_notification( $args = '' ) {
 	if ( 'no' == bp_get_user_meta( (int)$leader_id, 'notification_starts_following' ) )
 		return false;
 
-	/* Check to see if this leader has already been notified of this follower before */
-	$has_notified = bp_get_user_meta( $follower_id, 'bp_follow_has_notified' );
+	// Check to see if this leader has already been notified of this follower before
+	$has_notified = bp_get_user_meta( $follower_id, 'bp_follow_has_notified', true );
 
 	if ( in_array( $leader_id, (array)$has_notified ) )
 		return false;
 
-	/* Not been notified before, update usermeta and continue to mail */
+	// Not been notified before, update usermeta and continue to mail
 	$has_notified[] = $leader_id;
 	bp_update_user_meta( $follower_id, 'bp_follow_has_notified', $has_notified );
 
