@@ -42,7 +42,7 @@ class BP_Follow {
 		$this->leader_id = apply_filters( 'bp_follow_leader_id_before_save', $this->leader_id, $this->id );
 		$this->follower_id = apply_filters( 'bp_follow_follower_id_before_save', $this->follower_id, $this->id );
 
-		do_action_ref_array( 'bp_follow_before_save', &$this );
+		do_action_ref_array( 'bp_follow_before_save', array( &$this ) );
 
 		if ( $this->id )
 			$result = $wpdb->query( $wpdb->prepare( "UPDATE {$bp->follow->table_name} SET leader_id = %d, follower_id = %d WHERE id = %d", $this->leader_id, $this->follower_id, $this->id ) );
@@ -52,7 +52,7 @@ class BP_Follow {
 			$this->id = $wpdb->insert_id;
 		}
 
-		do_action_ref_array( 'bp_follow_after_save', &$this );
+		do_action_ref_array( 'bp_follow_after_save', array( &$this ) );
 
 		return $result;
 	}

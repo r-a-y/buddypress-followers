@@ -109,7 +109,7 @@ function bp_follow_setup_nav() {
 	) );
 
 	// Add activity sub nav item
-	if ( bp_is_active( 'activity' ) && apply_filters( 'bp_follow_show_activity_subnav_if_empty', true && !empty( $counts['following'] ) ) ) {
+	if ( bp_is_active( 'activity' ) && apply_filters( 'bp_follow_show_activity_subnav_if_empty', true || !empty( $counts['following'] ) ) ) {
 
 		// Need to change the user domain, so if we're not on a member page,
 		// the BuddyBar renders the activity subnav properly
@@ -435,7 +435,7 @@ function bp_follow_screen_my_followers() {
 	do_action( 'bp_follow_screen_my_followers' );
 
 	if ( isset( $_GET['new'] ) )
-		bp_core_delete_notifications_for_user_by_type( bp_loggedin_user_id(), $bp->follow->id, 'new_follow' );
+		bp_core_delete_notifications_by_type( bp_loggedin_user_id(), $bp->follow->id, 'new_follow' );
 
 	bp_core_load_template( 'members/single/followers' );
 }
@@ -633,7 +633,7 @@ function bp_follow_start_following( $args = '' ) {
 	/* Add a more specific email notification */
 	bp_follow_new_follow_email_notification( array( 'leader_id' => $leader_id, 'follower_id' => $follower_id ) );
 
-	do_action_ref_array( 'bp_follow_start_following', &$follow );
+	do_action_ref_array( 'bp_follow_start_following', array( &$follow ) );
 
 	return true;
 }
@@ -662,7 +662,7 @@ function bp_follow_stop_following( $args = '' ) {
 	if ( !$follow->delete() )
 		return false;
 
-	do_action_ref_array( 'bp_follow_stop_following', &$follow );
+	do_action_ref_array( 'bp_follow_stop_following', array( &$follow ) );
 
 	return true;
 }

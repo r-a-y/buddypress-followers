@@ -10,18 +10,28 @@
 if ( !defined( 'ABSPATH' ) ) exit;
 
 /**
- * bp_follower_ids() [echo] / bp_get_follower_ids() [return]
+ * Output a comma-separated list of user_ids for a given user's followers. 
  *
- * Fetch a comma separated list of user_ids for the users follow a user. This
- * can then be passed directly into the members loop querystring.
- *
+ * @param mixed $args Arguments can be passed as an associative array or as a URL argument string
  * @global $bp The global BuddyPress settings variable created in bp_core_setup_globals()
- * @param $args/user_id - The user ID to fetch a followers list for.
- * @uses bp_follow_get_followers() Return an array of user_ids for the followers of a user.
+ * @uses bp_get_follower_ids() Returns comma-seperated string of user IDs on success. Integer zero on failure.
  */
-function bp_follower_ids() {
-	echo bp_get_follower_ids();
+function bp_follower_ids( $args = '' ) {
+	echo bp_get_follower_ids( $args );
 }
+	/**
+	 * Returns a comma separated list of user_ids for a given user's followers.
+	 *
+	 * This can then be passed directly into the members loop querystring.
+	 * On failure, returns an integer of zero. Needed when used in a members loop to prevent SQL errors.
+	 *
+	 * Arguments include:
+	 * 	'user_id' - The user ID you want to check for followers
+	 *
+	 * @param mixed $args Arguments can be passed as an associative array or as a URL argument string
+	 * @global $bp The global BuddyPress settings variable created in bp_core_setup_globals()
+	 * @return Mixed Comma-seperated string of user IDs on success. Integer zero on failure.
+	 */
 	function bp_get_follower_ids( $args = '' ) {
 
 		$defaults = array(
@@ -39,18 +49,28 @@ function bp_follower_ids() {
 	}
 
 /**
- * bp_following_ids() [echo] / bp_get_following_ids() [return]
+ * Output a comma-separated list of user_ids for a given user's following. 
  *
- * Fetch a comma separated list of user_ids for the users that a user is following. This
- * can then be passed directly into the members loop querystring.
- *
+ * @param mixed $args Arguments can be passed as an associative array or as a URL argument string
  * @global $bp The global BuddyPress settings variable created in bp_core_setup_globals()
- * @param $args/user_id - The user ID to fetch a following list for.
- * @uses bp_follow_get_following() Return an array of user_ids for the users a user is following.
+ * @uses bp_get_following_ids() Returns comma-seperated string of user IDs on success. Integer zero on failure.
  */
-function bp_following_ids() {
-	echo bp_get_following_ids();
+function bp_following_ids( $args = '' ) {
+	echo bp_get_following_ids( $args );
 }
+	/**
+	 * Returns a comma separated list of user_ids for a given user's following.
+	 *
+	 * This can then be passed directly into the members loop querystring.
+	 * On failure, returns an integer of zero. Needed when used in a members loop to prevent SQL errors.
+	 *
+	 * Arguments include:
+	 * 	'user_id' - The user ID you want to check for a following
+	 *
+	 * @param mixed $args Arguments can be passed as an associative array or as a URL argument string
+	 * @global $bp The global BuddyPress settings variable created in bp_core_setup_globals()
+	 * @return Mixed Comma-seperated string of user IDs on success. Integer zero on failure.
+	 */
 	function bp_get_following_ids( $args = '' ) {
 
 		$defaults = array(
@@ -70,8 +90,7 @@ function bp_following_ids() {
 /**
  * Output a follow / unfollow button for a given user depending on the follower status.
  *
- * @param int $leader_id The user you want to follow
- * @param int $follower_id The user who is initiating the follow request
+ * @param mixed $args Arguments can be passed as an associative array or as a URL argument string. See bp_follow_get_add_follow_button() for full arguments.
  * @uses bp_follow_get_add_follow_button() Returns the follow / unfollow button
  * @author r-a-y
  * @since 1.1
@@ -82,11 +101,14 @@ function bp_follow_add_follow_button( $args = '' ) {
 	/**
 	 * Returns a follow / unfollow button for a given user depending on the follower status.
 	 *
-	 * Checks to see if the follower is already following the leader.  If following, returns
+	 * Checks to see if the follower is already following the leader.  If is following, returns
 	 * "Stop following" button; if not following, returns "Follow" button.
 	 *
-	 * @param int $leader_id The user you want to follow
-	 * @param int $follower_id The user who is initiating the follow request
+	 * Arguments include:
+	 * 	'leader_id'   - The user you want to follow
+	 * 	'follower_id' - The user who is initiating the follow request
+	 *
+	 * @param mixed $args Arguments can be passed as an associative array or as a URL argument string
 	 * @return mixed String of the button on success.  Boolean false on failure.
 	 * @uses bp_get_button() Renders a button using the BP Button API
 	 * @author r-a-y
@@ -116,7 +138,7 @@ function bp_follow_add_follow_button( $args = '' ) {
 		}
 
 		// if the logged-in user is the leader, use already-queried variables
-		if ( !bp_loggedin_user_id() && $leader_id == bp_loggedin_user_id() ) {
+		if ( bp_loggedin_user_id() && $leader_id == bp_loggedin_user_id() ) {
 			$leader_domain   = bp_loggedin_user_domain();
 			$leader_fullname = bp_get_loggedin_user_fullname();
 		}
@@ -131,13 +153,13 @@ function bp_follow_add_follow_button( $args = '' ) {
 			$id        = 'following';
 			$action    = 'stop';
 			$class     = 'unfollow';
-			$link_text = $link_title = sprintf( __( 'Stop Following %s', 'bp-follow' ), bp_get_user_firstname( $leader_fullname ) );
+			$link_text = $link_title = sprintf( __( 'Stop Following %s', 'bp-follow' ), apply_filters( 'bp_follow_leader_name', bp_get_user_firstname( $leader_fullname ), $leader_id ) );
 		}
 		else {
 			$id        = 'not-following';
 			$action    = 'start';
 			$class     = 'follow';
-			$link_text = $link_title = sprintf( __( 'Follow %s', 'bp-follow' ), bp_get_user_firstname( $leader_fullname ) );
+			$link_text = $link_title = sprintf( __( 'Follow %s', 'bp-follow' ), apply_filters( 'bp_follow_leader_name', bp_get_user_firstname( $leader_fullname ), $leader_id ) );
 		}
 
 		// setup the button arguments

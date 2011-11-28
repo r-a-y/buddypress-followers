@@ -65,4 +65,10 @@ function bp_update_user_meta( $user_id, $meta_key, $meta_value, $prev_value = ''
 }
 endif;
 
+if ( !function_exists( 'bp_core_delete_notifications_by_type' ) ) :
+function bp_core_delete_notifications_by_type( $user_id, $component_name, $component_action ) {
+	return BP_Core_Notification::delete_for_user_by_type( $user_id, $component_name, $component_action );
+}
+endif;
+
 ?>
