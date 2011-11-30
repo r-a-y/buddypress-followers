@@ -180,9 +180,10 @@ add_action( 'bp_before_activity_type_tab_friends', 'bp_follow_add_activity_tab' 
  * @uses bp_get_following_ids() Get the user_ids of all users a user is following.
  */
 function bp_follow_add_activity_scope_filter( $qs, $object, $filter, $scope, $page, $search_terms, $extras ) {
+	global $bp;
 
 	// Only filter on directory pages (no action) and the following scope on activity object.
-	if ( ( 'following' != $scope && !bp_is_current_action( 'following' ) ) || 'activity' != $object )
+	if ( ( !empty( $bp->current_action ) && !bp_is_current_action( 'following' ) ) || 'following' != $scope || 'activity' != $object )
 		return $qs;
 
 	$user_id = bp_displayed_user_id() ? bp_displayed_user_id() : bp_loggedin_user_id();

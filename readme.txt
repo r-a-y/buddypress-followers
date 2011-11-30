@@ -26,8 +26,11 @@ The forums on wordpress.org are rarely checked.
 == Changelog ==
 
 = 1.1.1 =
-* Show the following / followers tabs even when empty. Addresses issues with clearing notifications.
-* Fix issues with following buttons when javascript is disabled
+* Show the following / followers tabs even when empty.
+* Fix issues with following buttons when javascript is disabled.
+* Fix issues with following activity overriding other member activity pages.
+* Fix issue when a user has already been notified of their new follower.
+* Adjust some hooks so 3rd-party plugins can properly run their code.
 
 = 1.1 =
 * Add BuddyPress 1.5 compatibility.
