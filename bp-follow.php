@@ -71,41 +71,41 @@ function bp_follow_setup_nav() {
 	$counts  = bp_follow_total_follow_counts( array( 'user_id' => $user_id ) );
 
 	bp_core_new_nav_item( array(
-		'name'                => sprintf( __( 'Following <span>%d</span>', 'bp-follow' ), $counts['following'] ), 
-		'slug'                => $bp->follow->following->slug, 
-		'position'            => apply_filters( 'bp_follow_following_nav_position', 61 ), 
-		'screen_function'     => 'bp_follow_screen_following', 
-		'default_subnav_slug' => 'following', 
-		'item_css_id'         => 'following' 
+		'name'                => sprintf( __( 'Following <span>%d</span>', 'bp-follow' ), $counts['following'] ),
+		'slug'                => $bp->follow->following->slug,
+		'position'            => apply_filters( 'bp_follow_following_nav_position', 61 ),
+		'screen_function'     => 'bp_follow_screen_following',
+		'default_subnav_slug' => 'following',
+		'item_css_id'         => 'following'
 	) );
 
-	bp_core_new_subnav_item( array( 
-		'name'                => __( 'Following', 'bp-follow' ), 
-		'slug'                => 'following', 
+	bp_core_new_subnav_item( array(
+		'name'                => __( 'Following', 'bp-follow' ),
+		'slug'                => 'following',
 		'parent_url'          => trailingslashit( bp_loggedin_user_domain() . $bp->follow->following->slug ),
-		'parent_slug'         => $bp->follow->following->slug, 
-		'screen_function'     => 'bp_follow_screen_following', 
-		'position'            => 10, 
-		'item_css_id'         => 'following' 
+		'parent_slug'         => $bp->follow->following->slug,
+		'screen_function'     => 'bp_follow_screen_following',
+		'position'            => 10,
+		'item_css_id'         => 'following'
 	) );
 
-	bp_core_new_nav_item( array( 
-		'name'                => sprintf( __( 'Followers <span>%d</span>', 'bp-follow' ), $counts['followers'] ), 
-		'slug'                => $bp->follow->followers->slug, 
-		'position'            => apply_filters( 'bp_follow_followers_nav_position', 62 ), 
-		'screen_function'     => 'bp_follow_screen_my_followers', 
-		'default_subnav_slug' => 'followers', 
-		'item_css_id'         => 'followers' 
+	bp_core_new_nav_item( array(
+		'name'                => sprintf( __( 'Followers <span>%d</span>', 'bp-follow' ), $counts['followers'] ),
+		'slug'                => $bp->follow->followers->slug,
+		'position'            => apply_filters( 'bp_follow_followers_nav_position', 62 ),
+		'screen_function'     => 'bp_follow_screen_followers',
+		'default_subnav_slug' => 'followers',
+		'item_css_id'         => 'followers'
 	) );
 
-	bp_core_new_subnav_item( array( 
-		'name'                => __( 'Followers', 'bp-follow' ), 
-		'slug'                => 'followers', 
+	bp_core_new_subnav_item( array(
+		'name'                => __( 'Followers', 'bp-follow' ),
+		'slug'                => 'followers',
 		'parent_url'          => trailingslashit( bp_loggedin_user_domain() . $bp->follow->followers->slug ),
-		'parent_slug'         => $bp->follow->followers->slug, 
-		'screen_function'     => 'bp_follow_screen_my_followers', 
-		'position'            => 10, 
-		'item_css_id'         => 'followers' 
+		'parent_slug'         => $bp->follow->followers->slug,
+		'screen_function'     => 'bp_follow_screen_followers',
+		'position'            => 10,
+		'item_css_id'         => 'followers'
 	) );
 
 	// Add activity sub nav item
@@ -115,14 +115,14 @@ function bp_follow_setup_nav() {
 		// the BuddyBar renders the activity subnav properly
 		$user_domain = bp_is_user() ? bp_displayed_user_domain() : bp_loggedin_user_domain();
 
-		bp_core_new_subnav_item( array( 
-			'name'            => __( 'Following', 'bp-follow' ), 
-			'slug'            => BP_FOLLOWING_SLUG, 
-			'parent_url'      => trailingslashit( $user_domain . $bp->activity->slug ), 
-			'parent_slug'     => $bp->activity->slug, 
-			'screen_function' => 'bp_follow_screen_activity_following', 
-			'position'        => 21, 
-			'item_css_id'     => 'activity-following' 
+		bp_core_new_subnav_item( array(
+			'name'            => __( 'Following', 'bp-follow' ),
+			'slug'            => BP_FOLLOWING_SLUG,
+			'parent_url'      => trailingslashit( $user_domain . $bp->activity->slug ),
+			'parent_slug'     => $bp->activity->slug,
+			'screen_function' => 'bp_follow_screen_activity_following',
+			'position'        => 21,
+			'item_css_id'     => 'activity-following'
 		) );
 	}
 
@@ -168,7 +168,7 @@ function bp_follow_group_buddybar_items() {
 		'css_id'                  => 'follow',
 		'position'                => $following_position,
 		'show_for_displayed_user' => 1,
-		'screen_function'         => 'bp_follow_screen_my_followers'
+		'screen_function'         => 'bp_follow_screen_followers'
 	);
 
 	// "Following" subnav item
@@ -179,7 +179,7 @@ function bp_follow_group_buddybar_items() {
 		'css_id'          => 'following',
 		'position'        => 10,
 		'user_has_access' => 1,
-		'screen_function' => 'bp_follow_screen_my_followers'
+		'screen_function' => 'bp_follow_screen_followers'
 	);
 
 	// "Followers" subnav item
@@ -190,7 +190,7 @@ function bp_follow_group_buddybar_items() {
 		'css_id'          => 'followers',
 		'position'        => 20,
 		'user_has_access' => 1,
-		'screen_function' => 'bp_follow_screen_my_followers'
+		'screen_function' => 'bp_follow_screen_followers'
 	);
 
 	// Resort the nav items to account for the late change made above
@@ -264,6 +264,8 @@ function bp_follow_load_template_filter( $found_template, $templates ) {
 	foreach ( (array) $templates as $template ) {
 		if ( file_exists( STYLESHEETPATH . '/' . $template ) )
 			$filtered_templates[] = STYLESHEETPATH . '/' . $template;
+		elseif ( is_child_theme() && file_exists( TEMPLATEPATH . '/' . $template ) )
+			$filtered_templates[] = TEMPLATEPATH . '/' . $template;
 		else
 			$filtered_templates[] = dirname( __FILE__ ) . '/_inc/templates/' . $template;
 	}
@@ -294,20 +296,28 @@ add_action( 'wp_enqueue_scripts', 'bp_follow_add_js' );
  * @global $bp The global BuddyPress settings variable created in bp_core_setup_globals()
  */
 function bp_follow_screen_notification_settings() {
+	if ( !$notify = bp_get_user_meta( bp_displayed_user_id(), 'notification_starts_following', true ) )
+		$notify = 'yes';
 ?>
+
 	<table class="notification-settings" id="follow-notification-settings">
-		<tr>
-			<th class="icon"></th>
-			<th class="title"><?php _e( 'Followers/Following', 'bp-follow' ) ?></th>
-			<th class="yes"><?php _e( 'Yes', 'buddypress' ) ?></th>
-			<th class="no"><?php _e( 'No', 'buddypress' )?></th>
-		</tr>
-		<tr>
-			<td></td>
-			<td><?php _e( 'A member starts following your activity', 'bp-follow' ) ?></td>
-			<td class="yes"><input type="radio" name="notifications[notification_starts_following]" value="yes" <?php if ( !bp_get_user_meta( bp_displayed_user_id(),'notification_starts_following') || 'yes' == bp_get_user_meta( bp_displayed_user_id(),'notification_starts_following') ) { ?>checked="checked" <?php } ?>/></td>
-			<td class="no"><input type="radio" name="notifications[notification_starts_following]" value="no" <?php if ( bp_get_user_meta( bp_displayed_user_id(),'notification_starts_following') == 'no' ) { ?>checked="checked" <?php } ?>/></td>
-		</tr>
+		<thead>
+			<tr>
+				<th class="icon"></th>
+				<th class="title"><?php _e( 'Followers/Following', 'bp-follow' ) ?></th>
+				<th class="yes"><?php _e( 'Yes', 'buddypress' ) ?></th>
+				<th class="no"><?php _e( 'No', 'buddypress' )?></th>
+			</tr>
+		</thead>
+
+		<tbody>
+			<tr>
+				<td></td>
+				<td><?php _e( 'A member starts following your activity', 'bp-follow' ) ?></td>
+				<td class="yes"><input type="radio" name="notifications[notification_starts_following]" value="yes" <?php checked( $notify, 'yes', true ) ?>/></td>
+				<td class="no"><input type="radio" name="notifications[notification_starts_following]" value="no" <?php checked( $notify, 'no', true ) ?>/></td>
+			</tr>
+		</tbody>
 
 		<?php do_action( 'bp_follow_screen_notification_settings' ); ?>
 	</table>
@@ -378,7 +388,7 @@ function bp_follow_new_follow_email_notification( $args = '' ) {
 	$r = wp_parse_args( $args, $defaults );
 	extract( $r, EXTR_SKIP );
 
-	if ( 'no' == bp_get_user_meta( (int)$leader_id, 'notification_starts_following' ) )
+	if ( 'no' == bp_get_user_meta( (int)$leader_id, 'notification_starts_following', true ) )
 		return false;
 
 	// Check to see if this leader has already been notified of this follower before
@@ -429,10 +439,10 @@ To view %s\'s profile: %s
  *
  * @uses bp_core_load_template() Loads a template file.
  */
-function bp_follow_screen_my_followers() {
+function bp_follow_screen_followers() {
 	global $bp;
 
-	do_action( 'bp_follow_screen_my_followers' );
+	do_action( 'bp_follow_screen_followers' );
 
 	if ( isset( $_GET['new'] ) )
 		bp_core_delete_notifications_by_type( bp_loggedin_user_id(), $bp->follow->id, 'new_follow' );
@@ -451,9 +461,15 @@ function bp_follow_screen_following() {
 	bp_core_load_template( 'members/single/following' );
 }
 
+/**
+ * Catches any visits to the "Activity > Following" tab on a users profile.
+ *
+ * @uses bp_core_load_template() Loads a template file.
+ */
 function bp_follow_screen_activity_following() {
-	do_action( 'bp_activity_screen_my_activity' );
-	bp_core_load_template( apply_filters( 'bp_activity_template_my_activity', 'members/single/home' ) );
+	bp_update_is_item_admin( is_super_admin(), 'activity' );
+	do_action( 'bp_activity_screen_following' );
+	bp_core_load_template( apply_filters( 'bp_activity_template_following', 'members/single/home' ) );
 }
 
 
@@ -590,7 +606,7 @@ function bp_follow_ajax_action_stop() {
 	}
 
 	echo $message;
-	
+
 	exit();
 }
 add_action( 'wp_ajax_bp_unfollow', 'bp_follow_ajax_action_stop' );
