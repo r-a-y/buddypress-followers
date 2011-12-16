@@ -147,6 +147,10 @@ add_action( 'bp_setup_nav', 'bp_follow_setup_nav' );
 function bp_follow_group_buddybar_items() {
 	global $bp;
 
+	// don't do this if we're using the WP Admin Bar / Toolbar
+	if ( defined( 'BP_USE_WP_ADMIN_BAR' ) && BP_USE_WP_ADMIN_BAR )
+		return;
+
 	if ( !bp_loggedin_user_id() )
 		return;
 
@@ -228,15 +232,25 @@ function bp_follow_setup_admin_bar() {
 		// "Following" subnav item
 		$wp_admin_nav[] = array(
 			'parent' => 'my-account-' . $bp->follow->id,
-			'title'  => sprintf( __( 'Following <span class="count">%d</span>', 'bp-follow' ), $counts['following'] ),
+			'id' => 'my-account-' . $bp->follow->id . '-following',
+			'title'  => __( 'Following', 'bp-follow' ),
 			'href'   => trailingslashit( bp_loggedin_user_domain() . $bp->follow->following->slug )
 		);
 
 		// "Followers" subnav item
 		$wp_admin_nav[] = array(
 			'parent' => 'my-account-' . $bp->follow->id,
-			'title'  => sprintf( __( 'Followers <span class="count">%d</span>', 'bp-follow' ), $counts['followers'] ),
+			'id' => 'my-account-' . $bp->follow->id . '-followers',
+			'title'  => __( 'Followers', 'bp-follow' ),
 			'href'   => trailingslashit( bp_loggedin_user_domain() . $bp->follow->followers->slug )
+		);
+
+		// "Activity > Following" subnav item
+		$wp_admin_nav[] = array(
+			'parent' => 'my-account-' . BP_ACTIVITY_SLUG,
+			'id'     => 'my-account-' . BP_ACTIVITY_SLUG . '-following',
+			'title'  => __( 'Following', 'bp-follow' ),
+			'href'   =>  trailingslashit( bp_loggedin_user_domain() . BP_ACTIVITY_SLUG . '/' . $bp->follow->following->slug )
 		);
 
 		foreach( $wp_admin_nav as $admin_menu )
