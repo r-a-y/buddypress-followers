@@ -72,11 +72,13 @@ function bp_core_delete_notifications_by_type( $user_id, $component_name, $compo
 endif;
 
 if ( !function_exists( 'bp_update_is_item_admin' ) ) :
-function bp_update_is_item_admin() {
+function bp_update_is_item_admin( $is_item_admin = false, $component = '' ) {
 	global $bp;
 
-	if ( !is_super_admin() )
-		$bp->is_item_admin = false;
+	if ( empty( $component ) )
+		$component = bp_current_component();
+
+	$bp->is_item_admin = apply_filters( 'bp_update_is_item_admin', $is_item_admin, $component );
 }
 endif;
 
