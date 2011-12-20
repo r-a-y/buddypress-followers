@@ -109,7 +109,7 @@ function bp_follow_setup_nav() {
 	) );
 
 	// Add activity sub nav item
-	if ( bp_is_active( 'activity' ) && apply_filters( 'bp_follow_show_activity_subnav_if_empty', true || !empty( $counts['following'] ) ) ) {
+	if ( bp_is_active( 'activity' ) && apply_filters( 'bp_follow_show_activity_subnav', true ) ) {
 
 		// Need to change the user domain, so if we're not on a member page,
 		// the BuddyBar renders the activity subnav properly
@@ -219,9 +219,7 @@ function bp_follow_setup_admin_bar() {
 	// Menus for logged in user
 	if ( is_user_logged_in() ) {
 
-		$counts = bp_follow_total_follow_counts( array( 'user_id' => bp_loggedin_user_id() ) );
-
-		// Add the "Follow" nav menu
+		// "Follow" parent nav menu
 		$wp_admin_nav[] = array(
 			'parent' => $bp->my_account_menu_id,
 			'id'     => 'my-account-' . $bp->follow->id,
@@ -232,7 +230,7 @@ function bp_follow_setup_admin_bar() {
 		// "Following" subnav item
 		$wp_admin_nav[] = array(
 			'parent' => 'my-account-' . $bp->follow->id,
-			'id' => 'my-account-' . $bp->follow->id . '-following',
+			'id'     => 'my-account-' . $bp->follow->id . '-following',
 			'title'  => __( 'Following', 'bp-follow' ),
 			'href'   => trailingslashit( bp_loggedin_user_domain() . $bp->follow->following->slug )
 		);
@@ -240,18 +238,20 @@ function bp_follow_setup_admin_bar() {
 		// "Followers" subnav item
 		$wp_admin_nav[] = array(
 			'parent' => 'my-account-' . $bp->follow->id,
-			'id' => 'my-account-' . $bp->follow->id . '-followers',
+			'id'     => 'my-account-' . $bp->follow->id . '-followers',
 			'title'  => __( 'Followers', 'bp-follow' ),
 			'href'   => trailingslashit( bp_loggedin_user_domain() . $bp->follow->followers->slug )
 		);
 
 		// "Activity > Following" subnav item
-		$wp_admin_nav[] = array(
-			'parent' => 'my-account-' . BP_ACTIVITY_SLUG,
-			'id'     => 'my-account-' . BP_ACTIVITY_SLUG . '-following',
-			'title'  => __( 'Following', 'bp-follow' ),
-			'href'   =>  trailingslashit( bp_loggedin_user_domain() . BP_ACTIVITY_SLUG . '/' . $bp->follow->following->slug )
-		);
+		if ( bp_is_active( 'activity' ) && apply_filters( 'bp_follow_show_activity_subnav', true ) ) {
+			$wp_admin_nav[] = array(
+				'parent' => 'my-account-' . BP_ACTIVITY_SLUG,
+				'id'     => 'my-account-' . BP_ACTIVITY_SLUG . '-following',
+				'title'  => __( 'Following', 'bp-follow' ),
+				'href'   => trailingslashit( bp_loggedin_user_domain() . BP_ACTIVITY_SLUG . '/' . $bp->follow->following->slug )
+			);
+		}
 
 		foreach( $wp_admin_nav as $admin_menu )
 			$wp_admin_bar->add_menu( $admin_menu );
