@@ -298,7 +298,7 @@ add_filter( 'bp_located_template', 'bp_follow_load_template_filter', 10, 2 );
 function bp_follow_add_js() {
 	wp_enqueue_script( 'bp-follow-js', plugin_dir_url( __FILE__ ) . '_inc/bp-follow.js', array( 'jquery' ) );
 }
-add_action( 'wp_enqueue_scripts', 'bp_follow_add_js' );
+add_action( 'wp_enqueue_scripts', 'bp_follow_add_js', 11 );
 
 /********************************************************************************
  * Notification Functions

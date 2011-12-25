@@ -1,6 +1,9 @@
-jQuery(document).ready( function() {
-	jQuery("a.follow, a.unfollow").live( 'click', function() {
-		var link = jQuery(this);
+if ( typeof jq == "undefined" )
+	var jq = jQuery;
+
+jq(document).ready( function() {
+	jq("a.follow, a.unfollow").live( 'click', function() {
+		var link = jq(this);
 		var type = link.attr('class');
 		var uid = link.attr('id');
 		var nonce = link.attr('href');
@@ -18,14 +21,14 @@ jQuery(document).ready( function() {
 		nonce = nonce[1].split('&');
 		nonce = nonce[0];
 
-		jQuery.post( ajaxurl, {
+		jq.post( ajaxurl, {
 			action: 'bp_' + action,
 			'cookie': encodeURIComponent(document.cookie),
 			'uid': uid,
 			'_wpnonce': nonce
 		},
 		function(response) {
-			jQuery(link.parent()).fadeOut(200, function() {
+			jq(link.parent()).fadeOut(200, function() {
 				link.html( response );
 
 				// remove the loading class for BP 1.2.x only
@@ -36,13 +39,13 @@ jQuery(document).ready( function() {
 				link.removeClass('unfollow');
 				link.parent().addClass('pending');
 				link.addClass('disabled');
-				jQuery(this).fadeIn(200);
+				jq(this).fadeIn(200);
 			});
 		});
 		return false;
 	} );
 
-	jQuery("a.disabled").live( 'click', function() {
+	jq("a.disabled").live( 'click', function() {
 		return false;
 	});
 } );
