@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: BuddyPress Followers\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-11-23 21:25-0800\n"
-"PO-Revision-Date: \n"
+"POT-Creation-Date: 2011-12-25 11:48-0800\n"
+"PO-Revision-Date: 2011-12-25 11:48-0800\n"
 "Last-Translator: Ray <r-a-y@gmx.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -13,78 +13,73 @@ msgstr ""
 "X-Poedit-Basepath: .\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: bp-follow.php:75
+#: bp-follow.php:74
 #: _inc/bp-follow-hooks.php:171
-#: _inc/bp-follow-hooks.php:214
+#: _inc/bp-follow-hooks.php:221
 #, php-format
 msgid "Following <span>%d</span>"
 msgstr ""
 
-#: bp-follow.php:84
-#: bp-follow.php:123
+#: bp-follow.php:83
+#: bp-follow.php:119
+#: bp-follow.php:180
+#: bp-follow.php:234
+#: bp-follow.php:251
 #: _inc/bp-follow-widgets.php:38
 msgid "Following"
 msgstr ""
 
-#: bp-follow.php:96
+#: bp-follow.php:93
 #, php-format
 msgid "Followers <span>%d</span>"
 msgstr ""
 
-#: bp-follow.php:105
+#: bp-follow.php:102
+#: bp-follow.php:191
+#: bp-follow.php:242
 msgid "Followers"
 msgstr ""
 
-#: bp-follow.php:177
-#: bp-follow.php:244
+#: bp-follow.php:169
+#: bp-follow.php:226
 msgid "Follow"
 msgstr ""
 
-#: bp-follow.php:190
-#: bp-follow.php:253
-msgid "Users I'm following"
-msgstr ""
-
-#: bp-follow.php:203
-#: bp-follow.php:262
-msgid "Users following me"
-msgstr ""
-
-#: bp-follow.php:326
+#: bp-follow.php:321
 msgid "Followers/Following"
 msgstr ""
 
-#: bp-follow.php:327
+#: bp-follow.php:322
 msgid "Yes"
 msgstr ""
 
-#: bp-follow.php:328
+#: bp-follow.php:323
 msgid "No"
 msgstr ""
 
-#: bp-follow.php:332
+#: bp-follow.php:330
 msgid "A member starts following your activity"
 msgstr ""
 
-#: bp-follow.php:358
+#: bp-follow.php:357
 msgid "1 more user is now following you"
 msgstr ""
 
-#: bp-follow.php:361
+#: bp-follow.php:360
 #, php-format
 msgid "%d more users are now following you"
 msgstr ""
 
-#: bp-follow.php:375
+#: bp-follow.php:374
 msgid "Your list of followers"
 msgstr ""
 
-#: bp-follow.php:427
+#: bp-follow.php:426
 #, php-format
 msgid "%s is now following you"
 msgstr ""
 
-#: bp-follow.php:430
+#: bp-follow.php:429
 #, php-format
 msgid ""
 "%s is now following your activity.\n"
@@ -94,62 +89,62 @@ msgid ""
 "---------------------\n"
 msgstr ""
 
-#: bp-follow.php:437
+#: bp-follow.php:436
 #, php-format
 msgid "To disable these notifications please log in and go to: %s"
 msgstr ""
 
-#: bp-follow.php:512
+#: bp-follow.php:517
 #, php-format
 msgid "You are already following %s."
 msgstr ""
 
-#: bp-follow.php:515
+#: bp-follow.php:520
 #, php-format
 msgid "There was a problem when trying to follow %s, please try again."
 msgstr ""
 
-#: bp-follow.php:517
+#: bp-follow.php:522
 #, php-format
 msgid "You are now following %s."
 msgstr ""
 
-#: bp-follow.php:551
+#: bp-follow.php:556
 #, php-format
 msgid "You are not following %s."
 msgstr ""
 
-#: bp-follow.php:554
+#: bp-follow.php:559
 #, php-format
 msgid "There was a problem when trying to stop following %s, please try again."
 msgstr ""
 
-#: bp-follow.php:556
+#: bp-follow.php:561
 #, php-format
 msgid "You are no longer following %s."
 msgstr ""
 
-#: bp-follow.php:581
+#: bp-follow.php:586
 msgid "Already following"
 msgstr ""
 
-#: bp-follow.php:584
+#: bp-follow.php:589
 msgid "Error following user"
 msgstr ""
 
-#: bp-follow.php:586
+#: bp-follow.php:591
 msgid "You are now following"
 msgstr ""
 
-#: bp-follow.php:609
+#: bp-follow.php:614
 msgid "Not following"
 msgstr ""
 
-#: bp-follow.php:612
+#: bp-follow.php:617
 msgid "Error unfollowing user"
 msgstr ""
 
-#: bp-follow.php:614
+#: bp-follow.php:619
 msgid "Stopped following"
 msgstr ""
 
@@ -157,12 +152,12 @@ msgstr ""
 msgid "The public activity for everyone you are following on this site."
 msgstr ""
 
-#: _inc/bp-follow-templatetags.php:126
+#: _inc/bp-follow-templatetags.php:156
 #, php-format
 msgid "Stop Following %s"
 msgstr ""
 
-#: _inc/bp-follow-templatetags.php:132
+#: _inc/bp-follow-templatetags.php:162
 #, php-format
 msgid "Follow %s"
 msgstr ""
