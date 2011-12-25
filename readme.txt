@@ -2,8 +2,8 @@
 Contributors: apeatling, r-a-y
 Tags: buddypress, following, followers, connections
 Requires at least: WP 3.0 / BP 1.2.6
-Tested up to: WP 3.2.1 / BP 1.5.1
-Stable tag: 1.1
+Tested up to: WP 3.3 / BP 1.5.2
+Stable tag: 1.1.1
 
 == Description ==
 
@@ -27,9 +27,12 @@ The forums on wordpress.org are rarely checked.
 
 = 1.1.1 =
 * Show the following / followers tabs even when empty.
+* Add better support for WP Toolbar.
+* Add better support for parent / child themes.
 * Fix issues with following buttons when javascript is disabled.
 * Fix issues with following activity overriding other member activity pages.
 * Fix issue when a user has already been notified of their new follower.
+* Fix issue when a user has disabled new follow notifications.
 * Adjust some hooks so 3rd-party plugins can properly run their code.
 
 = 1.1 =

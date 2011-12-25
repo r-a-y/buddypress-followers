@@ -1,14 +1,11 @@
 <?php
 /*
 Plugin Name: BuddyPress Follow
-Plugin URI: http://apeatling.wordpress.com/
+Plugin URI: http://buddypress.org/community/groups/buddypress-followers/
 Description: Allow your site members to follow other members' activity.
-Version: 1.1
-Requires at least: WP 3.0 / BP 1.2.6
-Tested up to: WP 3.2.1 / BP 1.5.1
+Version: 1.1.1
 License: GNU/GPL 2
-Author: Andy Peatling
-Author URI: http://apeatling.wordpress.com
+Author: Andy Peatling, r-a-y
 */
 
 /**
