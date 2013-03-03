@@ -722,7 +722,7 @@ function bp_follow_is_following( $args = '' ) {
 	extract( $r, EXTR_SKIP );
 
 	$follow = new BP_Follow( $leader_id, $follower_id );
-	return apply_filters( 'bp_follow_is_following', (int)$follow->id, &$follow );
+	return apply_filters( 'bp_follow_is_following', (int)$follow->id, $follow );
 }
 
 /**
