@@ -84,32 +84,12 @@ function bp_follow_setup_nav() {
 		'item_css_id'         => 'following'
 	) );
 
-	bp_core_new_subnav_item( array(
-		'name'                => __( 'Following', 'bp-follow' ),
-		'slug'                => 'following',
-		'parent_url'          => trailingslashit( bp_loggedin_user_domain() . $bp->follow->following->slug ),
-		'parent_slug'         => $bp->follow->following->slug,
-		'screen_function'     => 'bp_follow_screen_following',
-		'position'            => 10,
-		'item_css_id'         => 'following'
-	) );
-
 	bp_core_new_nav_item( array(
 		'name'                => sprintf( __( 'Followers <span>%d</span>', 'bp-follow' ), $counts['followers'] ),
 		'slug'                => $bp->follow->followers->slug,
 		'position'            => apply_filters( 'bp_follow_followers_nav_position', 62 ),
 		'screen_function'     => 'bp_follow_screen_followers',
 		'default_subnav_slug' => 'followers',
-		'item_css_id'         => 'followers'
-	) );
-
-	bp_core_new_subnav_item( array(
-		'name'                => __( 'Followers', 'bp-follow' ),
-		'slug'                => 'followers',
-		'parent_url'          => trailingslashit( bp_loggedin_user_domain() . $bp->follow->followers->slug ),
-		'parent_slug'         => $bp->follow->followers->slug,
-		'screen_function'     => 'bp_follow_screen_followers',
-		'position'            => 10,
 		'item_css_id'         => 'followers'
 	) );
 
@@ -266,34 +246,101 @@ function bp_follow_setup_admin_bar() {
 add_action( 'bp_setup_admin_bar', 'bp_follow_setup_admin_bar' );
 
 /**
- * Filter the template location so that templates can be stored in the plugin folder, but
- * overridden by templates of the same name and sub folder location in the theme.
+ * The old way of allowing BP-Follow templates to be customized.
+ *
+ * Looks for the following template files:
+ *  /wp-content/themes/YOUR-THEME/members/single/following.php
+ *  /wp-content/themes/YOUR-THEME/members/single/followers.php
  *
  * @global $bp The global BuddyPress settings variable created in bp_core_setup_globals()
  */
 function bp_follow_load_template_filter( $found_template, $templates ) {
 	global $bp;
 
-	/**
-	 * Only filter the template location when we're on the follow component pages.
-	 */
-	if ( !bp_is_current_component( $bp->follow->followers->slug ) && !bp_is_current_component( $bp->follow->following->slug ) )
+	// Only filter the template location when we're on the follow component pages.
+	if ( ! bp_is_current_component( $bp->follow->followers->slug ) && !bp_is_current_component( $bp->follow->following->slug ) )
 		return $found_template;
 
-	foreach ( (array) $templates as $template ) {
-		if ( file_exists( STYLESHEETPATH . '/' . $template ) )
-			$filtered_templates[] = STYLESHEETPATH . '/' . $template;
-		elseif ( is_child_theme() && file_exists( TEMPLATEPATH . '/' . $template ) )
-			$filtered_templates[] = TEMPLATEPATH . '/' . $template;
-		else
-			$filtered_templates[] = dirname( __FILE__ ) . '/_inc/templates/' . $template;
-	}
+	// $found_template is not empty when the older template files are found in the
+	// parent and child theme
+	//
+	//  /wp-content/themes/YOUR-THEME/members/single/following.php
+	//  /wp-content/themes/YOUR-THEME/members/single/followers.php
+	//
+	// The older template files utilize a full template ( get_header() + 
+	// get_footer() ), which sucks for themes and theme compat.
+	//
+	// When the older template files are not found, we use our new template method,
+	// which will act more like a template part.
+	if ( empty( $found_template ) ) {	
+		// register our theme compat directory
+		bp_register_template_stack( 'bp_follow_get_theme_compat_dir', 14 );
 
-	$found_template = $filtered_templates[0];
+		// locate_template() will attempt to find the plugins.php template in the
+		// child and parent theme and return the located template when found
+		//
+		// plugins.php is the preferred template to use, since all we'd need to do is
+		// inject our content into BP
+		$found_template = locate_template( 'members/single/plugins.php', false, false );
+
+		// remove the options nav
+		// only used in theme compat (hack!)
+		add_filter( 'bp_active_components', 'bp_follow_modify_active_component' );
+
+		// remove the options nav for bp-default themes and BP Template Pack
+		// -enabled themes
+		//
+		// if you have a customized bp-default child theme or BP Template Pack that
+		// has drastically modified plugins.php, you'll probably want to disable this
+		// use the 'bp_follow_remove_options_nav' filter and return false
+		if ( ( get_template() == 'bp-default' || function_exists( 'bp_dtheme_ajax_querystring' ) || current_theme_supports( 'buddypress' ) ) && apply_filters( 'bp_follow_remove_options_nav', true ) ) {
+			add_action( 'bp_before_member_body', create_function( '', "
+				ob_start();
+			" ), 9999 );
+			
+			add_action( 'bp_template_title', 'bp_follow_plugins_buffer', -10 );
+		}
+
+		// add our hook to inject content into BP
+		add_action( 'bp_template_content', create_function( '', "
+			bp_get_template_part( 'members/single/follow' );
+		" ) );
+	}
 
 	return apply_filters( 'bp_follow_load_template_filter', $found_template );
 }
 add_filter( 'bp_located_template', 'bp_follow_load_template_filter', 10, 2 );
+
+function bp_follow_plugins_buffer() {
+	// save buffer
+	$buffer = ob_get_contents();
+
+	// stop output buffering
+	ob_end_clean();
+
+	// what are we doing here?
+	// we want to output the tag before 'bp_template_title'
+	// so look for the opening HTML tag from the end of the content
+	$pos = strrpos( $buffer, '<' );
+
+	// echo the opening tag before the 'bp_template_title' action
+	// and hide it with CSS
+	echo substr( $buffer, $pos, -1 ) . ' style="display:none;">';
+}
+
+/**
+ * Gets the BuddyPress compatable theme used in the event the currently active
+ * WordPress theme does not explicitly support BuddyPress. This can be filtered,
+ * or set manually. Tricky theme authors can override the default and include
+ * their own BuddyPress compatability layers for their themes.
+ *
+ * @since BuddyPress (1.7)
+ * @uses apply_filters()
+ * @return string
+ */
+function bp_follow_get_theme_compat_dir() {
+	return apply_filters( 'bp_follow_get_theme_compat_dir', dirname( __FILE__ ) . '/_inc/templates' );
+}
 
 /**
  * Enqueues the javascript.
