@@ -2,8 +2,8 @@
 /**
  * BP Follow Hooks
  *
- * Functions in this file allow this component to hook into BuddyPress so it interacts
- * seamlessly with the interface and existing core components.
+ * Functions in this file allow this component to hook into BuddyPress so it
+ * interacts seamlessly with the interface and existing core components.
  *
  * @package BP-Follow
  * @subpackage Hooks
@@ -15,15 +15,23 @@ if ( !defined( 'ABSPATH' ) ) exit;
 /** LOOP INJECTION *******************************************************/
 
 /**
- * Once the members loop has queried and built a members_template object, fetch
- * all of the member IDs in the object and bulk fetch the following status for all the
- * members in one query. This is significantly more efficient that querying for every
- * member inside of the loop.
+ * Inject $members_template global with follow status for each member in the
+ * members loop.
+ *
+ * Once the members loop has queried and built a $members_template object,
+ * fetch all of the member IDs in the object and bulk fetch the following
+ * status for all the members in one query.
+ *
+ * This is significantly more efficient that querying for every member inside
+ * of the loop.
+ *
+ * @since 1.0
+ * @todo Use {@link BP_User_Query} introduced in BP 1.7 in a future version
  *
  * @global $members_template The members template object containing all fetched members in the loop
- * @uses bulk_check_follow_status() Check the following status for more than one member
- * @param $has_members - Whether any members where actually returned in the loop
- * @return $has_members - Return the original $has_members param as this is a filter function.
+ * @uses BP_Follow::bulk_check_follow_status() Check the following status for more than one member
+ * @param $has_members Whether any members where actually returned in the loop
+ * @return $has_members Return the original $has_members param as this is a filter function.
  */
 function bp_follow_inject_member_follow_status( $has_members ) {
 	global $members_template;
@@ -60,17 +68,23 @@ function bp_follow_inject_member_follow_status( $has_members ) {
 add_filter( 'bp_has_members', 'bp_follow_inject_member_follow_status' );
 
 /**
- * Once the group members loop has queried and built a members_template object, fetch
- * all of the member IDs in the object and bulk fetch the following status for all the
- * group members in one query. This is significantly more efficient that querying for
- * every member inside of the loop.
+ * Inject $members_template global with follow status for each member in the
+ * group members loop.
+ *
+ * Once the group members loop has queried and built a $members_template
+ * object, fetch all of the member IDs in the object and bulk fetch the
+ * following status for all the group members in one query.
+ *
+ * This is significantly more efficient that querying for every member inside
+ * of the loop.
+ *
+ * @author r-a-y
+ * @since 1.1
  *
  * @global $members_template The members template object containing all fetched members in the loop
  * @uses BP_Follow::bulk_check_follow_status() Check the following status for more than one member
  * @param $has_members - Whether any members where actually returned in the loop
  * @return $has_members - Return the original $has_members param as this is a filter function.
- * @author r-a-y
- * @since 1.1
  */
 function bp_follow_inject_group_member_follow_status( $has_members ) {
 	global $members_template;
@@ -122,7 +136,8 @@ function bp_follow_add_profile_follow_button() {
 add_action( 'bp_member_header_actions', 'bp_follow_add_profile_follow_button' );
 
 /**
- * Add a "Follow User/Stop Following" button to each member shown in a member listing
+ * Add a "Follow User/Stop Following" button to each member shown in the
+ * members loop.
  *
  * @global $bp The global BuddyPress settings variable created in bp_core_setup_globals()
  * @global $members_template The members template object containing all fetched members in the loop
@@ -139,12 +154,14 @@ function bp_follow_add_listing_follow_button() {
 add_action( 'bp_directory_members_actions', 'bp_follow_add_listing_follow_button' );
 
 /**
- * Add a "Follow User/Stop Following" button to each member shown in a group member listing
+ * Add a "Follow User/Stop Following" button to each member shown in a group
+ * members loop.
+ *
+ * @author r-a-y
+ * @since 1.1
  *
  * @global $bp The global BuddyPress settings variable created in bp_core_setup_globals()
  * @global $members_template The members template object containing all fetched members in the loop
- * @author r-a-y
- * @since 1.1
  */
 function bp_follow_add_group_member_follow_button() {
 	global $members_template;
@@ -159,8 +176,10 @@ add_action( 'bp_group_members_list_item_action', 'bp_follow_add_group_member_fol
 /** DIRECTORIES **********************************************************/
 
 /**
- * Adds a "Following (X)" tab to the activity stream so that users can select to filter on only
- * users they are following.
+ * Adds a "Following (X)" tab to the activity directory.
+ *
+ * This is so the logged-in user can filter the activity stream to only users
+ * that the current user is following.
  *
  * @global $bp The global BuddyPress settings variable created in bp_core_setup_globals()
  * @uses bp_follow_total_follow_counts() Get the following/followers counts for a user.
@@ -177,8 +196,10 @@ function bp_follow_add_activity_tab() {
 add_action( 'bp_before_activity_type_tab_friends', 'bp_follow_add_activity_tab' );
 
 /**
- * Add a "Following (X)" tab to the members directory so that only users that a user
- * is following will show in the listing.
+ * Add a "Following (X)" tab to the members directory.
+ *
+ * This is so the logged-in user can filter the members directory to only
+ * users that the current user is following.
  *
  * @global $bp The global BuddyPress settings variable created in bp_core_setup_globals()
  * @uses bp_follow_total_follow_counts() Get the following/followers counts for a user.
@@ -200,8 +221,8 @@ add_action( 'bp_members_directory_member_types', 'bp_follow_add_following_tab' )
 /** AJAX MANIPULATION ****************************************************/
 
 /**
- * Modify the querystring passed to the activity loop so we return only users that the
- * current user is following.
+ * Modify the querystring passed to the activity loop to return only users
+ * that the current user is following.
  *
  * @global $bp The global BuddyPress settings variable created in bp_core_setup_globals()
  * @uses bp_get_following_ids() Get the user_ids of all users a user is following.
@@ -228,8 +249,8 @@ add_filter( 'bp_dtheme_ajax_querystring',       'bp_follow_add_activity_scope_fi
 add_filter( 'bp_legacy_theme_ajax_querystring', 'bp_follow_add_activity_scope_filter', 10, 4 );
 
 /**
- * Modify the querystring passed to the members loop so we return only users that the
- * current user is following.
+ * Modify the querystring passed to the members loop to return only users
+ * that the current user is following.
  *
  * @global $bp The global BuddyPress settings variable created in bp_core_setup_globals()
  * @uses bp_get_following_ids() Get the user_ids of all users a user is following.
@@ -296,10 +317,12 @@ function bp_follow_add_member_scope_filter( $qs, $object ) {
 add_filter( 'bp_ajax_querystring', 'bp_follow_add_member_scope_filter', 20, 2 );
 
 /**
- * On a user's "Activity > Following" screen, set the activity scope to "following".
+ * On a user's "Activity > Following" page, set the activity scope to
+ * "following".
  *
- * Unfortunately for 3rd-party components, this is the only way to set the scope in
- * {@link bp_dtheme_ajax_querystring()} due to the way that function handles cookies.
+ * Unfortunately for 3rd-party components, this is the only way to set the
+ * scope in {@link bp_dtheme_ajax_querystring()} due to the way that function
+ * handles cookies.
  *
  * Yes, this is considered a hack, or more appropriately, a loophole!
  *
@@ -316,11 +339,13 @@ function bp_follow_set_activity_following_scope() {
 add_action( 'bp_activity_screen_following', 'bp_follow_set_activity_following_scope' );
 
 /**
- * On a user's "Activity > Following" screen, set the activity scope to "following"
- * during AJAX requests - "Load More" button or via activity dropdown filter menu.
+ * On a user's "Activity > Following" screen, set the activity scope to
+ * "following" during AJAX requests ("Load More" button or via activity
+ * dropdown filter menu).
  *
- * Unfortunately for 3rd-party components, this is the only way to set the scope in
- * {@link bp_dtheme_ajax_querystring()} due to the way that function handles cookies.
+ * Unfortunately for 3rd-party components, this is the only way to set the
+ * scope in {@link bp_dtheme_ajax_querystring()} due to the way that function
+ * handles cookies.
  *
  * Yes, this is considered a hack, or more appropriately, a loophole!
  *
@@ -337,7 +362,7 @@ function bp_follow_set_activity_following_scope_on_ajax() {
 		// if we have a post value already, let's add our scope to the existing cookie value
 		if ( !empty( $_POST['cookie'] ) )
 			$_POST['cookie'] .= '%3B%20bp-activity-scope%3Dfollowing';
-		else 
+		else
 			$_POST['cookie'] .= 'bp-activity-scope%3Dfollowing';
 	}
 }
