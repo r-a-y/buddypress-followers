@@ -13,6 +13,10 @@ function bp_follow_screen_followers() {
 	if ( isset( $_GET['new'] ) )
 		bp_core_delete_notifications_by_type( bp_loggedin_user_id(), $bp->follow->id, 'new_follow' );
 
+	// ignore the template referenced here
+	// 'members/single/followers' is for older themes already using this template
+	//
+	// view bp_follow_load_template_filter() for more info
 	bp_core_load_template( 'members/single/followers' );
 }
 
@@ -24,6 +28,10 @@ function bp_follow_screen_followers() {
 function bp_follow_screen_following() {
 	do_action( 'bp_follow_screen_following' );
 
+	// ignore the template referenced here
+	// 'members/single/following' is for older themes already using this template
+	//
+	// view bp_follow_load_template_filter() for more info
 	bp_core_load_template( 'members/single/following' );
 }
 
@@ -41,32 +49,82 @@ function bp_follow_screen_activity_following() {
 /** TEMPLATE LOADER ************************************************/
 
 /**
- * Filter the template location so that templates can be stored in the plugin folder, but
- * overridden by templates of the same name and sub folder location in the theme.
+ * BP Follow template loader.
  *
- * @global $bp The global BuddyPress settings variable created in bp_core_setup_globals()
+ * This function sets up BP Follow to use custom templates.
+ *
+ * If a template does not exist in the current theme, we will use our own
+ * bundled templates.
+ *
+ * We're doing two things here:
+ *  1) Support the older template format for themes that are using them
+ *     for backwards-compatibility (the template passed in 
+ *     {@link bp_core_load_template()}).
+ *  2) Route older template names to use our new template locations and
+ *     format.
+ *
+ * View the inline doc for more details.
+ *
+ * @since 1.0
  */
 function bp_follow_load_template_filter( $found_template, $templates ) {
 	global $bp;
 
-	/**
-	 * Only filter the template location when we're on the follow component pages.
-	 */
-	if ( !bp_is_current_component( $bp->follow->followers->slug ) && !bp_is_current_component( $bp->follow->following->slug ) )
+	// Only filter the template location when we're on the follow component pages.
+	if ( ! bp_is_current_component( $bp->follow->followers->slug ) && !bp_is_current_component( $bp->follow->following->slug ) )
 		return $found_template;
 
-	foreach ( (array) $templates as $template ) {
-		if ( file_exists( STYLESHEETPATH . '/' . $template ) )
-			$filtered_templates[] = STYLESHEETPATH . '/' . $template;
-		elseif ( is_child_theme() && file_exists( TEMPLATEPATH . '/' . $template ) )
-			$filtered_templates[] = TEMPLATEPATH . '/' . $template;
-		else
-			$filtered_templates[] = dirname( __FILE__ ) . '/templates/' . $template;
-	}
+	// $found_template is not empty when the older template files are found in the
+	// parent and child theme
+	//
+	//  /wp-content/themes/YOUR-THEME/members/single/following.php
+	//  /wp-content/themes/YOUR-THEME/members/single/followers.php
+	//
+	// The older template files utilize a full template ( get_header() +
+	// get_footer() ), which sucks for themes and theme compat.
+	//
+	// When the older template files are not found, we use our new template method,
+	// which will act more like a template part.
+	if ( empty( $found_template ) ) {
+		// register our theme compat directory
+		//
+		// this tells BP to look for templates in our plugin directory last
+		// when the template isn't found in the parent / child theme
+		bp_register_template_stack( 'bp_follow_get_template_directory', 14 );
 
-	$found_template = $filtered_templates[0];
+		// locate_template() will attempt to find the plugins.php template in the
+		// child and parent theme and return the located template when found
+		//
+		// plugins.php is the preferred template to use, since all we'd need to do is
+		// inject our content into BP
+		//
+		// note: this is only really relevant for bp-default themes as theme compat
+		// will kick in on its own when this template isn't found
+		$found_template = locate_template( 'members/single/plugins.php', false, false );
+
+		// add our hook to inject content into BP
+		//
+		// note the new template name for our template part
+		add_action( 'bp_template_content', create_function( '', "
+			bp_get_template_part( 'members/single/follow' );
+		" ) );
+	}
 
 	return apply_filters( 'bp_follow_load_template_filter', $found_template );
 }
 add_filter( 'bp_located_template', 'bp_follow_load_template_filter', 10, 2 );
 
+/** UTILITY ********************************************************/
+
+/**
+ * Get the BP Follow template directory.
+ *
+ * @author r-a-y
+ * @since 1.2
+ *
+ * @uses apply_filters()
+ * @return string
+ */
+function bp_follow_get_template_directory() {
+	return apply_filters( 'bp_follow_get_template_directory', constant( 'BP_FOLLOW_DIR' ) . '/_inc/templates' );
+}

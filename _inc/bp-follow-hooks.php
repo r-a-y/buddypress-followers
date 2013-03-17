@@ -243,6 +243,53 @@ function bp_follow_add_member_directory_filter( $qs, $object, $filter, $scope  )
 add_filter( 'bp_dtheme_ajax_querystring', 'bp_follow_add_member_directory_filter', 10, 4 );
 
 /**
+ * Filter the members loop on a user's "Following" or "Followers" page.
+ *
+ * This is done so we can return the users that:
+ *   - the current user is following; or
+ *   - the users that are following the current user
+ *
+ * @author r-a-y
+ * @since 1.2
+ *
+ * @param str $qs The querystring for the BP loop
+ * @param str $object The current object for the querystring
+ * @return str Modified querystring
+ */
+function bp_follow_add_member_scope_filter( $qs, $object ) {
+
+	// not on the members object? stop now!
+	if ( $object != 'members' )
+		return $qs;
+
+	// not on a user page? stop now!
+	if ( ! bp_is_user() )
+		return $qs;
+
+	// filter the members loop based on the current page
+	switch ( bp_current_action() ) {
+		// 'following' page
+		case constant( 'BP_FOLLOWING_SLUG' ) :
+			return add_query_arg( 'include', bp_get_following_ids(), $qs );
+
+			break;
+
+		// 'followers' page
+		case constant( 'BP_FOLLOWERS_SLUG' ) :
+			return add_query_arg( 'include', bp_get_follower_ids(), $qs );
+
+			break;
+
+		default :
+			return $qs;
+
+			break;
+	}
+
+}
+add_filter( 'bp_ajax_querystring', 'bp_follow_add_member_scope_filter', 20, 2 );
+
+/**
  * On a user's "Activity > Following" screen, set the activity scope to "following".
  *
  * Unfortunately for 3rd-party components, this is the only way to set the scope in
