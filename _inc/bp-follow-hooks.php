@@ -197,7 +197,8 @@ function bp_follow_add_activity_scope_filter( $qs, $object, $filter, $scope ) {
 
 	return apply_filters( 'bp_follow_add_activity_scope_filter', $qs, $filter );
 }
-add_filter( 'bp_dtheme_ajax_querystring', 'bp_follow_add_activity_scope_filter', 10, 4 );
+add_filter( 'bp_dtheme_ajax_querystring',       'bp_follow_add_activity_scope_filter', 10, 4 );
+add_filter( 'bp_legacy_theme_ajax_querystring', 'bp_follow_add_activity_scope_filter', 10, 4 );
 
 /* Hook into the member directory tabs and filtering */
 
@@ -240,7 +241,8 @@ function bp_follow_add_member_directory_filter( $qs, $object, $filter, $scope  )
 
 	return apply_filters( 'bp_follow_add_member_directory_filter', $qs, $filter );
 }
-add_filter( 'bp_dtheme_ajax_querystring', 'bp_follow_add_member_directory_filter', 10, 4 );
+add_filter( 'bp_dtheme_ajax_querystring',       'bp_follow_add_member_directory_filter', 10, 4 );
+add_filter( 'bp_legacy_theme_ajax_querystring', 'bp_follow_add_member_directory_filter', 10, 4 );
 
 /**
  * Filter the members loop on a user's "Following" or "Followers" page.
