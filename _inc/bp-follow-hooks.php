@@ -12,6 +12,8 @@
 // Exit if accessed directly
 if ( !defined( 'ABSPATH' ) ) exit;
 
+/** LOOP INJECTION *******************************************************/
+
 /**
  * Once the members loop has queried and built a members_template object, fetch
  * all of the member IDs in the object and bulk fetch the following status for all the
@@ -104,6 +106,8 @@ function bp_follow_inject_group_member_follow_status( $has_members ) {
 }
 add_filter( 'bp_group_has_members', 'bp_follow_inject_group_member_follow_status' );
 
+/** BUTTONS **************************************************************/
+
 /**
  * Add a "Follow User/Stop Following" button to the profile header for a user.
  *
@@ -152,7 +156,7 @@ function bp_follow_add_group_member_follow_button() {
 }
 add_action( 'bp_group_members_list_item_action', 'bp_follow_add_group_member_follow_button' );
 
-/* Hook into the activity stream tabs and scope ********************/
+/** DIRECTORIES **********************************************************/
 
 /**
  * Adds a "Following (X)" tab to the activity stream so that users can select to filter on only
@@ -171,6 +175,29 @@ function bp_follow_add_activity_tab() {
 	<li id="activity-following"><a href="<?php echo bp_loggedin_user_domain() . BP_ACTIVITY_SLUG . '/' . BP_FOLLOWING_SLUG . '/' ?>" title="<?php _e( 'The public activity for everyone you are following on this site.', 'bp-follow' ) ?>"><?php printf( __( 'Following <span>%d</span>', 'bp-follow' ), (int)$counts['following'] ) ?></a></li><?php
 }
 add_action( 'bp_before_activity_type_tab_friends', 'bp_follow_add_activity_tab' );
+
+/**
+ * Add a "Following (X)" tab to the members directory so that only users that a user
+ * is following will show in the listing.
+ *
+ * @global $bp The global BuddyPress settings variable created in bp_core_setup_globals()
+ * @uses bp_follow_total_follow_counts() Get the following/followers counts for a user.
+ */
+function bp_follow_add_following_tab() {
+
+	if ( bp_displayed_user_id() )
+		return false;
+
+	$counts = bp_follow_total_follow_counts( array( 'user_id' => bp_loggedin_user_id() ) );
+
+	if ( empty( $counts['following'] ) )
+		return false;
+	?>
+	<li id="members-following"><a href="<?php echo bp_loggedin_user_domain() . BP_FOLLOWING_SLUG ?>"><?php printf( __( 'Following <span>%d</span>', 'bp-follow' ), $counts['following'] ) ?></a></li><?php
+}
+add_action( 'bp_members_directory_member_types', 'bp_follow_add_following_tab' );
+
+/** AJAX MANIPULATION ****************************************************/
 
 /**
  * Modify the querystring passed to the activity loop so we return only users that the
@@ -199,29 +226,6 @@ function bp_follow_add_activity_scope_filter( $qs, $object, $filter, $scope ) {
 }
 add_filter( 'bp_dtheme_ajax_querystring',       'bp_follow_add_activity_scope_filter', 10, 4 );
 add_filter( 'bp_legacy_theme_ajax_querystring', 'bp_follow_add_activity_scope_filter', 10, 4 );
-
-/* Hook into the member directory tabs and filtering */
-
-/**
- * Add a "Following (X)" tab to the members directory so that only users that a user
- * is following will show in the listing.
- *
- * @global $bp The global BuddyPress settings variable created in bp_core_setup_globals()
- * @uses bp_follow_total_follow_counts() Get the following/followers counts for a user.
- */
-function bp_follow_add_following_tab() {
-
-	if ( bp_displayed_user_id() )
-		return false;
-
-	$counts = bp_follow_total_follow_counts( array( 'user_id' => bp_loggedin_user_id() ) );
-
-	if ( empty( $counts['following'] ) )
-		return false;
-	?>
-	<li id="members-following"><a href="<?php echo bp_loggedin_user_domain() . BP_FOLLOWING_SLUG ?>"><?php printf( __( 'Following <span>%d</span>', 'bp-follow' ), $counts['following'] ) ?></a></li><?php
-}
-add_action( 'bp_members_directory_member_types', 'bp_follow_add_following_tab' );
 
 /**
  * Modify the querystring passed to the members loop so we return only users that the
@@ -338,5 +342,3 @@ function bp_follow_set_activity_following_scope_on_ajax() {
 	}
 }
 add_action( 'bp_before_activity_loop', 'bp_follow_set_activity_following_scope_on_ajax' );
-
-?>
