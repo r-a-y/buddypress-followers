@@ -22,7 +22,14 @@ if ( !defined( 'ABSPATH' ) ) exit;
  * Only load the plugin code if BuddyPress is activated.
  */
 function bp_follow_init() {
-    require( dirname( __FILE__ ) . '/bp-follow.php' );
+	// some pertinent defines
+	define( 'BP_FOLLOW_DIR', dirname( __FILE__ ) );
+	define( 'BP_FOLLOW_URL', plugin_dir_url( __FILE__ ) );
+
+	// only supported in BP 1.5+
+	if ( version_compare( BP_VERSION, '1.3', '>' ) ) {
+		require( constant( 'BP_FOLLOW_DIR' ) . '/bp-follow-core.php' );
+	}
 }
 add_action( 'bp_include', 'bp_follow_init' );
 
