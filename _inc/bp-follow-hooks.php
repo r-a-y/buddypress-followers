@@ -361,6 +361,9 @@ add_action( 'bp_activity_screen_following', 'bp_follow_set_activity_following_sc
 function bp_follow_set_activity_following_scope_on_ajax() {
 
 	// are we in an ajax request?
+	//
+	// backpat for BP 1.5 as we can't check the DOING_AJAX constant b/c 1.5
+	// doesn't use admin-ajax.php
 	$is_ajax = ( isset( $_SERVER['HTTP_X_REQUESTED_WITH'] ) && strtolower( $_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest' );
 
 	// set the activity scope to 'following'
