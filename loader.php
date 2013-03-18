@@ -1,9 +1,9 @@
 <?php
 /*
 Plugin Name: BuddyPress Follow
-Plugin URI: http://buddypress.org/community/groups/buddypress-followers/
+Plugin URI: http://wordpress.org/extend/plugins/buddypress-followers
 Description: Allow your site members to follow other members' activity.
-Version: 1.1.1
+Version: 1.2-bleeding
 License: GNU/GPL 2
 Author: Andy Peatling, r-a-y
 */
