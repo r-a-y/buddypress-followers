@@ -58,7 +58,7 @@ function bp_follow_screen_activity_following() {
  *
  * We're doing two things here:
  *  1) Support the older template format for themes that are using them
- *     for backwards-compatibility (the template passed in 
+ *     for backwards-compatibility (the template passed in
  *     {@link bp_core_load_template()}).
  *  2) Route older template names to use our new template locations and
  *     format.

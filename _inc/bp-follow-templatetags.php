@@ -10,7 +10,7 @@
 if ( !defined( 'ABSPATH' ) ) exit;
 
 /**
- * Output a comma-separated list of user_ids for a given user's followers. 
+ * Output a comma-separated list of user_ids for a given user's followers.
  *
  * @param mixed $args Arguments can be passed as an associative array or as a URL argument string
  * @global $bp The global BuddyPress settings variable created in bp_core_setup_globals()
@@ -40,16 +40,16 @@ function bp_follower_ids( $args = '' ) {
 
 		$r = wp_parse_args( $args, $defaults );
 		extract( $r, EXTR_SKIP );
-		
+
 		$ids = implode( ',', (array)bp_follow_get_followers( array( 'user_id' => $user_id ) ) );
-		
+
 		$ids = empty( $ids ) ? 0 : $ids;
 
  		return apply_filters( 'bp_get_follower_ids', $ids, $user_id );
 	}
 
 /**
- * Output a comma-separated list of user_ids for a given user's following. 
+ * Output a comma-separated list of user_ids for a given user's following.
  *
  * @param mixed $args Arguments can be passed as an associative array or as a URL argument string
  * @global $bp The global BuddyPress settings variable created in bp_core_setup_globals()
@@ -81,7 +81,7 @@ function bp_following_ids( $args = '' ) {
 		extract( $r, EXTR_SKIP );
 
 		$ids = implode( ',', (array)bp_follow_get_following( array( 'user_id' => $user_id ) ) );
-		
+
 		$ids = empty( $ids ) ? 0 : $ids;
 
  		return apply_filters( 'bp_get_following_ids', $ids, $user_id );
@@ -121,7 +121,7 @@ function bp_follow_add_follow_button( $args = '' ) {
 			'leader_id'   => bp_displayed_user_id(),
 			'follower_id' => bp_loggedin_user_id()
 		);
-	
+
 		$r = wp_parse_args( $args, $defaults );
 		extract( $r );
 
