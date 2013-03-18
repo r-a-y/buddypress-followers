@@ -102,6 +102,16 @@ function bp_follow_load_template_filter( $found_template, $templates ) {
 		// will kick in on its own when this template isn't found
 		$found_template = locate_template( 'members/single/plugins.php', false, false );
 
+		// add AJAX support to the members loop
+		// can disable with the 'bp_follow_allow_ajax_on_follow_pages' filter
+		if ( apply_filters( 'bp_follow_allow_ajax_on_follow_pages', true ) ) {
+			// add the "Order by" dropdown filter
+			add_action( 'bp_member_plugin_options_nav',    'bp_follow_add_members_dropdown_filter' );
+
+			// add ability to use AJAX
+			add_action( 'bp_after_member_plugin_template', 'bp_follow_add_ajax_to_members_loop' );
+		}
+
 		// add our hook to inject content into BP
 		//
 		// note the new template name for our template part
@@ -127,4 +137,69 @@ add_filter( 'bp_located_template', 'bp_follow_load_template_filter', 10, 2 );
  */
 function bp_follow_get_template_directory() {
 	return apply_filters( 'bp_follow_get_template_directory', constant( 'BP_FOLLOW_DIR' ) . '/_inc/templates' );
+}
+
+/**
+ * Add ability to use AJAX on the /members/single/plugins.php template.
+ *
+ * The plugins.php template hardcodes the 'no-ajax' class to prevent AJAX
+ * from being used.
+ *
+ * We want to use AJAX; so we dynamically remove the class with jQuery after
+ * the document has finished loading.
+ *
+ * This will enable AJAX in our members loop.
+ *
+ * Hooked to the 'bp_after_member_plugin_template' action.
+ *
+ * @author r-a-y
+ * @since 1.2
+ *
+ * @see bp_follow_load_template_filter()
+ */
+function bp_follow_add_ajax_to_members_loop() {
+?>
+
+	<script type="text/javascript">
+	jQuery(document).ready( function() {
+		jQuery('#subnav').removeClass('no-ajax');
+	});
+	</script>
+
+<?php
+}
+
+/**
+ * Add "Order By" dropdown filter to the /members/single/plugins.php template.
+ *
+ * Hooked to the 'bp_member_plugin_options_nav' action.
+ *
+ * @author r-a-y
+ * @since 1.2
+ *
+ * @see bp_follow_load_template_filter()
+ */
+function bp_follow_add_members_dropdown_filter() {
+?>
+
+	<?php do_action( 'bp_members_directory_member_sub_types' ); ?>
+
+	<li id="members-order-select" class="last filter">
+
+		<?php // the ID for this is important as AJAX relies on it! ?>
+		<label for="members-<?php echo bp_current_action(); ?>-orderby"><?php _e( 'Order By:', 'buddypress' ); ?></label>
+		<select id="members-<?php echo bp_current_action(); ?>-orderby">
+			<option value="active"><?php _e( 'Last Active', 'buddypress' ); ?></option>
+			<option value="newest"><?php _e( 'Newest Registered', 'buddypress' ); ?></option>
+
+			<?php if ( bp_is_active( 'xprofile' ) ) : ?>
+				<option value="alphabetical"><?php _e( 'Alphabetical', 'buddypress' ); ?></option>
+			<?php endif; ?>
+
+			<?php do_action( 'bp_members_directory_order_options' ); ?>
+
+		</select>
+	</li>
+
+<?php
 }
