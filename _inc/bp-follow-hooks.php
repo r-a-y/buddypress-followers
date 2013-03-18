@@ -297,13 +297,19 @@ function bp_follow_add_member_scope_filter( $qs, $object ) {
 	switch ( bp_current_action() ) {
 		// 'following' page
 		case constant( 'BP_FOLLOWING_SLUG' ) :
-			return add_query_arg( 'include', bp_get_following_ids(), $qs );
+			$qs = add_query_arg( 'include',  bp_get_following_ids(), $qs );
+			$qs = add_query_arg( 'per_page', apply_filters( 'bp_follow_per_page', 20 ), $qs );
+
+			return $qs;
 
 			break;
 
 		// 'followers' page
 		case constant( 'BP_FOLLOWERS_SLUG' ) :
-			return add_query_arg( 'include', bp_get_follower_ids(), $qs );
+			$qs = add_query_arg( 'include',  bp_get_follower_ids(), $qs );
+			$qs = add_query_arg( 'per_page', apply_filters( 'bp_follow_per_page', 20 ), $qs );
+
+			return $qs;
 
 			break;
 
