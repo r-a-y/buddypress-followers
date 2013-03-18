@@ -1,9 +1,9 @@
 === BuddyPress Followers ===
 Contributors: apeatling, r-a-y
 Tags: buddypress, following, followers, connections
-Requires at least: WP 3.0 / BP 1.2.6
-Tested up to: WP 3.3 / BP 1.5.2
-Stable tag: 1.1.1
+Requires at least: WP 3.2 / BP 1.5
+Tested up to: WP 3.5.x / BP 1.7
+Stable tag: trunk
 
 == Description ==
 
@@ -24,6 +24,13 @@ Please post on the [BuddyPress Followers support forum](http://buddypress.org/co
 The forums on wordpress.org are rarely checked.
 
 == Changelog ==
+
+= 1.2 =
+* Add BuddyPress 1.7 theme compatibility
+* Add AJAX filtering to a user's "Following" and "Followers" pages
+* Refactor plugin to use BP 1.5's component API
+* Bump version requirements to use at least BP 1.5 (BP 1.2 is no longer supported)
+* Deprecate older templates and use newer format (/buddypress/members/single/follow.php)
 
 = 1.1.1 =
 * Show the following / followers tabs even when empty.
