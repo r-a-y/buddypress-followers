@@ -33,8 +33,11 @@ function bp_follow_setup_globals() {
 		define( 'BP_FOLLOWING_SLUG', 'following' );
 
 	// For internal identification
-	$bp->follow->id              = 'follow';
+	$bp->follow            = new stdClass;
+	$bp->follow->followers = new stdClass;
+	$bp->follow->following = new stdClass;
 
+	$bp->follow->id              = 'follow';
 	$bp->follow->table_name      = $bp->table_prefix . 'bp_follow';
 	$bp->follow->followers->slug = BP_FOLLOWERS_SLUG;
 	$bp->follow->following->slug = BP_FOLLOWING_SLUG;
