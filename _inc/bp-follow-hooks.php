@@ -297,8 +297,17 @@ function bp_follow_add_member_scope_filter( $qs, $object ) {
 	switch ( bp_current_action() ) {
 		// 'following' page
 		case constant( 'BP_FOLLOWING_SLUG' ) :
-			$qs = add_query_arg( 'include',  bp_get_following_ids(), $qs );
-			$qs = add_query_arg( 'per_page', apply_filters( 'bp_follow_per_page', 20 ), $qs );
+			$args = array(
+				'include'  => bp_get_following_ids(),
+				'per_page' => apply_filters( 'bp_follow_per_page', 20 )
+			);
+
+			// make sure we add a separator if we have an existing querystring
+			if ( ! empty( $qs ) )
+				$qs .= '&';
+
+			// add our follow parameters to the end of the querystring
+			$qs .= build_query( $args );
 
 			return $qs;
 
@@ -306,8 +315,17 @@ function bp_follow_add_member_scope_filter( $qs, $object ) {
 
 		// 'followers' page
 		case constant( 'BP_FOLLOWERS_SLUG' ) :
-			$qs = add_query_arg( 'include',  bp_get_follower_ids(), $qs );
-			$qs = add_query_arg( 'per_page', apply_filters( 'bp_follow_per_page', 20 ), $qs );
+			$args = array(
+				'include'  => bp_get_follower_ids(),
+				'per_page' => apply_filters( 'bp_follow_per_page', 20 )
+			);
+
+			// make sure we add a separator if we have an existing querystring
+			if ( ! empty( $qs ) )
+				$qs .= '&';
+
+			// add our follow parameters to the end of the querystring
+			$qs .= build_query( $args );
 
 			return $qs;
 
