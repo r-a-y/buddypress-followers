@@ -1,5 +1,8 @@
 <?php
 
+// Exit if accessed directly
+if ( !defined( 'ABSPATH' ) ) exit;
+
 /**
  * Catches clicks on a "Follow User" button and tries to make that happen.
  *

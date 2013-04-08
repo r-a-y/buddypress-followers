@@ -1,5 +1,8 @@
 <?php
 
+// Exit if accessed directly
+if ( !defined( 'ABSPATH' ) ) exit;
+
 /**
  * Adds user configurable notification settings for the component.
  *

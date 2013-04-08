@@ -1,5 +1,8 @@
 <?php
 
+// Exit if accessed directly
+if ( !defined( 'ABSPATH' ) ) exit;
+
 /**
  * Catches any visits to the "Followers (X)" tab on a users profile.
  *
