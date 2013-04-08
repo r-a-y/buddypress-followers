@@ -45,7 +45,7 @@ function bp_follow_activate() {
 	if ( !$table_prefix = $bp->table_prefix )
 		$table_prefix = apply_filters( 'bp_core_get_table_prefix', $wpdb->base_prefix );
 
-	$sql[] = "CREATE TABLE {$table_prefix}bp_follow (
+	$sql[] = "CREATE TABLE IF NOT EXISTS {$table_prefix}bp_follow (
 			id bigint(20) NOT NULL AUTO_INCREMENT PRIMARY KEY,
 			leader_id bigint(20) NOT NULL,
 			follower_id bigint(20) NOT NULL,
