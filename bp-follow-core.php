@@ -300,6 +300,10 @@ class BP_Follow_Component extends BP_Component {
 	 * The JS is used to add AJAX functionality when clicking on the follow button.
 	 */
 	function enqueue_scripts() {
+		// Do not enqueue if no user is logged in
+		if ( ! is_user_logged_in() )
+			return;
+
 		wp_enqueue_script( 'bp-follow-js', constant( 'BP_FOLLOW_URL' ) . '_inc/bp-follow.js', array( 'jquery' ) );
 	}
 
