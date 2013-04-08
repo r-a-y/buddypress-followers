@@ -33,7 +33,7 @@ class BP_Follow_Component extends BP_Component {
 		parent::start(
 			'follow',
 			__( 'Follow', 'bp-follow' ),
-			constant( 'BP_FOLLOW_DIR' )
+			constant( 'BP_FOLLOW_DIR' ) . '/_inc'
 		);
 
 		// include our files
@@ -51,23 +51,19 @@ class BP_Follow_Component extends BP_Component {
 	 */
 	function includes() {
 
-		$files = array();
-
 		// Backpat functions for BP < 1.7
 		if ( ! class_exists( 'BP_Theme_Compat' ) )
-			$files[] = '_inc/bp-follow-backpat.php';
+			require( $this->path . '/bp-follow-backpat.php' );
 
-		$files[] = '_inc/bp-follow-classes.php';
-		$files[] = '_inc/bp-follow-functions.php';
-		$files[] = '_inc/bp-follow-screens.php';
-		$files[] = '_inc/bp-follow-actions.php';
-		$files[] = '_inc/bp-follow-hooks.php';
-		$files[] = '_inc/bp-follow-templatetags.php';
-		$files[] = '_inc/bp-follow-notifications.php';
-		$files[] = '_inc/bp-follow-widgets.php';
+		require( $this->path . '/bp-follow-classes.php' );
+		require( $this->path . '/bp-follow-functions.php' );
+		require( $this->path . '/bp-follow-screens.php' );
+		require( $this->path . '/bp-follow-actions.php' );
+		require( $this->path . '/bp-follow-hooks.php' );
+		require( $this->path . '/bp-follow-templatetags.php' );
+		require( $this->path . '/bp-follow-notifications.php' );
+		require( $this->path . '/bp-follow-widgets.php' );
 
-		//@todo - only allow this on the frontend only?
-		parent::includes( $files );
 	}
 
 	/**
