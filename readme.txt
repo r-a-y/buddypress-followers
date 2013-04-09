@@ -3,7 +3,7 @@ Contributors: apeatling, r-a-y
 Tags: buddypress, following, followers, connections
 Requires at least: WP 3.2 / BP 1.5
 Tested up to: WP 3.5.x / BP 1.7
-Stable tag: trunk
+Stable tag: 1.2
 
 == Description ==
 
