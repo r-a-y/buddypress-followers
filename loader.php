@@ -29,6 +29,14 @@ function bp_follow_init() {
 	// only supported in BP 1.5+
 	if ( version_compare( BP_VERSION, '1.3', '>' ) ) {
 		require( constant( 'BP_FOLLOW_DIR' ) . '/bp-follow-core.php' );
+
+	// show admin notice for users on BP 1.2.x
+	} else {
+		add_action( 'admin_notices', create_function( '', "
+			echo '<div class=\"error\"><p>' . __( \"Hey! BP Follow v1.2 requires BuddyPress 1.5 or higher.  If you are still using BuddyPress 1.2 and you don't plan on upgrading, use BP Follow v1.1.1 instead.\", 'bp-follow' ) . '</p></div>';
+		" ) );
+
+		return;
 	}
 }
 add_action( 'bp_include', 'bp_follow_init' );
