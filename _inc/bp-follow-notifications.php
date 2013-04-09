@@ -99,43 +99,48 @@ function bp_follow_new_follow_email_notification( $args = '' ) {
 	);
 
 	$r = wp_parse_args( $args, $defaults );
-	extract( $r, EXTR_SKIP );
 
-	if ( 'no' == bp_get_user_meta( (int)$leader_id, 'notification_starts_following', true ) )
+	if ( 'no' == bp_get_user_meta( (int) $r['leader_id'], 'notification_starts_following', true ) )
 		return false;
 
 	// Check to see if this leader has already been notified of this follower before
-	$has_notified = bp_get_user_meta( $follower_id, 'bp_follow_has_notified', true );
+	$has_notified = bp_get_user_meta( $r['follower_id'], 'bp_follow_has_notified', true );
 
-	if ( in_array( $leader_id, (array)$has_notified ) )
+	// Already notified so don't send another email
+	if ( in_array( $r['leader_id'], (array) $has_notified ) )
 		return false;
 
 	// Not been notified before, update usermeta and continue to mail
-	$has_notified[] = $leader_id;
-	bp_update_user_meta( $follower_id, 'bp_follow_has_notified', $has_notified );
+	$has_notified[] = $r['leader_id'];
+	bp_update_user_meta( $r['follower_id'], 'bp_follow_has_notified', $has_notified );
 
-	$follower_name = bp_core_get_user_displayname( $follower_id );
-	$follower_link = bp_core_get_user_domain( $follower_id );
+	$follower_name = bp_core_get_user_displayname( $r['follower_id'] );
+	$follower_link = bp_core_get_user_domain( $r['follower_id'] );
 
-	$leader_ud = bp_core_get_core_userdata( $leader_id );
-	$settings_link = bp_core_get_user_domain( $leader_id ) . BP_SETTINGS_SLUG . '/notifications/';
+	$leader_ud = bp_core_get_core_userdata( $r['leader_id'] );
 
 	// Set up and send the message
 	$to = $leader_ud->user_email;
-	$subject = '[' . get_option( 'blogname' ) . '] ' . sprintf( __( '%s is now following you', 'bp-follow' ), $follower_name );
+
+	$subject = '[' . wp_specialchars_decode( bp_get_option( 'blogname' ), ENT_QUOTES ) . '] ' . sprintf( __( '%s is now following you', 'bp-follow' ), $follower_name );
 
 	$message = sprintf( __(
 '%s is now following your activity.
 
-To view %s\'s profile: %s
+To view %s\'s profile: %s', 'bp-follow' ), $follower_name, $follower_name, $follower_link );
+
+	// Add notifications link if settings component is enabled
+	if ( bp_is_active( 'settings' ) ) {
+		$settings_link = bp_core_get_user_domain( $r['leader_id'] ) . BP_SETTINGS_SLUG . '/notifications/';
+		$message .= sprintf( __( '
 
 ---------------------
-', 'bp-follow' ), $follower_name, $follower_name, $follower_link );
+To disable these notifications please log in and go to:
+%s', 'bp-follow' ), $settings_link );
+	}
 
-	$message .= sprintf( __( 'To disable these notifications please log in and go to: %s', 'buddypress' ), $settings_link );
-
-	/* Send the message */
-	$to = apply_filters( 'bp_follow_notification_to', $to );
+	// Send the message
+	$to      = apply_filters( 'bp_follow_notification_to', $to );
 	$subject = apply_filters( 'bp_follow_notification_subject', $subject, $follower_name );
 	$message = apply_filters( 'bp_follow_notification_message', $message, $follower_name, $follower_link );
 
