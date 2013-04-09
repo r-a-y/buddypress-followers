@@ -27,20 +27,27 @@ function bp_follow_start_following( $args = '' ) {
 	);
 
 	$r = wp_parse_args( $args, $defaults );
-	extract( $r, EXTR_SKIP );
 
 	$follow = new BP_Follow;
-	$follow->leader_id = (int)$leader_id;
-	$follow->follower_id = (int)$follower_id;
+	$follow->leader_id   = (int) $r['leader_id'];
+	$follow->follower_id = (int) $r['follower_id'];
 
-	if ( !$follow->save() )
+	if ( ! $follow->save() )
 		return false;
 
-	/* Add a screen count notification */
-	bp_core_add_notification( $follower_id, $leader_id, $bp->follow->id, 'new_follow' );
+	// Add a screen count notification
+	bp_core_add_notification(
+		$r['follower_id'],
+		$r['leader_id'],
+		$bp->follow->id,
+		'new_follow'
+	);
 
-	/* Add a more specific email notification */
-	bp_follow_new_follow_email_notification( array( 'leader_id' => $leader_id, 'follower_id' => $follower_id ) );
+	// Add a more specific email notification
+	bp_follow_new_follow_email_notification( array(
+		'leader_id'   => $r['leader_id'],
+		'follower_id' => $r['follower_id']
+	) );
 
 	do_action_ref_array( 'bp_follow_start_following', array( &$follow ) );
 
@@ -64,11 +71,10 @@ function bp_follow_stop_following( $args = '' ) {
 	);
 
 	$r = wp_parse_args( $args, $defaults );
-	extract( $r, EXTR_SKIP );
 
-	$follow = new BP_Follow( $leader_id, $follower_id );
+	$follow = new BP_Follow( $r['leader_id'], $r['follower_id'] );
 
-	if ( !$follow->delete() )
+	if ( ! $follow->delete() )
 		return false;
 
 	do_action_ref_array( 'bp_follow_stop_following', array( &$follow ) );
@@ -93,9 +99,9 @@ function bp_follow_is_following( $args = '' ) {
 	);
 
 	$r = wp_parse_args( $args, $defaults );
-	extract( $r, EXTR_SKIP );
 
-	$follow = new BP_Follow( $leader_id, $follower_id );
+	$follow = new BP_Follow( $r['leader_id'], $r['follower_id'] );
+
 	return apply_filters( 'bp_follow_is_following', (int)$follow->id, $follow );
 }
 
@@ -114,9 +120,8 @@ function bp_follow_get_followers( $args = '' ) {
 	);
 
 	$r = wp_parse_args( $args, $defaults );
-	extract( $r, EXTR_SKIP );
 
-	return apply_filters( 'bp_follow_get_followers', BP_Follow::get_followers( $user_id ) );
+	return apply_filters( 'bp_follow_get_followers', BP_Follow::get_followers( $r['user_id'] ) );
 }
 
 /**
@@ -134,9 +139,8 @@ function bp_follow_get_following( $args = '' ) {
 	);
 
 	$r = wp_parse_args( $args, $defaults );
-	extract( $r, EXTR_SKIP );
 
-	return apply_filters( 'bp_follow_get_following', BP_Follow::get_following( $user_id ) );
+	return apply_filters( 'bp_follow_get_following', BP_Follow::get_following( $r['user_id'] ) );
 }
 
 /**
@@ -154,9 +158,8 @@ function bp_follow_total_follow_counts( $args = '' ) {
 	);
 
 	$r = wp_parse_args( $args, $defaults );
-	extract( $r, EXTR_SKIP );
 
-	return apply_filters( 'bp_follow_total_follow_counts', BP_Follow::get_counts( $user_id ) );
+	return apply_filters( 'bp_follow_total_follow_counts', BP_Follow::get_counts( $r['user_id'] ) );
 }
 
 /**
