@@ -1,4 +1,10 @@
 <?php
+/**
+ * BP Follow Actions
+ *
+ * @package BP-Follow
+ * @subpackage Actions
+ */
 
 // Exit if accessed directly
 if ( !defined( 'ABSPATH' ) ) exit;

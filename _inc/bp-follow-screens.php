@@ -1,4 +1,10 @@
 <?php
+/**
+ * BP Follow Screens
+ *
+ * @package BP-Follow
+ * @subpackage Screens
+ */
 
 // Exit if accessed directly
 if ( !defined( 'ABSPATH' ) ) exit;

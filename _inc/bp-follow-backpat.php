@@ -1,6 +1,6 @@
 <?php
 /**
- * Backwards compatibililty functions for BP 1.2.x.
+ * Backwards compatibililty functions for < BP 1.7.
  *
  * @author r-a-y
  * @package BP-Follow
