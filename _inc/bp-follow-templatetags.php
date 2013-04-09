@@ -180,4 +180,3 @@ function bp_follow_add_follow_button( $args = '' ) {
 		// Filter and return the HTML button
 		return bp_get_button( apply_filters( 'bp_follow_get_add_follow_button', $button, $leader_id, $follower_id ) );
 	}
-?>

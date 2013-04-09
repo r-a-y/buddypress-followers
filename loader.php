@@ -96,4 +96,3 @@ function bp_follow_localization() {
 		return false;
 }
 add_action( 'plugins_loaded', 'bp_follow_localization' );
-?>
