@@ -1,4 +1,4 @@
-=== BuddyPress Followers ===
+=== BuddyPress Follow ===
 Contributors: apeatling, r-a-y
 Tags: buddypress, following, followers, connections
 Requires at least: WP 3.2 / BP 1.5
@@ -7,21 +7,32 @@ Stable tag: trunk
 
 == Description ==
 
-Add the ability for users to follow others and keep track of their site activity. This plugin works exactly the same way that the friends component of BuddyPress works, however the connection does not need to be accepted by the person being followed.
+Follow members on your BuddyPress site with this nifty plugin.
 
-The plugin integrates seamlessly with your site, adding a new activity stream tab, follow/unfollow buttons to user profiles and adds menus to display the users following/followed and total counts.
+The plugin works similar to the friends component, however the connection does not need to be accepted by the person being followed.  Just like Twitter!
+
+This plugin adds:
+* Following / Followers tabs to user profile pages
+* Follow / Unfollow buttons on user profile pages and in the members directory
+* A new "Following" activity directory tab
+* An "Activity > Following" subnav tab to a user's profile page
+* Menu items to the WP Toolbar
+
+For bug reports or to add patches or translation files, visit the [BP Follow Github page](https://github.com/r-a-y/buddypress-followers).
+
+Translators will be forever enshrined in this readme! :)
+
 
 == Installation ==
 
 1. Download, install and activate the plugin.
 1. To follow a user, simply visit their profile and hit the follow button under their name.
 
+
 == Frequently Asked Questions ==
 
-#### Where to find support? ####
+Check out the [BP Follow wiki](https://github.com/r-a-y/buddypress-followers/wiki).
 
-Please post on the [BuddyPress Followers support forum](http://buddypress.org/community/groups/buddypress-followers/forum/) at buddypress.org.
-The forums on wordpress.org are rarely checked.
 
 == Changelog ==
 
@@ -31,6 +42,8 @@ The forums on wordpress.org are rarely checked.
 * Refactor plugin to use BP 1.5's component API
 * Bump version requirements to use at least BP 1.5 (BP 1.2 is no longer supported)
 * Deprecate older templates and use newer format (/buddypress/members/single/follow.php)
+* Add ability to change the widget title
+* Thanks to the Hamilton-Wentworth District School Board for sponsoring this release
 
 = 1.1.1 =
 * Show the following / followers tabs even when empty.
