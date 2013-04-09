@@ -23,7 +23,7 @@ function bp_follow_screen_notification_settings() {
 		<thead>
 			<tr>
 				<th class="icon"></th>
-				<th class="title"><?php _e( 'Followers/Following', 'bp-follow' ) ?></th>
+				<th class="title"><?php _e( 'Follow', 'bp-follow' ) ?></th>
 				<th class="yes"><?php _e( 'Yes', 'buddypress' ) ?></th>
 				<th class="no"><?php _e( 'No', 'buddypress' )?></th>
 			</tr>
