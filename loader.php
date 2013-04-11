@@ -7,6 +7,8 @@ Version: 1.2
 Author: Andy Peatling, r-a-y
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: bp-follow
+Domain Path: /languages
 */
 
 /**
