@@ -80,7 +80,7 @@ function bp_follow_load_template_filter( $found_template, $templates ) {
 	global $bp;
 
 	// Only filter the template location when we're on the follow component pages.
-	if ( ! bp_is_current_component( $bp->follow->followers->slug ) && !bp_is_current_component( $bp->follow->following->slug ) )
+	if ( ! bp_is_current_component( $bp->follow->followers->slug ) && ! bp_is_current_component( $bp->follow->following->slug ) )
 		return $found_template;
 
 	// $found_template is not empty when the older template files are found in the
@@ -196,13 +196,13 @@ function bp_follow_add_members_dropdown_filter() {
 	<li id="members-order-select" class="last filter">
 
 		<?php // the ID for this is important as AJAX relies on it! ?>
-		<label for="members-<?php echo bp_current_action(); ?>-orderby"><?php _e( 'Order By:', 'buddypress' ); ?></label>
+		<label for="members-<?php echo bp_current_action(); ?>-orderby"><?php _e( 'Order By:', 'bp-follow' ); ?></label>
 		<select id="members-<?php echo bp_current_action(); ?>-orderby">
-			<option value="active"><?php _e( 'Last Active', 'buddypress' ); ?></option>
-			<option value="newest"><?php _e( 'Newest Registered', 'buddypress' ); ?></option>
+			<option value="active"><?php _e( 'Last Active', 'bp-follow' ); ?></option>
+			<option value="newest"><?php _e( 'Newest Registered', 'bp-follow' ); ?></option>
 
 			<?php if ( bp_is_active( 'xprofile' ) ) : ?>
-				<option value="alphabetical"><?php _e( 'Alphabetical', 'buddypress' ); ?></option>
+				<option value="alphabetical"><?php _e( 'Alphabetical', 'bp-follow' ); ?></option>
 			<?php endif; ?>
 
 			<?php do_action( 'bp_members_directory_order_options' ); ?>
