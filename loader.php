@@ -36,7 +36,7 @@ function bp_follow_init() {
 	// show admin notice for users on BP 1.2.x
 	} else {
 		add_action( 'admin_notices', create_function( '', "
-			echo '<div class=\"error\"><p>' . __( \"Hey! BP Follow v1.2 requires BuddyPress 1.5 or higher.  If you are still using BuddyPress 1.2 and you don't plan on upgrading, use BP Follow v1.1.1 instead.\", 'bp-follow' ) . '</p></div>';
+			echo '<div class=\"error\"><p>' . sprintf( __( \"Hey! BP Follow v1.2 requires BuddyPress 1.5 or higher.  If you are still using BuddyPress 1.2 and you don't plan on upgrading, use <a href='%s'>BP Follow v1.1.1 instead</a>.\", 'bp-follow' ), 'https://github.com/r-a-y/buddypress-followers/archive/1.1.x.zip' ) . '</p></div>';
 		" ) );
 
 		return;
