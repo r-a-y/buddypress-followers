@@ -26,7 +26,7 @@ class BP_Follow_Component extends BP_Component {
 	 *
 	 * @global obj $bp BuddyPress instance
 	 */
-	function __construct() {
+	public function __construct() {
 		global $bp;
 
 		// let's start the show!
@@ -49,7 +49,7 @@ class BP_Follow_Component extends BP_Component {
 	/**
 	 * Includes.
 	 */
-	function includes() {
+	public function includes( $includes = array() ) {
 
 		// Backpat functions for BP < 1.7
 		if ( ! class_exists( 'BP_Theme_Compat' ) )
@@ -71,7 +71,7 @@ class BP_Follow_Component extends BP_Component {
 	 *
 	 * @global obj $bp BuddyPress instance
 	 */
-	function setup_globals() {
+	public function setup_globals( $args = array() ) {
 		global $bp;
 
 		if ( ! defined( 'BP_FOLLOWERS_SLUG' ) )
@@ -119,7 +119,7 @@ class BP_Follow_Component extends BP_Component {
 	/**
 	 * Setup hooks.
 	 */
-	function setup_hooks() {
+	public function setup_hooks() {
 		// javascript hook
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ), 11 );
 	}
@@ -127,7 +127,7 @@ class BP_Follow_Component extends BP_Component {
 	/**
 	 * Setup profile / BuddyBar navigation
 	 */
-	function setup_nav() {
+	public function setup_nav( $main_nav = array(), $sub_nav = array() ) {
 		global $bp;
 
 		// Need to change the user ID, so if we're not on a member page, $counts variable is still calculated
@@ -187,9 +187,7 @@ class BP_Follow_Component extends BP_Component {
 	 *
 	 * @global obj $bp BuddyPress instance
 	 */
-	function setup_admin_bar() {
-		// Prevent debug notices
-		$wp_admin_nav = array();
+	public function setup_admin_bar( $wp_admin_nav = array() ) {
 
 		// Menus for logged in user
 		if ( is_user_logged_in() ) {
@@ -252,7 +250,7 @@ class BP_Follow_Component extends BP_Component {
 	 * @global object $bp BuddyPress global settings
 	 * @uses bp_follow_total_follow_counts() Get the following/followers counts for a user.
 	 */
-	function group_buddybar_items() {
+	public function group_buddybar_items() {
 		// don't do this if we're using the WP Admin Bar / Toolbar
 		if ( defined( 'BP_USE_WP_ADMIN_BAR' ) && BP_USE_WP_ADMIN_BAR )
 			return;
@@ -314,7 +312,7 @@ class BP_Follow_Component extends BP_Component {
 	 *
 	 * The JS is used to add AJAX functionality when clicking on the follow button.
 	 */
-	function enqueue_scripts() {
+	public function enqueue_scripts() {
 		// Do not enqueue if no user is logged in
 		if ( ! is_user_logged_in() )
 			return;
