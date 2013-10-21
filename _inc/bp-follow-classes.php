@@ -88,7 +88,7 @@ class BP_Follow {
 		global $bp, $wpdb;
 
 		if ( empty( $user_id ) )
-			$user_id = $bp->loggedin_user->id;
+			$user_id = bp_loggedin_user_id();
 
 		$leader_ids = implode( ',', wp_parse_id_list( (array) $leader_ids ) );
 
