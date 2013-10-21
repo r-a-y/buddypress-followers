@@ -90,7 +90,7 @@ class BP_Follow {
 		if ( empty( $user_id ) )
 			$user_id = $bp->loggedin_user->id;
 
-		$leader_ids = $wpdb->escape( implode( ',', (array)$leader_ids ) );
+		$leader_ids = implode( ',', wp_parse_id_list( (array) $leader_ids ) );
 
 		return $wpdb->get_results( $wpdb->prepare( "SELECT leader_id, id FROM {$bp->follow->table_name} WHERE follower_id = %d AND leader_id IN ($leader_ids)", $user_id ) );
 	}
