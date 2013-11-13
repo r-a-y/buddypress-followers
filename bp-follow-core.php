@@ -323,6 +323,12 @@ class BP_Follow_Component extends BP_Component {
 		if ( ! is_user_logged_in() )
 			return;
 
+		// Do not add the script on network sites if not on multiblog mode
+		// just add follow script on the root blog 
+		if( !bp_is_multiblog_mode() && !bp_is_root_blog() )
+			return;
+
+
 		wp_enqueue_script( 'bp-follow-js', constant( 'BP_FOLLOW_URL' ) . '_inc/bp-follow.js', array( 'jquery' ) );
 	}
 
