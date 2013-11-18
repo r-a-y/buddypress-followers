@@ -169,7 +169,9 @@ endif;
 // HOOKS ////////////////////////////////////////////////////////////
 
 // Filter BuddyPress template locations
-add_filter( 'bp_get_template_stack', 'bp_add_template_stack_locations' );
+if ( ! has_filter( 'bp_get_template_stack', 'bp_add_template_stack_locations' ) ) {
+	add_filter( 'bp_get_template_stack', 'bp_add_template_stack_locations' );
+}
 
 // Register template stacks
 bp_register_template_stack( 'get_stylesheet_directory', 10 );
