@@ -29,11 +29,17 @@ class BP_Follow_Component extends BP_Component {
 	public function __construct() {
 		global $bp;
 
+		// setup misc parameters
+		$this->params = array(
+			'adminbar_myaccount_order' => apply_filters( 'bp_follow_following_nav_position', 61 )
+		);
+
 		// let's start the show!
 		parent::start(
 			'follow',
 			__( 'Follow', 'bp-follow' ),
-			constant( 'BP_FOLLOW_DIR' ) . '/_inc'
+			constant( 'BP_FOLLOW_DIR' ) . '/_inc',
+			$this->params
 		);
 
 		// include our files
@@ -142,7 +148,7 @@ class BP_Follow_Component extends BP_Component {
 		bp_core_new_nav_item( array(
 			'name'                => sprintf( __( 'Following <span>%d</span>', 'bp-follow' ), $counts['following'] ),
 			'slug'                => $bp->follow->following->slug,
-			'position'            => apply_filters( 'bp_follow_following_nav_position', 61 ),
+			'position'            => $this->params['adminbar_myaccount_order'],
 			'screen_function'     => 'bp_follow_screen_following',
 			'default_subnav_slug' => 'following',
 			'item_css_id'         => 'members-following'
@@ -261,7 +267,7 @@ class BP_Follow_Component extends BP_Component {
 		global $bp;
 
 		// get follow nav positions
-		$following_position = apply_filters( 'bp_follow_following_nav_position', 61 );
+		$following_position = $this->params['adminbar_myaccount_order'];
 		$followers_position = apply_filters( 'bp_follow_followers_nav_position', 62 );
 
 		// clobberin' time!
