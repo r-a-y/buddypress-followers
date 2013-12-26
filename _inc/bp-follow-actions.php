@@ -87,6 +87,45 @@ function bp_follow_action_stop() {
 }
 add_action( 'bp_actions', 'bp_follow_action_stop' );
 
+/**
+ * Add RSS feed support for a user's following activity.
+ *
+ * eg. example.com/members/USERNAME/activity/following/feed/
+ *
+ * Only available in BuddyPress 1.8+.
+ *
+ * @since 1.2.1
+ * @author r-a-y
+ */
+function bp_follow_my_following_feed() {
+	// only available in BP 1.8+
+	if ( ! class_exists( 'BP_Activity_Feed' ) ) {
+		return;
+	}
+
+	if ( ! bp_is_user_activity() || ! bp_is_current_action( constant( 'BP_FOLLOWING_SLUG' ) ) || ! bp_is_action_variable( 'feed', 0 ) ) {
+		return false;
+	}
+
+	global $bp;
+
+	// setup the feed
+	$bp->activity->feed = new BP_Activity_Feed( array(
+		'id'            => 'myfollowing',
+
+		/* translators: User's following activity RSS title - "[Site Name] | [User Display Name] | Following Activity" */
+		'title'         => sprintf( __( '%1$s | %2$s | Following Activity', 'bp-follow' ), bp_get_site_name(), bp_get_displayed_user_fullname() ),
+
+		'link'          => trailingslashit( bp_displayed_user_domain() . bp_get_activity_slug() . '/' . constant( 'BP_FOLLOWING_SLUG' ) ),
+		'description'   => sprintf( __( "Activity feed for people that %s is following.", 'buddypress' ), bp_get_displayed_user_fullname() ),
+		'activity_args' => array(
+			'user_id'  => bp_get_following_ids(),
+			'display_comments' => 'threaded'
+		)
+	) );
+}
+add_action( 'bp_actions', 'bp_follow_my_following_feed' );
+
 /** AJAX ACTIONS ***************************************************/
 
 /**
