@@ -132,8 +132,9 @@ function bp_follow_add_follow_button( $args = '' ) {
 		if ( ! $r['leader_id'] || ! $r['follower_id'] )
 			return false;
 
-		// if we're checking during a members loop, then follow status is already queried via bp_follow_inject_member_follow_status()
-		if ( ! empty( $members_template->member ) && $r['follower_id'] == bp_loggedin_user_id() && $r['follower_id'] == bp_displayed_user_id() ) {
+		// if we're checking during a members loop, then follow status is already
+		// queried via bp_follow_inject_member_follow_status()
+		if ( ! empty( $members_template->member ) && $r['follower_id'] == bp_loggedin_user_id() && $r['leader_id'] == bp_get_member_user_id() ) {
 			$is_following = $members_template->member->is_following;
 
 		// else we manually query the follow status
