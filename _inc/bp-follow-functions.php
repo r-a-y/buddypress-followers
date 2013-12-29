@@ -32,16 +32,31 @@ function bp_follow_start_following( $args = '' ) {
 	$follow->leader_id   = (int) $r['leader_id'];
 	$follow->follower_id = (int) $r['follower_id'];
 
-	if ( ! $follow->save() )
+	if ( ! $follow->save() ) {
 		return false;
+	}
 
 	// Add a screen count notification
-	bp_core_add_notification(
-		$r['follower_id'],
-		$r['leader_id'],
-		$bp->follow->id,
-		'new_follow'
-	);
+	//
+	// The new notifications component
+	if ( bp_is_active( 'notifications' ) ) {
+		bp_notifications_add_notification( array(
+			'item_id'           => $follow->follower_id,
+			'user_id'           => $follow->leader_id,
+			'component_name'    => $bp->follow->id,
+			'component_action'  => 'new_follow'
+		) );
+
+	// The older notifications method
+	// @todo remove this in a future release
+	} else {
+		bp_core_add_notification(
+			$follow->follower_id,
+			$follow->leader_id,
+			$bp->follow->id,
+			'new_follow'
+		);
+	}
 
 	// Add a more specific email notification
 	bp_follow_new_follow_email_notification( array(
