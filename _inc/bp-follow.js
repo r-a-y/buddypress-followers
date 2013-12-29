@@ -53,6 +53,22 @@ jq( function() {
 				// add ajax response
 				link.html( response );
 
+				// increase / decrease counts
+				var count_wrapper = false;
+				if ( context == 'profile' ) {
+					count_wrapper = jq("#user-members-followers span");
+				} else if ( context == 'member-directory' ) {
+					count_wrapper = jq("#members-following span");
+				}
+
+				if ( count_wrapper.length ) {
+					if ( action == 'unfollow' ) {
+						count_wrapper.text( ( count_wrapper.text() >> 0 ) - 1 );
+					} else if ( action == 'follow' ) {
+						count_wrapper.text( ( count_wrapper.text() >> 0 ) + 1 );
+					}
+				}
+
 				jq(this).fadeIn(200);
 			});
 		});
