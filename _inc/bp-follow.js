@@ -1,21 +1,36 @@
-if ( typeof jq == "undefined" )
+if ( typeof jq == "undefined" ) {
 	var jq = jQuery;
+}
 
-jq(document).ready( function() {
-	jq("a.follow, a.unfollow").live( 'click', function() {
-		var link = jq(this);
-		var type = link.attr('class');
-		var uid = link.attr('id');
-		var nonce = link.attr('href');
+jq( function() {
+	var profileHeader   = jq("#item-buttons");
+	var memberLoop      = jq("#members-list");
+	var groupMemberLoop = jq("#member-list"); // groan!
+
+	profileHeader.on("click", ".follow-button a", function() {
+		bp_follow_button_action( jq(this), 'profile' );
+		return false;
+	});
+
+	memberLoop.on("click", ".follow-button a", function() {
+		bp_follow_button_action( jq(this), 'member-directory' );
+		return false;
+	});
+
+	groupMemberLoop.on("click", ".follow-button a", function() {
+		bp_follow_button_action( jq(this) );
+		return false;
+	});
+
+	function bp_follow_button_action( scope, context ) {
+		var link   = scope;
+		var uid    = link.attr('id');
+		var nonce  = link.attr('href');
 		var action = '';
 
-		// add the loading class for BP 1.2.x only
-		if ( BP_DTheme.mention_explain )
-			link.addClass('loading');
-
-		uid = uid.split('-');
+		uid    = uid.split('-');
 		action = uid[0];
-		uid = uid[1];
+		uid    = uid[1];
 
 		nonce = nonce.split('?_wpnonce=');
 		nonce = nonce[1].split('&');
@@ -23,29 +38,23 @@ jq(document).ready( function() {
 
 		jq.post( ajaxurl, {
 			action: 'bp_' + action,
-			'cookie': encodeURIComponent(document.cookie),
 			'uid': uid,
 			'_wpnonce': nonce
 		},
 		function(response) {
-			jq(link.parent()).fadeOut(200, function() {
+			jq( link.parent()).fadeOut(200, function() {
+				// toggle classes
+				if ( action == 'unfollow' ) {
+					link.parent().removeClass( 'following' ).addClass( 'not-following' );
+				} else {
+					link.parent().removeClass( 'not-following' ).addClass( 'following' );
+				}
+
+				// add ajax response
 				link.html( response );
 
-				// remove the loading class for BP 1.2.x only
-				if ( BP_DTheme.mention_explain )
-					link.removeClass('loading');
-
-				link.removeClass('follow');
-				link.removeClass('unfollow');
-				link.parent().addClass('pending');
-				link.addClass('disabled');
 				jq(this).fadeIn(200);
 			});
 		});
-		return false;
-	} );
-
-	jq("a.disabled").live( 'click', function() {
-		return false;
-	});
+	}
 } );
