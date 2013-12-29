@@ -118,34 +118,41 @@ function bp_follow_add_follow_button( $args = '' ) {
 		global $bp, $members_template;
 
 		$defaults = array(
-			'leader_id'   => bp_displayed_user_id(),
-			'follower_id' => bp_loggedin_user_id()
+			'leader_id'     => bp_displayed_user_id(),
+			'follower_id'   => bp_loggedin_user_id(),
+			'link_text'     => '',
+			'link_title'    => '',
+			'wrapper_class' => '',
+			'link_class'    => '',
+			'wrapper'       => 'div'
 		);
 
 		$r = wp_parse_args( $args, $defaults );
-		extract( $r );
 
-		if ( !$leader_id || !$follower_id )
+		if ( ! $r['leader_id'] || ! $r['follower_id'] )
 			return false;
 
 		// if we're checking during a members loop, then follow status is already queried via bp_follow_inject_member_follow_status()
-		if ( !empty( $members_template->member ) && $follower_id == bp_loggedin_user_id() && $follower_id == bp_displayed_user_id() ) {
+		if ( ! empty( $members_template->member ) && $r['follower_id'] == bp_loggedin_user_id() && $r['follower_id'] == bp_displayed_user_id() ) {
 			$is_following = $members_template->member->is_following;
-		}
+
 		// else we manually query the follow status
-		else {
-			$is_following = bp_follow_is_following( array( 'leader_id' => $leader_id, 'follower_id' => $follower_id ) );
+		} else {
+			$is_following = bp_follow_is_following( array(
+				'leader_id'   => $r['leader_id'],
+				'follower_id' => $r['follower_id']
+			) );
 		}
 
 		// if the logged-in user is the leader, use already-queried variables
-		if ( bp_loggedin_user_id() && $leader_id == bp_loggedin_user_id() ) {
+		if ( bp_loggedin_user_id() && $r['leader_id'] == bp_loggedin_user_id() ) {
 			$leader_domain   = bp_loggedin_user_domain();
 			$leader_fullname = bp_get_loggedin_user_fullname();
-		}
+
 		// else we do a lookup for the user domain and display name of the leader
-		else {
-			$leader_domain   = bp_core_get_user_domain( $leader_id );
-			$leader_fullname = bp_core_get_user_displayname( $leader_id );
+		} else {
+			$leader_domain   = bp_core_get_user_domain( $r['leader_id'] );
+			$leader_fullname = bp_core_get_user_displayname( $r['leader_id'] );
 		}
 
 		// setup some variables
@@ -153,13 +160,34 @@ function bp_follow_add_follow_button( $args = '' ) {
 			$id        = 'following';
 			$action    = 'stop';
 			$class     = 'unfollow';
-			$link_text = $link_title = sprintf( __( 'Stop Following %s', 'bp-follow' ), apply_filters( 'bp_follow_leader_name', bp_get_user_firstname( $leader_fullname ), $leader_id ) );
-		}
-		else {
+			$link_text = sprintf( __( 'Unfollow', 'bp-follow' ), apply_filters( 'bp_follow_leader_name', bp_get_user_firstname( $leader_fullname ), $r['leader_id'] ) );
+
+			if ( empty( $r['link_text'] ) ) {
+				$r['link_text'] = $link_text;
+			}
+
+		} else {
 			$id        = 'not-following';
 			$action    = 'start';
 			$class     = 'follow';
-			$link_text = $link_title = sprintf( __( 'Follow %s', 'bp-follow' ), apply_filters( 'bp_follow_leader_name', bp_get_user_firstname( $leader_fullname ), $leader_id ) );
+			$link_text = sprintf( __( 'Follow', 'bp-follow' ), apply_filters( 'bp_follow_leader_name', bp_get_user_firstname( $leader_fullname ), $r['leader_id'] ) );
+
+			if ( empty( $r['link_text'] ) ) {
+				$r['link_text'] = $link_text;
+			}
+
+		}
+
+		$wrapper_class = 'follow-button ' . $id;
+
+		if ( ! empty( $r['wrapper_class'] ) ) {
+			$wrapper_class .= ' '  . esc_attr( $r['wrapper_class'] );
+		}
+
+		$link_class = $class;
+
+		if ( ! empty( $r['link_class'] ) ) {
+			$link_class .= ' '  . esc_attr( $r['link_class'] );
 		}
 
 		// setup the button arguments
@@ -167,16 +195,16 @@ function bp_follow_add_follow_button( $args = '' ) {
 			'id'                => $id,
 			'component'         => 'follow',
 			'must_be_logged_in' => true,
-			'block_self'        => empty( $members_template->member ) ? true : false,
-			'wrapper_class'     => 'follow-button ' . $id,
-			'wrapper_id'        => 'follow-button-' . $leader_id,
+			'wrapper_class'     => $wrapper_class,
+			'wrapper_id'        => 'follow-button-' . (int) $r['leader_id'],
 			'link_href'         => wp_nonce_url( $leader_domain . $bp->follow->followers->slug . '/' . $action .'/', $action . '_following' ),
-			'link_text'         => $link_text,
-			'link_title'        => $link_title,
-			'link_id'           => $class . '-' . $leader_id,
-			'link_class'        => $class
+			'link_text'         => esc_attr( $r['link_text'] ),
+			'link_title'        => esc_attr( $r['link_title'] ),
+			'link_id'           => $class . '-' . (int) $r['leader_id'],
+			'link_class'        => $link_class,
+			'wrapper'           => ! empty( $r['wrapper'] ) ? esc_attr( $r['wrapper'] ) : false
 		);
 
 		// Filter and return the HTML button
-		return bp_get_button( apply_filters( 'bp_follow_get_add_follow_button', $button, $leader_id, $follower_id ) );
+		return bp_get_button( apply_filters( 'bp_follow_get_add_follow_button', $button, $r['leader_id'], $r['follower_id'] ) );
 	}
