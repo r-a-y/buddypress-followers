@@ -129,56 +129,100 @@ add_action( 'bp_actions', 'bp_follow_my_following_feed' );
 /** AJAX ACTIONS ***************************************************/
 
 /**
- * Allow a user to start following another user by catching an AJAX request.
+ * AJAX callback when clicking on the "Follow" button to follow a user.
  *
- * @global $bp The global BuddyPress settings variable created in bp_core_setup_globals()
  * @uses check_admin_referer() Checks to make sure the WP security nonce matches.
- * @uses bp_follow_is_following() Checks to see if a user is following another user already.
  * @uses bp_follow_start_following() Starts a user following another user.
- * @return bool false
+ * @uses bp_follow_is_following() Checks to see if a user is following another user already.
  */
 function bp_follow_ajax_action_start() {
 
 	check_admin_referer( 'start_following' );
 
-	if ( bp_follow_is_following( array( 'leader_id' => $_POST['uid'], 'follower_id' => bp_loggedin_user_id() ) ) )
-		$message = __( 'Already following', 'bp-follow' );
-	else {
-		if ( !bp_follow_start_following( array( 'leader_id' => $_POST['uid'], 'follower_id' => bp_loggedin_user_id() ) ) )
-			$message = __( 'Error following user', 'bp-follow' );
-		else
-			$message = __( 'You are now following', 'bp-follow' );
+	// successful follow
+	if ( bp_follow_start_following( array( 'leader_id' => $_POST['uid'], 'follower_id' => bp_loggedin_user_id() ) ) ) {
+		// output unfollow button
+		$output = bp_follow_get_add_follow_button( array(
+			'leader_id'   => $_POST['uid'],
+			'follower_id' => bp_loggedin_user_id(),
+			'wrapper'     => false
+		) );
+
+	// failed follow
+	} else {
+		// output fallback invalid button
+		$args = array(
+			'id'        => 'invalid',
+			'link_href' => 'javascript:;',
+			'component' => 'follow',
+			'wrapper'   => false
+		);
+
+		if ( bp_follow_is_following( array( 'leader_id' => $_POST['uid'], 'follower_id' => bp_loggedin_user_id() ) ) ) {
+			$output = bp_get_button( array_merge(
+				array( 'link_text' => __( 'Already following', 'bp-follow' ) ),
+				$args
+			) );
+		} else {
+			$output = bp_get_button( array_merge(
+				array( 'link_text' => __( 'Error following user', 'bp-follow' ) ),
+				$args
+			) );
+		}
 	}
 
-	echo $message;
+	echo $output;
 
 	exit();
 }
 add_action( 'wp_ajax_bp_follow', 'bp_follow_ajax_action_start' );
 
 /**
- * Allow a user to stop following another user by catching an AJAX request.
+ * AJAX callback when clicking on the "Unfollow" button to unfollow a user.
  *
- * @global $bp The global BuddyPress settings variable created in bp_core_setup_globals()
  * @uses check_admin_referer() Checks to make sure the WP security nonce matches.
- * @uses bp_follow_is_following() Checks to see if a user is following another user already.
  * @uses bp_follow_stop_following() Stops a user following another user.
- * @return bool false
+ * @uses bp_follow_is_following() Checks to see if a user is following another user already.
  */
 function bp_follow_ajax_action_stop() {
 
 	check_admin_referer( 'stop_following' );
 
-	if ( !bp_follow_is_following( array( 'leader_id' => $_POST['uid'], 'follower_id' => bp_loggedin_user_id() ) ) )
-		$message = __( 'Not following', 'bp-follow' );
-	else {
-		if ( !bp_follow_stop_following( array( 'leader_id' => $_POST['uid'], 'follower_id' => bp_loggedin_user_id() ) ) )
-			$message = __( 'Error unfollowing user', 'bp-follow' );
-		else
-			$message = __( 'Stopped following', 'bp-follow' );
+	// successful unfollow
+	if ( bp_follow_stop_following( array( 'leader_id' => $_POST['uid'], 'follower_id' => bp_loggedin_user_id() ) ) ) {
+		// output follow button
+		$output = bp_follow_get_add_follow_button( array(
+			'leader_id'   => $_POST['uid'],
+			'follower_id' => bp_loggedin_user_id(),
+			'wrapper'     => false
+		) );
+
+	// failed unfollow
+	} else {
+		// output fallback invalid button
+		$args = array(
+			'id'        => 'invalid',
+			'link_href' => 'javascript:;',
+			'component' => 'follow',
+			'wrapper'   => false
+		);
+
+		if ( ! bp_follow_is_following( array( 'leader_id' => $_POST['uid'], 'follower_id' => bp_loggedin_user_id() ) ) ) {
+			$output = bp_get_button( array_merge(
+				array( 'link_text' => __( 'Not following', 'bp-follow' ) ),
+				$args
+			) );
+
+		} else {
+			$output = bp_get_button( array_merge(
+				array( 'link_text' => __( 'Error unfollowing user', 'bp-follow' ) ),
+				$args
+			) );
+
+		}
 	}
 
-	echo $message;
+	echo $output;
 
 	exit();
 }

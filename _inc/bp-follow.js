@@ -51,7 +51,7 @@ jq( function() {
 				}
 
 				// add ajax response
-				link.html( response );
+				link.parent().html( response );
 
 				// increase / decrease counts
 				var count_wrapper = false;
