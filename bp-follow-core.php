@@ -54,7 +54,8 @@ class BP_Follow_Component extends BP_Component {
 		// Backpat functions for BP < 1.7
 		if ( ! class_exists( 'BP_Theme_Compat' ) )
 			require( $this->path . '/bp-follow-backpat.php' );
-
+		
+		require( $this->path . '/bp-follow-activity.php' );
 		require( $this->path . '/bp-follow-classes.php' );
 		require( $this->path . '/bp-follow-functions.php' );
 		require( $this->path . '/bp-follow-screens.php' );
