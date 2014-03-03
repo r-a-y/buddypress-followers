@@ -34,18 +34,15 @@ function bp_follower_ids( $args = '' ) {
 	 */
 	function bp_get_follower_ids( $args = '' ) {
 
-		$defaults = array(
+		$r = wp_parse_args( $args, array(
 			'user_id' => bp_displayed_user_id()
-		);
+		) );
 
-		$r = wp_parse_args( $args, $defaults );
-		extract( $r, EXTR_SKIP );
-
-		$ids = implode( ',', (array)bp_follow_get_followers( array( 'user_id' => $user_id ) ) );
+		$ids = implode( ',', (array) bp_follow_get_followers( array( 'user_id' => $r['user_id'] ) ) );
 
 		$ids = empty( $ids ) ? 0 : $ids;
 
- 		return apply_filters( 'bp_get_follower_ids', $ids, $user_id );
+ 		return apply_filters( 'bp_get_follower_ids', $ids, $r['user_id'] );
 	}
 
 /**
@@ -78,13 +75,12 @@ function bp_following_ids( $args = '' ) {
 		);
 
 		$r = wp_parse_args( $args, $defaults );
-		extract( $r, EXTR_SKIP );
 
-		$ids = implode( ',', (array)bp_follow_get_following( array( 'user_id' => $user_id ) ) );
+		$ids = implode( ',', (array)bp_follow_get_following( array( 'user_id' => $r['user_id'] ) ) );
 
 		$ids = empty( $ids ) ? 0 : $ids;
 
- 		return apply_filters( 'bp_get_following_ids', $ids, $user_id );
+ 		return apply_filters( 'bp_get_following_ids', $ids, $r['user_id'] );
 	}
 
 /**
