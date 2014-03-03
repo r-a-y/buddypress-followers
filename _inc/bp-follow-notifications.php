@@ -84,6 +84,27 @@ function bp_follow_remove_notification_data( $user_id = 0 ) {
 add_action( 'bp_follow_remove_data', 'bp_follow_remove_notification_data' );
 
 /**
+ * Removes notification when a user unfollows another user.
+ *
+ * @since 1.2.1
+ *
+ * @param object $follow The BP_Follow object.
+ */
+function bp_follow_notifications_remove_on_unfollow( $follow ) {
+	// BP 1.9+
+	if ( bp_is_active( 'notifications' ) ) {
+		bp_notifications_delete_notifications_by_item_id( $follow->leader_id, $follow->follower_id, buddypress()->follow->id, 'new_follow' );
+
+	// BP < 1.9 - delete notifications the old way
+	} elseif ( ! class_exists( 'BP_Core_Login_Widget' ) ) {
+		global $bp;
+
+		bp_core_delete_notifications_by_item_id( $follow->leader_id, $follow->follower_id, buddypress()->follow->id, 'new_follow' );
+	}
+}
+add_action( 'bp_follow_stop_following', 'bp_follow_notifications_remove_on_unfollow' );
+
+/**
  * Mark notification as read when a logged-in user visits their follower's profile.
  *
  * This is a new feature in BuddyPress 1.9.
