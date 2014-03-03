@@ -86,7 +86,7 @@ function bp_following_ids( $args = '' ) {
 /**
  * Output a follow / unfollow button for a given user depending on the follower status.
  *
- * @param mixed $args Arguments can be passed as an associative array or as a URL argument string. See bp_follow_get_add_follow_button() for full arguments.
+ * @param mixed $args See bp_follow_get_add_follow_button() for full arguments.
  * @uses bp_follow_get_add_follow_button() Returns the follow / unfollow button
  * @author r-a-y
  * @since 1.1
@@ -100,11 +100,16 @@ function bp_follow_add_follow_button( $args = '' ) {
 	 * Checks to see if the follower is already following the leader.  If is following, returns
 	 * "Stop following" button; if not following, returns "Follow" button.
 	 *
-	 * Arguments include:
-	 * 	'leader_id'   - The user you want to follow
-	 * 	'follower_id' - The user who is initiating the follow request
-	 *
-	 * @param mixed $args Arguments can be passed as an associative array or as a URL argument string
+	 * @param array $args {
+	 *     Array of arguments.
+	 *     @type int $leader_id The user ID of the person we want to follow.
+	 *     @type int $follower_id The user ID initiating the follow request.
+	 *     @type string $link_text The anchor text for the link.
+	 *     @type string $link_title The title attribute for the link.
+	 *     @type string $wrapper_class CSS class for the wrapper container.
+	 *     @type string $link_class CSS class for the link.
+	 *     @type string $wrapper The element for the wrapper container. Defaults to 'div'.
+	 * }
 	 * @return mixed String of the button on success.  Boolean false on failure.
 	 * @uses bp_get_button() Renders a button using the BP Button API
 	 * @author r-a-y
