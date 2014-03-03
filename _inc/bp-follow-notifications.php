@@ -55,6 +55,42 @@ function bp_follow_format_notifications( $action, $item_id, $secondary_item_id, 
 	}
 }
 
+/**
+ * Removes notification data for a user.
+ *
+ * @since 1.2.1
+ */
+function bp_follow_remove_notification_data( $user_id = 0 ) {
+	global $bp;
+
+	// Remove following notifications from user
+	if ( bp_is_active( 'notifications' ) ) {
+		bp_notifications_delete_all_notifications_by_type( $user_id, $bp->follow->id, 'new_follow' );
+
+	// check if we're not on BP 1.9
+	// delete notifications the old way
+	} elseif ( ! class_exists( 'BP_Core_Login_Widget' ) ) {
+		bp_core_delete_notifications_from_user( $user_id, $bp->follow->id, 'new_follow' );
+	}
+}
+add_action( 'bp_follow_remove_data', 'bp_follow_remove_notification_data' );
+
+/**
+ * Delete notifications when a logged-in user visits their followers page.
+ *
+ * Only do this for users on < BuddyPress 1.9.
+ *
+ * @since 1.2.1
+ */
+function bp_follow_deprecated_delete_notifications() {
+	if ( ! bp_is_active( 'notifications' ) && ! function_exists( 'BP_Core_Login_Widget' ) && isset( $_GET['new'] ) ) {
+		global $bp;
+
+		bp_core_delete_notifications_by_type( bp_loggedin_user_id(), $bp->follow->id, 'new_follow' );
+	}
+}
+add_action( 'bp_follow_screen_followers', 'bp_follow_deprecated_delete_notifications' );
+
 /** SETTINGS ************************************************************/
 
 /**

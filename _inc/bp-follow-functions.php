@@ -209,14 +209,9 @@ function bp_follow_total_follow_counts( $args = '' ) {
  * @uses BP_Follow::delete_all_for_user() Deletes user ID from all following / follower records
  */
 function bp_follow_remove_data( $user_id ) {
-	global $bp;
-
 	do_action( 'bp_follow_before_remove_data', $user_id );
 
 	BP_Follow::delete_all_for_user( $user_id );
-
-	// Remove following notifications from user
-	bp_core_delete_notifications_from_user( $user_id, $bp->follow->id, 'new_follow' );
 
 	do_action( 'bp_follow_remove_data', $user_id );
 }
