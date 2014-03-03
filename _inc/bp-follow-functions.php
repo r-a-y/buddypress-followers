@@ -43,7 +43,6 @@ function bp_follow_start_following( $args = '' ) {
 		bp_notifications_add_notification( array(
 			'item_id'           => $follow->follower_id,
 			'user_id'           => $follow->leader_id,
-			'secondary_item_id' => $follow->leader_id,
 			'component_name'    => $bp->follow->id,
 			'component_action'  => 'new_follow'
 		) );
