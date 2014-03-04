@@ -100,7 +100,7 @@ function bp_follow_notifications_remove_on_unfollow( $follow ) {
 	} elseif ( ! class_exists( 'BP_Core_Login_Widget' ) ) {
 		global $bp;
 
-		bp_core_delete_notifications_by_item_id( $follow->leader_id, $follow->follower_id, buddypress()->follow->id, 'new_follow' );
+		bp_core_delete_notifications_by_item_id( $follow->leader_id, $follow->follower_id, $bp->follow->id, 'new_follow' );
 	}
 }
 add_action( 'bp_follow_stop_following', 'bp_follow_notifications_remove_on_unfollow' );
