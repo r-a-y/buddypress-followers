@@ -130,7 +130,7 @@ add_action( 'bp_follow_start_following', 'bp_follow_notifications_add_on_follow'
  *
  * @param object $follow The BP_Follow object.
  */
-function bp_follow_notifications_remove_on_unfollow( $follow ) {
+function bp_follow_notifications_remove_on_unfollow( BP_Follow $follow ) {
 	// BP 1.9+
 	if ( bp_is_active( 'notifications' ) ) {
 		bp_notifications_delete_notifications_by_item_id( $follow->leader_id, $follow->follower_id, buddypress()->follow->id, 'new_follow' );
