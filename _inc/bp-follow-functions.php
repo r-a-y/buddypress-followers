@@ -36,34 +36,6 @@ function bp_follow_start_following( $args = '' ) {
 		return false;
 	}
 
-	// Add a screen count notification
-	//
-	// The new notifications component
-	if ( bp_is_active( 'notifications' ) ) {
-		bp_notifications_add_notification( array(
-			'item_id'           => $follow->follower_id,
-			'user_id'           => $follow->leader_id,
-			'component_name'    => $bp->follow->id,
-			'component_action'  => 'new_follow'
-		) );
-
-	// The older notifications method
-	// @todo remove this in a future release
-	} else {
-		bp_core_add_notification(
-			$follow->follower_id,
-			$follow->leader_id,
-			$bp->follow->id,
-			'new_follow'
-		);
-	}
-
-	// Add a more specific email notification
-	bp_follow_new_follow_email_notification( array(
-		'leader_id'   => $r['leader_id'],
-		'follower_id' => $r['follower_id']
-	) );
-
 	do_action_ref_array( 'bp_follow_start_following', array( &$follow ) );
 
 	return true;

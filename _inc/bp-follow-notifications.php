@@ -85,6 +85,45 @@ function bp_follow_remove_notifications_for_user( $user_id = 0 ) {
 add_action( 'bp_follow_remove_data', 'bp_follow_remove_notifications_for_user' );
 
 /**
+ * Adds notification when a user follows another user.
+ *
+ * @since 1.2.1
+ *
+ * @param object $follow The BP_Follow object.
+ */
+function bp_follow_notifications_add_on_follow( BP_Follow $follow ) {
+	// Add a screen notification
+	//
+	// BP 1.9+
+	if ( bp_is_active( 'notifications' ) ) {
+		bp_notifications_add_notification( array(
+			'item_id'           => $follow->follower_id,
+			'user_id'           => $follow->leader_id,
+			'component_name'    => buddypress()->follow->id,
+			'component_action'  => 'new_follow'
+		) );
+
+	// BP < 1.9 - add notifications the old way
+	} elseif ( ! class_exists( 'BP_Core_Login_Widget' ) ) {
+		global $bp;
+
+		bp_core_add_notification(
+			$follow->follower_id,
+			$follow->leader_id,
+			$bp->follow->id,
+			'new_follow'
+		);
+	}
+
+	// Add an email notification
+	bp_follow_new_follow_email_notification( array(
+		'leader_id'   => $follow->leader_id,
+		'follower_id' => $follow->follower_id
+	) );
+}
+add_action( 'bp_follow_start_following', 'bp_follow_notifications_add_on_follow' );
+
+/**
  * Removes notification when a user unfollows another user.
  *
  * @since 1.2.1
