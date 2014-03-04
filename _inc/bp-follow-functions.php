@@ -21,12 +21,10 @@ if ( !defined( 'ABSPATH' ) ) exit;
 function bp_follow_start_following( $args = '' ) {
 	global $bp;
 
-	$defaults = array(
+	$r = wp_parse_args( $args, array(
 		'leader_id'   => bp_displayed_user_id(),
 		'follower_id' => bp_loggedin_user_id()
-	);
-
-	$r = wp_parse_args( $args, $defaults );
+	) );
 
 	$follow = new BP_Follow( $r['leader_id'], $r['follower_id'] );
 
@@ -55,17 +53,16 @@ function bp_follow_start_following( $args = '' ) {
  */
 function bp_follow_stop_following( $args = '' ) {
 
-	$defaults = array(
+	$r = wp_parse_args( $args, array(
 		'leader_id'   => bp_displayed_user_id(),
 		'follower_id' => bp_loggedin_user_id()
-	);
-
-	$r = wp_parse_args( $args, $defaults );
+	) );
 
 	$follow = new BP_Follow( $r['leader_id'], $r['follower_id'] );
 
-	if ( ! $follow->delete() )
+	if ( ! $follow->delete() ) {
 		return false;
+	}
 
 	do_action_ref_array( 'bp_follow_stop_following', array( &$follow ) );
 
@@ -83,12 +80,10 @@ function bp_follow_stop_following( $args = '' ) {
  */
 function bp_follow_is_following( $args = '' ) {
 
-	$defaults = array(
+	$r = wp_parse_args( $args, array(
 		'leader_id'   => bp_displayed_user_id(),
 		'follower_id' => bp_loggedin_user_id()
-	);
-
-	$r = wp_parse_args( $args, $defaults );
+	) );
 
 	$follow = new BP_Follow( $r['leader_id'], $r['follower_id'] );
 
@@ -105,11 +100,9 @@ function bp_follow_is_following( $args = '' ) {
  */
 function bp_follow_get_followers( $args = '' ) {
 
-	$defaults = array(
+	$r = wp_parse_args( $args, array(
 		'user_id' => bp_displayed_user_id()
-	);
-
-	$r = wp_parse_args( $args, $defaults );
+	) );
 
 	return apply_filters( 'bp_follow_get_followers', BP_Follow::get_followers( $r['user_id'] ) );
 }
@@ -124,11 +117,9 @@ function bp_follow_get_followers( $args = '' ) {
  */
 function bp_follow_get_following( $args = '' ) {
 
-	$defaults = array(
+	$r = wp_parse_args( $args, array(
 		'user_id' => bp_displayed_user_id()
-	);
-
-	$r = wp_parse_args( $args, $defaults );
+	) );
 
 	return apply_filters( 'bp_follow_get_following', BP_Follow::get_following( $r['user_id'] ) );
 }
@@ -143,11 +134,9 @@ function bp_follow_get_following( $args = '' ) {
  */
 function bp_follow_total_follow_counts( $args = '' ) {
 
-	$defaults = array(
+	$r = wp_parse_args( $args, array(
 		'user_id' => bp_loggedin_user_id()
-	);
-
-	$r = wp_parse_args( $args, $defaults );
+	) );
 
 	$count = false;
 
