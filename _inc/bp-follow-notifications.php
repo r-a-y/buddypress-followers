@@ -67,21 +67,22 @@ function bp_follow_format_notifications( $action, $item_id, $secondary_item_id, 
  * Removes notifications made by a user.
  *
  * @since 1.2.1
+ *
+ * @param int $user_id The user ID.
  */
-function bp_follow_remove_notification_data( $user_id = 0 ) {
-	global $bp;
-
-	// Remove following notifications from user
+function bp_follow_remove_notifications_for_user( $user_id = 0 ) {
+	// BP 1.9+
 	if ( bp_is_active( 'notifications' ) ) {
-		bp_notifications_delete_all_notifications_by_type( $user_id, $bp->follow->id, 'new_follow' );
+		bp_notifications_delete_all_notifications_by_type( $user_id, buddypress()->follow->id, 'new_follow' );
 
-	// check if we're not on BP 1.9
-	// delete notifications the old way
+	// BP < 1.9 - delete notifications the old way
 	} elseif ( ! class_exists( 'BP_Core_Login_Widget' ) ) {
+		global $bp;
+
 		bp_core_delete_notifications_from_user( $user_id, $bp->follow->id, 'new_follow' );
 	}
 }
-add_action( 'bp_follow_remove_data', 'bp_follow_remove_notification_data' );
+add_action( 'bp_follow_remove_data', 'bp_follow_remove_notifications_for_user' );
 
 /**
  * Removes notification when a user unfollows another user.
