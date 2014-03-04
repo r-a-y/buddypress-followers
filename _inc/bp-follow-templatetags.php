@@ -70,11 +70,9 @@ function bp_following_ids( $args = '' ) {
 	 */
 	function bp_get_following_ids( $args = '' ) {
 
-		$defaults = array(
+		$r = wp_parse_args( $args, array(
 			'user_id' => bp_displayed_user_id()
-		);
-
-		$r = wp_parse_args( $args, $defaults );
+		) );
 
 		$ids = implode( ',', (array)bp_follow_get_following( array( 'user_id' => $r['user_id'] ) ) );
 
@@ -118,7 +116,7 @@ function bp_follow_add_follow_button( $args = '' ) {
 	function bp_follow_get_add_follow_button( $args = '' ) {
 		global $bp, $members_template;
 
-		$defaults = array(
+		$r = wp_parse_args( $args, array(
 			'leader_id'     => bp_displayed_user_id(),
 			'follower_id'   => bp_loggedin_user_id(),
 			'link_text'     => '',
@@ -126,9 +124,7 @@ function bp_follow_add_follow_button( $args = '' ) {
 			'wrapper_class' => '',
 			'link_class'    => '',
 			'wrapper'       => 'div'
-		);
-
-		$r = wp_parse_args( $args, $defaults );
+		) );
 
 		if ( ! $r['leader_id'] || ! $r['follower_id'] )
 			return false;
