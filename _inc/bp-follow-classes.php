@@ -21,10 +21,16 @@ class BP_Follow {
 	var $leader_id;
 	var $follower_id;
 
-	function bp_follow( $leader_id = false, $follower_id = false ) {
-		if ( !empty( $leader_id ) && !empty( $follower_id ) ) {
-			$this->leader_id = $leader_id;
-			$this->follower_id = $follower_id;
+	/**
+	 * Constructor.
+	 *
+	 * @param int $leader_id The user ID of the user you want to follow.
+	 * @param int $follower_id The user ID initiating the follow request.
+	 */
+	public function __construct( $leader_id = 0, $follower_id = 0 ) {
+		if ( ! empty( $leader_id ) && ! empty( $follower_id ) ) {
+			$this->leader_id   = (int) $leader_id;
+			$this->follower_id = (int) $follower_id;
 			$this->populate();
 		}
 	}
