@@ -47,13 +47,14 @@ function bp_follow_format_notifications( $action, $item_id, $secondary_item_id, 
 		break;
 	}
 
-	if ( !$link || !$text )
+	if ( ! $link || ! $text ) {
 		return false;
+	}
 
 	if ( 'string' == $format ) {
 		return apply_filters( 'bp_follow_new_followers_notification', '<a href="' . $link . '">' . $text . '</a>', $total_items, $link, $text, $item_id, $secondary_item_id );
-	}
-	else {
+
+	} else {
 		$array = array(
 			'text' => $text,
 			'link' => $link
