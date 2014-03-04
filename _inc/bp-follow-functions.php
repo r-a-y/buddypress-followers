@@ -28,9 +28,12 @@ function bp_follow_start_following( $args = '' ) {
 
 	$r = wp_parse_args( $args, $defaults );
 
-	$follow = new BP_Follow;
-	$follow->leader_id   = (int) $r['leader_id'];
-	$follow->follower_id = (int) $r['follower_id'];
+	$follow = new BP_Follow( $r['leader_id'], $r['follower_id'] );
+
+	// existing follow already exists
+	if ( ! empty( $follow->id ) ) {
+		return false;
+	}
 
 	if ( ! $follow->save() ) {
 		return false;
