@@ -10,15 +10,35 @@
 if ( !defined( 'ABSPATH' ) ) exit;
 
 /**
- * Class: BP_Follow
+ * BuddyPress Follow class.
  *
- * Handles populating and saving BP follow requests.
+ * Handles populating and saving follow relationships.
  *
- * @subpackage Classes
+ * @since 1.0.0
  */
 class BP_Follow {
-	var $id;
-	var $leader_id;
+	/**
+	 * The follow ID.
+	 *
+	 * @since 1.0.0
+	 * @var int
+	 */
+	public $id = 0;
+
+	/**
+	 * The user ID of the person we want to follow.
+	 *
+	 * @since 1.0.0
+	 * @var int
+	 */
+	public $leader_id;
+
+	/**
+	 * The user ID of the person initiating the follow request.
+	 *
+	 * @since 1.0.0
+	 * @var int
+	 */
 	var $follower_id;
 
 	/**
@@ -35,25 +55,42 @@ class BP_Follow {
 		}
 	}
 
-	public function populate() {
+	/**
+	 * Populate method.
+	 *
+	 * Used in constructor.
+	 *
+	 * @since 1.0.0
+	 */
+	protected function populate() {
 		global $wpdb, $bp;
 
-		if ( $follow_id = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$bp->follow->table_name} WHERE leader_id = %d AND follower_id = %d", $this->leader_id, $this->follower_id ) ) )
+		if ( $follow_id = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$bp->follow->table_name} WHERE leader_id = %d AND follower_id = %d", $this->leader_id, $this->follower_id ) ) ) {
 			$this->id = $follow_id;
+		}
 	}
 
+	/**
+	 * Saves a follow relationship into the database.
+	 *
+	 * @since 1.0.0
+	 */
 	public function save() {
 		global $wpdb, $bp;
 
-		$this->leader_id = apply_filters( 'bp_follow_leader_id_before_save', $this->leader_id, $this->id );
+		// do not use these filters
+		// use the 'bp_follow_before_save' hook instead
+		$this->leader_id   = apply_filters( 'bp_follow_leader_id_before_save',   $this->leader_id,   $this->id );
 		$this->follower_id = apply_filters( 'bp_follow_follower_id_before_save', $this->follower_id, $this->id );
 
 		do_action_ref_array( 'bp_follow_before_save', array( &$this ) );
 
-		if ( $this->id )
+		// update existing entry
+		if ( $this->id ) {
 			$result = $wpdb->query( $wpdb->prepare( "UPDATE {$bp->follow->table_name} SET leader_id = %d, follower_id = %d WHERE id = %d", $this->leader_id, $this->follower_id, $this->id ) );
-		else {
-			// Save
+
+		// add new entry
+		} else {
 			$result = $wpdb->query( $wpdb->prepare( "INSERT INTO {$bp->follow->table_name} ( leader_id, follower_id ) VALUES ( %d, %d )", $this->leader_id, $this->follower_id ) );
 			$this->id = $wpdb->insert_id;
 		}
@@ -63,24 +100,53 @@ class BP_Follow {
 		return $result;
 	}
 
+	/**
+	 * Deletes a follow relationship from the database.
+	 *
+	 * @since 1.0.0
+	 */
 	public function delete() {
 		global $wpdb, $bp;
 
 		return $wpdb->query( $wpdb->prepare( "DELETE FROM {$bp->follow->table_name} WHERE id = %d", $this->id ) );
 	}
 
-	/* Static Methods */
+	/** STATIC METHODS *****************************************************/
 
+	/**
+	 * Get the follower IDs for a given user.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param int $user_id The user ID.
+	 * @return array
+	 */
 	public static function get_followers( $user_id ) {
 		global $bp, $wpdb;
 		return $wpdb->get_col( $wpdb->prepare( "SELECT follower_id FROM {$bp->follow->table_name} WHERE leader_id = %d", $user_id ) );
 	}
 
+	/**
+	 * Get the user IDs that a user is following.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param int $user_id The user ID to fetch.
+	 * @return array
+	 */
 	public static function get_following( $user_id ) {
 		global $bp, $wpdb;
 		return $wpdb->get_col( $wpdb->prepare( "SELECT leader_id FROM {$bp->follow->table_name} WHERE follower_id = %d", $user_id ) );
 	}
 
+	/**
+	 * Get the follower / following counts for a given user.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param int $user_id The user ID to fetch counts for.
+	 * @return array
+	 */
 	public static function get_counts( $user_id ) {
 		global $bp, $wpdb;
 
@@ -90,6 +156,15 @@ class BP_Follow {
 		return array( 'followers' => $followers, 'following' => $following );
 	}
 
+	/**
+	 * Bulk check the follow status for a user against a list of user IDs.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param array $leader_ids The user IDs to check the follow status for.
+	 * @param int $user_id The user ID to check against the list of leader IDs.
+	 * @return array
+	 */
 	public static function bulk_check_follow_status( $leader_ids, $user_id = false ) {
 		global $bp, $wpdb;
 
@@ -101,10 +176,16 @@ class BP_Follow {
 		return $wpdb->get_results( $wpdb->prepare( "SELECT leader_id, id FROM {$bp->follow->table_name} WHERE follower_id = %d AND leader_id IN ($leader_ids)", $user_id ) );
 	}
 
+	/**
+	 * Deletes all follow relationships for a given user.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param int $user_id The user ID
+	 */
 	public static function delete_all_for_user( $user_id ) {
 		global $bp, $wpdb;
 
-		// Delete all follow relationships related to $user_id
 		$wpdb->query( $wpdb->prepare( "DELETE FROM {$bp->follow->table_name} WHERE leader_id = %d OR follower_id = %d", $user_id, $user_id ) );
 	}
 }
