@@ -33,7 +33,7 @@ function bp_follow_format_notifications( $action, $item_id, $secondary_item_id, 
 				$text = sprintf( __( '%d more users are now following you', 'bp-follow' ), $total_items );
 
 				if ( bp_is_active( 'notifications' ) ) {
-					$link = bp_get_notifications_permalink();				
+					$link = bp_get_notifications_permalink();
 				} else {
 					$link = bp_loggedin_user_domain() . $bp->follow->followers->slug . '/?new';
 				}
