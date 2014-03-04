@@ -195,9 +195,12 @@ function bp_follow_notifications_delete_on_followers_page() {
 		return;
 	}
 
+	// BP 1.9+
 	if ( bp_is_active( 'notifications' ) ) {
 		bp_notifications_delete_notifications_by_type( bp_loggedin_user_id(), $bp->follow->id, 'new_follow' );
-	} else {
+
+	// BP < 1.9
+	} elseif ( ! class_exists( 'BP_Core_Login_Widget' ) ) {
 		global $bp;
 
 		bp_core_delete_notifications_by_type( bp_loggedin_user_id(), $bp->follow->id, 'new_follow' );
