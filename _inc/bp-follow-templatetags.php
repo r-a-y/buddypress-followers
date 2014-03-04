@@ -193,6 +193,7 @@ function bp_follow_add_follow_button( $args = '' ) {
 			'id'                => $id,
 			'component'         => 'follow',
 			'must_be_logged_in' => true,
+			'block_self'        => empty( $members_template->member ) ? true : false,
 			'wrapper_class'     => $wrapper_class,
 			'wrapper_id'        => 'follow-button-' . (int) $r['leader_id'],
 			'link_href'         => wp_nonce_url( $leader_domain . $bp->follow->followers->slug . '/' . $action .'/', $action . '_following' ),
