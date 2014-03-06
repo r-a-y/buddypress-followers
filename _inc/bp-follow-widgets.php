@@ -51,7 +51,11 @@ class BP_Follow_Following_Widget extends WP_Widget {
 		}
 
 		// show the users the logged-in user is following
-		if ( bp_has_members( 'include=' . $following . '&max=' . $instance['max_users'] ) ) {
+		if ( bp_has_members( array(
+			'include'         => $following,
+			'max'             => $instance['max_users'],
+			'populate_extras' => false,
+		) ) ) {
 			do_action( 'bp_before_following_widget' );
 
 			echo $args['before_widget'];
