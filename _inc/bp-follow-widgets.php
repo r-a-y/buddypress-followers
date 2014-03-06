@@ -95,12 +95,10 @@ class BP_Follow_Following_Widget extends WP_Widget {
 	 * Widget settings form.
 	 */
 	function form( $instance ) {
-		$defaults = array(
+		$instance = wp_parse_args( (array) $instance, array(
 			'title'     => __( "Users I'm Following", 'bp-follow' ),
 			'max_users' => 16
-		);
-
-		$instance = wp_parse_args( (array) $instance, $defaults );
+		) );
 	?>
 
 		<p><label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:'); ?></label>
