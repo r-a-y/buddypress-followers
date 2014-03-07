@@ -168,8 +168,13 @@ class BP_Follow {
 	public static function bulk_check_follow_status( $leader_ids, $user_id = false ) {
 		global $bp, $wpdb;
 
-		if ( empty( $user_id ) )
+		if ( empty( $user_id ) ) {
 			$user_id = bp_loggedin_user_id();
+		}
+
+		if ( empty( $user_id ) ) {
+			return false;
+		}
 
 		$leader_ids = implode( ',', wp_parse_id_list( (array) $leader_ids ) );
 
