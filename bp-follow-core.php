@@ -171,7 +171,7 @@ class BP_Follow_Component extends BP_Component {
 		if ( bp_is_active( 'activity' ) && apply_filters( 'bp_follow_show_activity_subnav', true ) ) {
 
 			bp_core_new_subnav_item( array(
-				'name'            => __( 'Following', 'bp-follow' ),
+				'name'            => _x( 'Following', 'Activity subnav tab', 'bp-follow' ),
 				'slug'            => constant( 'BP_FOLLOWING_SLUG' ),
 				'parent_url'      => trailingslashit( $domain . bp_get_activity_slug() ),
 				'parent_slug'     => bp_get_activity_slug(),
@@ -203,7 +203,7 @@ class BP_Follow_Component extends BP_Component {
 			$wp_admin_nav[] = array(
 				'parent' => $bp->my_account_menu_id,
 				'id'     => 'my-account-' . $this->id,
-				'title'  => __( 'Follow', 'bp-follow' ),
+				'title'  => _x( 'Follow', 'Adminbar main nav', 'bp-follow' ),
 				'href'   => trailingslashit( bp_loggedin_user_domain() . $bp->follow->following->slug )
 			);
 
@@ -211,7 +211,7 @@ class BP_Follow_Component extends BP_Component {
 			$wp_admin_nav[] = array(
 				'parent' => 'my-account-' . $this->id,
 				'id'     => 'my-account-' . $this->id . '-following',
-				'title'  => __( 'Following', 'bp-follow' ),
+				'title'  => _x( 'Following', 'Adminbar follow subnav', 'bp-follow' ),
 				'href'   => trailingslashit( bp_loggedin_user_domain() . $bp->follow->following->slug )
 			);
 
@@ -219,7 +219,7 @@ class BP_Follow_Component extends BP_Component {
 			$wp_admin_nav[] = array(
 				'parent' => 'my-account-' . $this->id,
 				'id'     => 'my-account-' . $this->id . '-followers',
-				'title'  => __( 'Followers', 'bp-follow' ),
+				'title'  => _x( 'Followers', 'Adminbar follow subnav', 'bp-follow' ),
 				'href'   => trailingslashit( bp_loggedin_user_domain() . $bp->follow->followers->slug )
 			);
 
@@ -228,7 +228,7 @@ class BP_Follow_Component extends BP_Component {
 				$wp_admin_nav[] = array(
 					'parent' => 'my-account-activity',
 					'id'     => 'my-account-activity-following',
-					'title'  => __( 'Following', 'bp-follow' ),
+					'title'  => _x( 'Following', 'Adminbar activity subnav', 'bp-follow' ),
 					'href'   => trailingslashit( bp_loggedin_user_domain() . bp_get_activity_slug() . '/' . $bp->follow->following->slug )
 				);
 			}
@@ -278,7 +278,7 @@ class BP_Follow_Component extends BP_Component {
 
 		// Add the "Follow" nav menu
 		$bp->bp_nav[$following_position] = array(
-			'name'                    => __( 'Follow', 'bp-follow' ),
+			'name'                    => _x( 'Follow', 'Adminbar main nav', 'bp-follow' ),
 			'link'                    => trailingslashit( bp_loggedin_user_domain() . $bp->follow->following->slug ),
 			'slug'                    => 'follow',
 			'css_id'                  => 'follow',
@@ -289,7 +289,7 @@ class BP_Follow_Component extends BP_Component {
 
 		// "Following" subnav item
 		$bp->bp_options_nav['follow'][10] = array(
-			'name'            => __( 'Following', 'bp-follow' ),
+			'name'            => _x( 'Following', 'Adminbar follow subnav', 'bp-follow' ),
 			'link'            => trailingslashit( bp_loggedin_user_domain() . $bp->follow->following->slug ),
 			'slug'            => $bp->follow->following->slug,
 			'css_id'          => 'following',
@@ -300,7 +300,7 @@ class BP_Follow_Component extends BP_Component {
 
 		// "Followers" subnav item
 		$bp->bp_options_nav['follow'][20] = array(
-			'name'            => __( 'Followers', 'bp-follow' ),
+			'name'            => _x( 'Followers', 'Adminbar follow subnav', 'bp-follow' ),
 			'link'            => trailingslashit( bp_loggedin_user_domain() . $bp->follow->followers->slug ),
 			'slug'            => $bp->follow->followers->slug,
 			'css_id'          => 'followers',
