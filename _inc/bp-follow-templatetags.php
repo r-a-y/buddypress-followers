@@ -188,12 +188,21 @@ function bp_follow_add_follow_button( $args = '' ) {
 			$link_class .= ' '  . esc_attr( $r['link_class'] );
 		}
 
+		// make sure we can view the button if a user is on their own page
+		$block_self = empty( $members_template->member ) ? true : false;
+
+		// if we're using AJAX and a user is on their own profile, we need to set
+		// block_self to false so the button shows up
+		if ( defined( 'DOING_AJAX' ) && bp_is_my_profile() ) {
+			$block_self = false;
+		}
+
 		// setup the button arguments
 		$button = array(
 			'id'                => $id,
 			'component'         => 'follow',
 			'must_be_logged_in' => true,
-			'block_self'        => empty( $members_template->member ) ? true : false,
+			'block_self'        => $block_self,
 			'wrapper_class'     => $wrapper_class,
 			'wrapper_id'        => 'follow-button-' . (int) $r['leader_id'],
 			'link_href'         => wp_nonce_url( $leader_domain . $bp->follow->followers->slug . '/' . $action .'/', $action . '_following' ),
