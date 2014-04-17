@@ -478,7 +478,7 @@ function bp_follow_no_activity_text( $translated_text, $untranslated_text ) {
 			) );
 
 			if ( $follow_counts['following'] ) {
-				return __( "You are following some users, but they haven't posted yet.", 'bp-lists' );
+				return __( "You are following some users, but they haven't posted yet.", 'bp-follow' );
 			} else {
 				return __( "You are not following anyone yet.", 'bp-lists' );
 			}
@@ -486,9 +486,9 @@ function bp_follow_no_activity_text( $translated_text, $untranslated_text ) {
 			global $bp;
 
 			if ( ! empty( $bp->displayed_user->total_follow_counts['following'] ) ) {
-				return __( "This user is following some users, but they haven't posted yet.", 'bp-lists' );
+				return __( "This user is following some users, but they haven't posted yet.", 'bp-follow' );
 			} else {
-				return __( "This user isn't following anyone yet.", 'bp-lists' );
+				return __( "This user isn't following anyone yet.", 'bp-follow' );
 			}
 		}
 
