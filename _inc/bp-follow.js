@@ -13,7 +13,7 @@ jq( function() {
 	});
 
 	memberLoop.on("click", ".follow-button a", function() {
-		bp_follow_button_action( jq(this), 'member-directory' );
+		bp_follow_button_action( jq(this), 'member-loop' );
 		return false;
 	});
 
@@ -57,8 +57,16 @@ jq( function() {
 				var count_wrapper = false;
 				if ( context == 'profile' ) {
 					count_wrapper = jq("#user-members-followers span");
-				} else if ( context == 'member-directory' ) {
-					count_wrapper = jq("#members-following span");
+
+				} else if ( context == 'member-loop' ) {
+					// a user is on their own profile
+					if ( ! jq.trim( profileHeader.text() ) ) {
+						count_wrapper = jq("#user-members-following span");
+
+					// this means we're on the member directory
+					} else {
+						count_wrapper = jq("#members-following span");
+					}
 				}
 
 				if ( count_wrapper.length ) {
