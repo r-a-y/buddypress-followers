@@ -10,44 +10,35 @@
 if ( !defined( 'ABSPATH' ) ) exit;
 
 /**
- * Start following a user's activity
+ * Start following a user's activity.
  *
- * @global $bp The global BuddyPress settings variable created in bp_core_setup_globals()
- * @uses wp_parse_args() Parses arguments from an array or request string.
- * @param $args/leader_id - user ID of user to follow
- * @param $args/follower_id - user ID of the user who follows
+ * @since 1.0.0
+ *
+ * @param array $args {
+ *     Array of arguments.
+ *     @type int $leader_id The user ID of the person we want to follow.
+ *     @type int $follower_id The user ID initiating the follow request.
+ * }
  * @return bool
  */
 function bp_follow_start_following( $args = '' ) {
 	global $bp;
 
-	$defaults = array(
+	$r = wp_parse_args( $args, array(
 		'leader_id'   => bp_displayed_user_id(),
 		'follower_id' => bp_loggedin_user_id()
-	);
-
-	$r = wp_parse_args( $args, $defaults );
-
-	$follow = new BP_Follow;
-	$follow->leader_id   = (int) $r['leader_id'];
-	$follow->follower_id = (int) $r['follower_id'];
-
-	if ( ! $follow->save() )
-		return false;
-
-	// Add a screen count notification
-	bp_core_add_notification(
-		$r['follower_id'],
-		$r['leader_id'],
-		$bp->follow->id,
-		'new_follow'
-	);
-
-	// Add a more specific email notification
-	bp_follow_new_follow_email_notification( array(
-		'leader_id'   => $r['leader_id'],
-		'follower_id' => $r['follower_id']
 	) );
+
+	$follow = new BP_Follow( $r['leader_id'], $r['follower_id'] );
+
+	// existing follow already exists
+	if ( ! empty( $follow->id ) ) {
+		return false;
+	}
+
+	if ( ! $follow->save() ) {
+		return false;
+	}
 
 	do_action_ref_array( 'bp_follow_start_following', array( &$follow ) );
 
@@ -55,27 +46,29 @@ function bp_follow_start_following( $args = '' ) {
 }
 
 /**
- * Stop following a user's activity
+ * Stop following a user's activity.
  *
- * @global $bp The global BuddyPress settings variable created in bp_core_setup_globals()
- * @uses wp_parse_args() Parses arguments from an array or request string.
- * @param $args/leader_id - user ID of user to stop following
- * @param $args/follower_id - user ID of the user who wants to stop following
+ * @since 1.0.0
+ *
+ * @param array $args {
+ *     Array of arguments.
+ *     @type int $leader_id The user ID of the person we want to stop following.
+ *     @type int $follower_id The user ID initiating the unfollow request.
+ * }
  * @return bool
  */
 function bp_follow_stop_following( $args = '' ) {
 
-	$defaults = array(
+	$r = wp_parse_args( $args, array(
 		'leader_id'   => bp_displayed_user_id(),
 		'follower_id' => bp_loggedin_user_id()
-	);
-
-	$r = wp_parse_args( $args, $defaults );
+	) );
 
 	$follow = new BP_Follow( $r['leader_id'], $r['follower_id'] );
 
-	if ( ! $follow->delete() )
+	if ( ! $follow->delete() ) {
 		return false;
+	}
 
 	do_action_ref_array( 'bp_follow_stop_following', array( &$follow ) );
 
@@ -85,20 +78,21 @@ function bp_follow_stop_following( $args = '' ) {
 /**
  * Check if a user is already following another user.
  *
- * @global $bp The global BuddyPress settings variable created in bp_core_setup_globals()
- * @uses wp_parse_args() Parses arguments from an array or request string.
- * @param $args/leader_id - user ID of user to check is being followed
- * @param $args/follower_id - user ID of the user who is doing the following
+ * @since 1.0.0
+ *
+ * @param array $args {
+ *     Array of arguments.
+ *     @type int $leader_id The user ID of the person we want to check.
+ *     @type int $follower_id The user ID initiating the follow request.
+ * }
  * @return bool
  */
 function bp_follow_is_following( $args = '' ) {
 
-	$defaults = array(
+	$r = wp_parse_args( $args, array(
 		'leader_id'   => bp_displayed_user_id(),
 		'follower_id' => bp_loggedin_user_id()
-	);
-
-	$r = wp_parse_args( $args, $defaults );
+	) );
 
 	$follow = new BP_Follow( $r['leader_id'], $r['follower_id'] );
 
@@ -106,39 +100,41 @@ function bp_follow_is_following( $args = '' ) {
 }
 
 /**
- * Fetch the user_ids of all the followers of a particular user.
+ * Fetch the user IDs of all the followers of a particular user.
  *
- * @global $bp The global BuddyPress settings variable created in bp_core_setup_globals()
- * @uses wp_parse_args() Parses arguments from an array or request string.
- * @param $args/user_id - the user ID of the user to get followers for.
- * @return array of user ids
+ * @since 1.0.0
+ *
+ * @param array $args {
+ *     Array of arguments.
+ *     @type int $user_id The user ID to get followers for.
+ * }
+ * @return array
  */
 function bp_follow_get_followers( $args = '' ) {
 
-	$defaults = array(
+	$r = wp_parse_args( $args, array(
 		'user_id' => bp_displayed_user_id()
-	);
-
-	$r = wp_parse_args( $args, $defaults );
+	) );
 
 	return apply_filters( 'bp_follow_get_followers', BP_Follow::get_followers( $r['user_id'] ) );
 }
 
 /**
- * Fetch the user_ids of all the users a particular user is following.
+ * Fetch the user IDs of all the users a particular user is following.
  *
- * @global $bp The global BuddyPress settings variable created in bp_core_setup_globals()
- * @uses wp_parse_args() Parses arguments from an array or request string.
- * @param $args/user_id - the user ID of the user to get a list of users followed for.
- * @return array of user ids
+ * @since 1.0.0
+ *
+ * @param array $args {
+ *     Array of arguments.
+ *     @type int $user_id The user ID to fetch following user IDs for.
+ * }
+ * @return array
  */
 function bp_follow_get_following( $args = '' ) {
 
-	$defaults = array(
+	$r = wp_parse_args( $args, array(
 		'user_id' => bp_displayed_user_id()
-	);
-
-	$r = wp_parse_args( $args, $defaults );
+	) );
 
 	return apply_filters( 'bp_follow_get_following', BP_Follow::get_following( $r['user_id'] ) );
 }
@@ -146,18 +142,19 @@ function bp_follow_get_following( $args = '' ) {
 /**
  * Get the total followers and total following counts for a user.
  *
- * @global $bp The global BuddyPress settings variable created in bp_core_setup_globals()
- * @uses wp_parse_args() Parses arguments from an array or request string.
- * @param $args/user_id - the user ID of the user to get counts for.
+ * @since 1.0.0
+ *
+ * @param array $args {
+ *     Array of arguments.
+ *     @type int $user_id The user ID to grab follow counts for.
+ * }
  * @return array [ followers => int, following => int ]
  */
 function bp_follow_total_follow_counts( $args = '' ) {
 
-	$defaults = array(
+	$r = wp_parse_args( $args, array(
 		'user_id' => bp_loggedin_user_id()
-	);
-
-	$r = wp_parse_args( $args, $defaults );
+	) );
 
 	$count = false;
 
@@ -191,17 +188,14 @@ function bp_follow_total_follow_counts( $args = '' ) {
 /**
  * Removes follow relationships for all users from a user who is deleted or spammed
  *
+ * @since 1.0.0
+ *
  * @uses BP_Follow::delete_all_for_user() Deletes user ID from all following / follower records
  */
 function bp_follow_remove_data( $user_id ) {
-	global $bp;
-
 	do_action( 'bp_follow_before_remove_data', $user_id );
 
 	BP_Follow::delete_all_for_user( $user_id );
-
-	// Remove following notifications from user
-	bp_core_delete_notifications_from_user( $user_id, $bp->follow->id, 'new_follow' );
 
 	do_action( 'bp_follow_remove_data', $user_id );
 }

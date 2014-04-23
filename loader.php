@@ -3,7 +3,7 @@
 Plugin Name: BuddyPress Follow
 Plugin URI: http://wordpress.org/extend/plugins/buddypress-followers
 Description: Follow members on your BuddyPress site with this nifty plugin.
-Version: 1.2
+Version: 1.2.1
 Author: Andy Peatling, r-a-y
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -35,8 +35,10 @@ function bp_follow_init() {
 
 	// show admin notice for users on BP 1.2.x
 	} else {
+		$older_version_notice = sprintf( __( "Hey! BP Follow v1.2 requires BuddyPress 1.5 or higher.  If you are still using BuddyPress 1.2 and you don't plan on upgrading, use <a href='%s'>BP Follow v1.1.1 instead</a>.", 'bp-follow' ), 'https://github.com/r-a-y/buddypress-followers/archive/1.1.x.zip' );
+
 		add_action( 'admin_notices', create_function( '', "
-			echo '<div class=\"error\"><p>' . sprintf( __( \"Hey! BP Follow v1.2 requires BuddyPress 1.5 or higher.  If you are still using BuddyPress 1.2 and you don't plan on upgrading, use <a href='%s'>BP Follow v1.1.1 instead</a>.\", 'bp-follow' ), 'https://github.com/r-a-y/buddypress-followers/archive/1.1.x.zip' ) . '</p></div>';
+			echo '<div class=\"error\"><p>' . $older_version_notice . '</p></div>';
 		" ) );
 
 		return;

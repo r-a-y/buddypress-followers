@@ -2,8 +2,8 @@
 Contributors: apeatling, r-a-y
 Tags: buddypress, following, followers, connections
 Requires at least: WP 3.2 / BP 1.5
-Tested up to: WP 3.5.x / BP 1.7
-Stable tag: 1.2
+Tested up to: WP 3.9.x / BP 2.0.x
+Stable tag: 1.2.1
 
 == Description ==
 
@@ -12,16 +12,21 @@ Follow members on your BuddyPress site with this nifty plugin.
 The plugin works similar to the friends component, however the connection does not need to be accepted by the person being followed.  Just like Twitter!
 
 This plugin adds:
+
 * Following / Followers tabs to user profile pages
 * Follow / Unfollow buttons on user profile pages and in the members directory
 * A new "Following" activity directory tab
 * An "Activity > Following" subnav tab to a user's profile page
 * Menu items to the WP Toolbar
 
+**Translations**
+
+BP Follow has been translated into the following languages by these awesome people:
+
+* Brazilian Portuguese - [espellcaste](https://profiles.wordpress.org/espellcaste)
+* German - [solhuebner](https://profiles.wordpress.org/solhuebner)
+
 For bug reports or to add patches or translation files, visit the [BP Follow Github page](https://github.com/r-a-y/buddypress-followers).
-
-Translators will be forever enshrined in this readme! :)
-
 
 == Installation ==
 
@@ -33,8 +38,18 @@ Translators will be forever enshrined in this readme! :)
 
 Check out the [BP Follow wiki](https://github.com/r-a-y/buddypress-followers/wiki).
 
-
 == Changelog ==
+
+= 1.2.1 =
+* Add "Mark as read" support for the Notifications component (only available on BP 1.9+)
+* Add "Activity > Following" RSS feed support (only available on BP 1.8+)
+* Allow users to immediately unfollow / follow a user after clicking on the "Follow" button
+* Dynamically update follow count on profile navigation tabs after clicking on the "Follow" button
+* Change follow button text to remove the username by popular request
+* Add Brazilian Portuguese translation (props espellcaste)
+* Add German translation (props solhuebner)
+* Streamline javascript to use event delegation
+* Fix various PHP warnings
 
 = 1.2 =
 * Add BuddyPress 1.7 theme compatibility

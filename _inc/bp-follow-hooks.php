@@ -234,6 +234,9 @@ function bp_follow_add_activity_scope_filter( $qs, $object, $filter, $scope ) {
 	if ( ( !empty( $bp->current_action ) && !bp_is_current_action( 'following' ) ) || 'following' != $scope || 'activity' != $object )
 		return $qs;
 
+	// set internal marker noting that our activity scope is applied
+	$bp->follow->activity_scope_set = 1;
+
 	$user_id = bp_displayed_user_id() ? bp_displayed_user_id() : bp_loggedin_user_id();
 
 	$following_ids = bp_get_following_ids( array( 'user_id' => $user_id ) );
@@ -394,3 +397,120 @@ function bp_follow_set_activity_following_scope_on_ajax() {
 	}
 }
 add_action( 'bp_before_activity_loop', 'bp_follow_set_activity_following_scope_on_ajax' );
+
+/**
+ * Sets the "RSS" feed URL for the tab on the Sitewide Activity page.
+ *
+ * This occurs when the "Following" tab is clicked on the Sitewide Activity
+ * page or when the activity scope is already set to "following".
+ *
+ * Only do this for BuddyPress 1.8+.
+ *
+ * @since 1.2.1
+ *
+ * @author r-a-y
+ * @param string $retval The feed URL.
+ * @return string The feed URL.
+ */
+function bp_follow_alter_activity_feed_url( $retval ) {
+	// only available in BP 1.8+
+	if ( ! class_exists( 'BP_Activity_Feed' ) ) {
+		return $retval;
+	}
+
+	// this is done b/c we're filtering 'bp_get_sitewide_activity_feed_link' and
+	// we only want to alter the feed link for the "RSS" tab
+	if ( ! defined( 'DOING_AJAX' ) && ! did_action( 'bp_before_directory_activity' ) ) {
+		return $retval;
+	}
+
+	// get the activity scope
+	$scope = ! empty( $_COOKIE['bp-activity-scope'] ) ? $_COOKIE['bp-activity-scope'] : false;
+
+	if ( $scope == 'following' && bp_loggedin_user_id() ) {
+		$retval = bp_loggedin_user_domain() . bp_get_activity_slug() . '/' . constant( 'BP_FOLLOWING_SLUG' ) . '/feed/';
+	}
+
+	return $retval;
+}
+add_filter( 'bp_get_sitewide_activity_feed_link', 'bp_follow_alter_activity_feed_url' );
+add_filter( 'bp_dtheme_activity_feed_url',        'bp_follow_alter_activity_feed_url' );
+add_filter( 'bp_legacy_theme_activity_feed_url',  'bp_follow_alter_activity_feed_url' );
+
+/** GETTEXT **************************************************************/
+
+/**
+ * Add gettext filter when no activities are found and when using follow scope.
+ *
+ * @since 1.2.1
+ *
+ * @author r-a-y
+ * @param bool $has_activities Whether the current activity loop has activities.
+ * @return bool
+ */
+function bp_follow_has_activities( $has_activities ) {
+	global $bp;
+
+	if ( ! empty( $bp->follow->activity_scope_set ) && ! $has_activities ) {
+		add_filter( 'gettext', 'bp_follow_no_activity_text', 10, 2 );
+	}
+
+	return $has_activities;
+}
+add_filter( 'bp_has_activities', 'bp_follow_has_activities', 10, 2 );
+
+/**
+ * Modifies 'no activity found' text to be more specific to follow scope.
+ *
+ * @since 1.2.1
+ *
+ * @author r-a-y
+ * @see bp_follow_has_activities()
+ * @param string $translated_text The translated text.
+ * @param string $untranslated_text The unmodified text.
+ * @return string
+ */
+function bp_follow_no_activity_text( $translated_text, $untranslated_text ) {
+	if ( $untranslated_text == 'Sorry, there was no activity found. Please try a different filter.' ) {
+		if ( ! bp_is_user() || bp_is_my_profile() ) {
+			$follow_counts = bp_follow_total_follow_counts( array(
+				'user_id' => bp_loggedin_user_id()
+			) );
+
+			if ( $follow_counts['following'] ) {
+				return __( "You are following some users, but they haven't posted yet.", 'bp-follow' );
+			} else {
+				return __( "You are not following anyone yet.", 'bp-lists' );
+			}
+		} else {
+			global $bp;
+
+			if ( ! empty( $bp->displayed_user->total_follow_counts['following'] ) ) {
+				return __( "This user is following some users, but they haven't posted yet.", 'bp-follow' );
+			} else {
+				return __( "This user isn't following anyone yet.", 'bp-follow' );
+			}
+		}
+
+	}
+
+	return $translated_text;
+}
+
+/**
+ * Removes custom gettext filter when using follow scope.
+ *
+ * @since 1.2.1
+ *
+ * @author r-a-y
+ * @see bp_follow_has_activities()
+ */
+function bp_follow_after_activity_loop() {
+	global $bp;
+
+	if ( ! empty( $bp->follow->activity_scope_set ) ) {
+		remove_filter( 'gettext', 'bp_follow_no_activity_text', 10, 2 );
+		unset( $bp->follow->activity_scope_set );
+	}
+}
+add_action( 'bp_after_activity_loop', 'bp_follow_after_activity_loop' );

@@ -19,9 +19,6 @@ function bp_follow_screen_followers() {
 
 	do_action( 'bp_follow_screen_followers' );
 
-	if ( isset( $_GET['new'] ) )
-		bp_core_delete_notifications_by_type( bp_loggedin_user_id(), $bp->follow->id, 'new_follow' );
-
 	// ignore the template referenced here
 	// 'members/single/followers' is for older themes already using this template
 	//
