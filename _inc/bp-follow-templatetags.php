@@ -193,7 +193,7 @@ function bp_follow_add_follow_button( $args = '' ) {
 
 		// if we're using AJAX and a user is on their own profile, we need to set
 		// block_self to false so the button shows up
-		if ( defined( 'DOING_AJAX' ) && bp_is_my_profile() ) {
+		if ( ( isset( $_SERVER['HTTP_X_REQUESTED_WITH'] ) && strtolower( $_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest' ) && bp_is_my_profile() ) {
 			$block_self = false;
 		}
 
