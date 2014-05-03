@@ -298,8 +298,7 @@ function bp_follow_add_member_scope_filter( $qs, $object ) {
 
 	// filter the members loop based on the current page
 	switch ( bp_current_action() ) {
-		// 'following' page
-		case constant( 'BP_FOLLOWING_SLUG' ) :
+		case 'following':
 			$args = array(
 				'include'  => bp_get_following_ids(),
 				'per_page' => apply_filters( 'bp_follow_per_page', 20 )
@@ -316,8 +315,7 @@ function bp_follow_add_member_scope_filter( $qs, $object ) {
 
 			break;
 
-		// 'followers' page
-		case constant( 'BP_FOLLOWERS_SLUG' ) :
+		case 'followers' :
 			$args = array(
 				'include'  => bp_get_follower_ids(),
 				'per_page' => apply_filters( 'bp_follow_per_page', 20 )
