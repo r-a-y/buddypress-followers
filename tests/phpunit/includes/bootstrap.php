@@ -1,6 +1,13 @@
 <?php
 if ( ! defined( 'BP_TESTS_DIR' ) ) {
-	define( 'BP_TESTS_DIR', dirname( __FILE__ ) . '/../../../../buddypress/tests' );
+	// BP 2.1 and higher
+	if ( file_exists( realpath( dirname( __FILE__ ) . '/../../../../buddypress/tests/phpunit' ) ) ) {
+		define( 'BP_TESTS_DIR', dirname( __FILE__ ) . '/../../../../buddypress/tests/phpunit' );
+
+	// BP 2.0 and lower
+	} else {
+		define( 'BP_TESTS_DIR', dirname( __FILE__ ) . '/../../../../buddypress/tests' );
+	}
 }
 
 if ( ! file_exists( BP_TESTS_DIR . '/bootstrap.php' ) ) {
