@@ -22,6 +22,11 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 class BP_Follow_Component extends BP_Component {
 
 	/**
+	 * @var string The current revision date.
+	 */
+	public $revision_date = '2014-05-06 05:00 UTC';
+
+	/**
 	 * Constructor.
 	 *
 	 * @global obj $bp BuddyPress instance
@@ -58,8 +63,9 @@ class BP_Follow_Component extends BP_Component {
 	public function includes( $includes = array() ) {
 
 		// Backpat functions for BP < 1.7
-		if ( ! class_exists( 'BP_Theme_Compat' ) )
+		if ( ! class_exists( 'BP_Theme_Compat' ) ) {
 			require( $this->path . '/bp-follow-backpat.php' );
+		}
 
 		require( $this->path . '/bp-follow-classes.php' );
 		require( $this->path . '/bp-follow-functions.php' );
@@ -70,6 +76,9 @@ class BP_Follow_Component extends BP_Component {
 		require( $this->path . '/bp-follow-notifications.php' );
 		require( $this->path . '/bp-follow-widgets.php' );
 
+		if ( defined( 'WP_NETWORK_ADMIN' ) ) {
+			require( $this->path . '/bp-follow-updater.php' );
+		}
 	}
 
 	/**
@@ -351,5 +360,13 @@ function bp_follow_setup_component() {
 	global $bp;
 
 	$bp->follow = new BP_Follow_Component;
+
+	// Load up the updater if we're in the admin area
+	//
+	// Checking the WP_NETWORK_ADMIN define is a more, reliable check to determine
+	// if we're in the admin area
+	if ( defined( 'WP_NETWORK_ADMIN' ) ) {
+		$bp->follow->updater = new BP_Follow_Updater;
+	}
 }
 add_action( 'bp_loaded', 'bp_follow_setup_component' );

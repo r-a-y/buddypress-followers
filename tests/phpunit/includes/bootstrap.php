@@ -33,13 +33,24 @@ tests_add_filter( 'muplugins_loaded', '_bp_follow_bootstrap' );
  * Install BP Follow's DB tables.
  */
 function _bp_follow_install() {
-	global $wpdb;
+	global $wpdb, $wp_actions;
+
+	// require BP Follow updater class
+	require dirname( __FILE__ ) . '/../../../_inc/bp-follow-updater.php';
 
 	// Set DB tables to InnoDB
 	$wpdb->query( 'SET storage_engine = INNODB' );
 
+	// Fake that we're in the admin area so BP Follow's did_action() check passes
+	$wp_actions['admin_init'] = 1;
+
+	// Start the install
 	echo "Installing BP Follow...\n";
-	bp_follow_activate();
+	$install = new BP_Follow_Updater;
+	$install->_init();
+
+	// undo the hack
+	unset( $wp_actions['admin_init'] );
 }
 tests_add_filter( 'plugins_loaded', '_bp_follow_install', 20 );
 
