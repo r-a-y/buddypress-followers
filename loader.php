@@ -47,39 +47,6 @@ function bp_follow_init() {
 add_action( 'bp_include', 'bp_follow_init' );
 
 /**
- * Run the activation routine when BP-Follow is activated.
- *
- * @uses dbDelta() Executes queries and performs selective upgrades on existing tables.
- */
-function bp_follow_activate() {
-	global $bp, $wpdb;
-
-	$charset_collate = !empty( $wpdb->charset ) ? "DEFAULT CHARACTER SET $wpdb->charset" : '';
-	if ( !$table_prefix = $bp->table_prefix )
-		$table_prefix = apply_filters( 'bp_core_get_table_prefix', $wpdb->base_prefix );
-
-	$sql[] = "CREATE TABLE IF NOT EXISTS {$table_prefix}bp_follow (
-			id bigint(20) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-			leader_id bigint(20) NOT NULL,
-			follower_id bigint(20) NOT NULL,
-		        KEY followers (leader_id, follower_id)
-		) {$charset_collate};";
-
-	require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
-	dbDelta( $sql );
-}
-register_activation_hook( __FILE__, 'bp_follow_activate' );
-
-/**
- * Run the deactivation routine when BP-Follow is deactivated.
- * Not used currently.
- */
-function bp_follow_deactivate() {
-	// Cleanup.
-}
-//register_deactivation_hook( __FILE__, 'bp_follow_deactivate' );
-
-/**
  * Custom textdomain loader.
  *
  * Checks WP_LANG_DIR for the .mo file first, then the plugin's language folder.
