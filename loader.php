@@ -57,11 +57,12 @@ function bp_follow_localization() {
 	$mofile_global	= trailingslashit( WP_LANG_DIR ) . $mofile;
 	$mofile_local	= plugin_dir_path( __FILE__ ) . 'languages/' . $mofile;
 
-	if ( is_readable( $mofile_global ) )
+	if ( is_readable( $mofile_global ) ) {
 		return load_textdomain( 'bp-follow', $mofile_global );
-	elseif ( is_readable( $mofile_local ) )
+	} elseif ( is_readable( $mofile_local ) ) {
 		return load_textdomain( 'bp-follow', $mofile_local );
-	else
+	} else {
 		return false;
+	}
 }
 add_action( 'plugins_loaded', 'bp_follow_localization' );
