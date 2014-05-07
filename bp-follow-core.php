@@ -106,8 +106,8 @@ class BP_Follow_Component extends BP_Component {
 		$bp->follow->followers->slug = constant( 'BP_FOLLOWERS_SLUG' );
 		$bp->follow->following->slug = constant( 'BP_FOLLOWING_SLUG' );
 
-		// locally cache total count values for logged-in user
-		if ( is_user_logged_in() ) {
+		// locally cache total count values for logged-in user if not in admin area
+		if ( ! defined( 'WP_NETWORK_ADMIN' ) && is_user_logged_in() ) {
 			$bp->loggedin_user->total_follow_counts = bp_follow_total_follow_counts( array(
 				'user_id' => bp_loggedin_user_id()
 			) );
@@ -135,6 +135,12 @@ class BP_Follow_Component extends BP_Component {
 	 */
 	public function setup_nav( $main_nav = array(), $sub_nav = array() ) {
 		global $bp;
+
+		// If we're in the admin area and we're using the WP toolbar, we don't need
+		// to run the rest of this method
+		if ( defined( 'WP_NETWORK_ADMIN' ) && bp_use_wp_admin_bar() ) {
+			return;
+		}
 
 		// Need to change the user ID, so if we're not on a member page, $counts variable is still calculated
 		$user_id = bp_is_user() ? bp_displayed_user_id() : bp_loggedin_user_id();
