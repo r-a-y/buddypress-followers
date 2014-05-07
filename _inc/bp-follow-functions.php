@@ -202,3 +202,21 @@ function bp_follow_remove_data( $user_id ) {
 add_action( 'wpmu_delete_user',	'bp_follow_remove_data' );
 add_action( 'delete_user',	'bp_follow_remove_data' );
 add_action( 'make_spam_user',	'bp_follow_remove_data' );
+
+/**
+ * Is an AJAX request currently taking place?
+ *
+ * Since BP Follow still supports BP 1.5, we can't simply use the DOING_AJAX
+ * constant because BP 1.5 doesn't use admin-ajax.php for AJAX requests.  A
+ * workaround is checking the "HTTP_X_REQUESTED_WITH" server variable.
+ *
+ * Once BP Follow drops support for BP 1.5, we can use the DOING_AJAX constant
+ * as intended.
+ *
+ * @since 1.3.0
+ *
+ * @return bool
+ */
+function bp_follow_is_doing_ajax() {
+	return ( isset( $_SERVER['HTTP_X_REQUESTED_WITH'] ) && strtolower( $_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest' );
+}
