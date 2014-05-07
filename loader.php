@@ -40,8 +40,6 @@ function bp_follow_init() {
 		add_action( 'admin_notices', create_function( '', "
 			echo '<div class=\"error\"><p>' . $older_version_notice . '</p></div>';
 		" ) );
-
-		return;
 	}
 }
 add_action( 'bp_include', 'bp_follow_init' );
