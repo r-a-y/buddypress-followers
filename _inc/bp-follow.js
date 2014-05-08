@@ -59,13 +59,13 @@ jq( function() {
 					count_wrapper = jq("#user-members-followers span");
 
 				} else if ( context == 'member-loop' ) {
-					// a user is on their own profile
-					if ( ! jq.trim( profileHeader.text() ) ) {
-						count_wrapper = jq("#user-members-following span");
-
 					// this means we're on the member directory
-					} else {
+					if ( jq(".dir-search").length ) {
 						count_wrapper = jq("#members-following span");
+
+					// a user is on their own profile
+					} else if ( ! jq.trim( profileHeader.text() ) ) {
+						count_wrapper = jq("#user-members-following span");
 					}
 				}
 
