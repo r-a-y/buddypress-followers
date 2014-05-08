@@ -344,7 +344,7 @@ class BP_Follow_Component extends BP_Component {
 			return;
 		}
 
-		wp_enqueue_script( 'bp-follow-js', constant( 'BP_FOLLOW_URL' ) . '_inc/bp-follow.js', array( 'jquery' ) );
+		wp_enqueue_script( 'bp-follow-js', constant( 'BP_FOLLOW_URL' ) . '_inc/bp-follow.js', array( 'jquery' ), strtotime( $this->revision_date ) );
 	}
 
 }
