@@ -27,7 +27,7 @@ if ( !defined( 'ABSPATH' ) ) exit;
 function bp_follow_init() {
 	// some pertinent defines
 	define( 'BP_FOLLOW_DIR', dirname( __FILE__ ) );
-	define( 'BP_FOLLOW_URL', plugins_url( basename( BP_FOLLOW_DIR ) ) ) . '/';
+	define( 'BP_FOLLOW_URL', plugins_url( basename( BP_FOLLOW_DIR ) ) . '/' );
 
 	// only supported in BP 1.5+
 	if ( version_compare( BP_VERSION, '1.3', '>' ) ) {
