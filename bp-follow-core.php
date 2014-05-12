@@ -76,6 +76,11 @@ class BP_Follow_Component extends BP_Component {
 		require( $this->path . '/bp-follow-notifications.php' );
 		require( $this->path . '/bp-follow-widgets.php' );
 
+		// Follow blog support on multisite and BP 2.0+ only
+		if ( function_exists( 'bp_add_option' ) && bp_is_active( 'blogs' ) && is_multisite() && bp_is_network_activated() && apply_filters( 'bp_follow_enable_blogs', true ) ) {
+			require( $this->path . '/bp-follow-blogs.php' );		
+		}
+
 		if ( defined( 'WP_NETWORK_ADMIN' ) ) {
 			require( $this->path . '/bp-follow-updater.php' );
 		}
