@@ -26,10 +26,11 @@ function bp_follow_start_following( $args = '' ) {
 
 	$r = wp_parse_args( $args, array(
 		'leader_id'   => bp_displayed_user_id(),
-		'follower_id' => bp_loggedin_user_id()
+		'follower_id' => bp_loggedin_user_id(),
+		'follow_type' => '',
 	) );
 
-	$follow = new BP_Follow( $r['leader_id'], $r['follower_id'] );
+	$follow = new BP_Follow( $r['leader_id'], $r['follower_id'], $r['follow_type'] );
 
 	// existing follow already exists
 	if ( ! empty( $follow->id ) ) {
@@ -61,10 +62,11 @@ function bp_follow_stop_following( $args = '' ) {
 
 	$r = wp_parse_args( $args, array(
 		'leader_id'   => bp_displayed_user_id(),
-		'follower_id' => bp_loggedin_user_id()
+		'follower_id' => bp_loggedin_user_id(),
+		'follow_type' => '',
 	) );
 
-	$follow = new BP_Follow( $r['leader_id'], $r['follower_id'] );
+	$follow = new BP_Follow( $r['leader_id'], $r['follower_id'], $r['follow_type'] );
 
 	if ( ! $follow->delete() ) {
 		return false;
@@ -91,10 +93,11 @@ function bp_follow_is_following( $args = '' ) {
 
 	$r = wp_parse_args( $args, array(
 		'leader_id'   => bp_displayed_user_id(),
-		'follower_id' => bp_loggedin_user_id()
+		'follower_id' => bp_loggedin_user_id(),
+		'follow_type' => '',
 	) );
 
-	$follow = new BP_Follow( $r['leader_id'], $r['follower_id'] );
+	$follow = new BP_Follow( $r['leader_id'], $r['follower_id'], $r['follow_type'] );
 
 	return apply_filters( 'bp_follow_is_following', (int)$follow->id, $follow );
 }
@@ -120,23 +123,25 @@ function bp_follow_get_followers( $args = '' ) {
 }
 
 /**
- * Fetch the user IDs of all the users a particular user is following.
+ * Fetch all IDs that a particular user is following.
  *
  * @since 1.0.0
  *
  * @param array $args {
  *     Array of arguments.
  *     @type int $user_id The user ID to fetch following user IDs for.
+ *     @type string $follow_type The follow type
  * }
  * @return array
  */
 function bp_follow_get_following( $args = '' ) {
 
 	$r = wp_parse_args( $args, array(
-		'user_id' => bp_displayed_user_id()
+		'user_id'     => bp_displayed_user_id(),
+		'follow_type' => '',
 	) );
 
-	return apply_filters( 'bp_follow_get_following', BP_Follow::get_following( $r['user_id'] ) );
+	return apply_filters( 'bp_follow_get_following', BP_Follow::get_following( $r['user_id'], $r['follow_type'] ) );
 }
 
 /**
@@ -147,13 +152,15 @@ function bp_follow_get_following( $args = '' ) {
  * @param array $args {
  *     Array of arguments.
  *     @type int $user_id The user ID to grab follow counts for.
+ *     @type string $follow_type The follow type
  * }
  * @return array [ followers => int, following => int ]
  */
 function bp_follow_total_follow_counts( $args = '' ) {
 
 	$r = wp_parse_args( $args, array(
-		'user_id' => bp_loggedin_user_id()
+		'user_id'     => bp_loggedin_user_id(),
+		'follow_type' => '',
 	) );
 
 	$count = false;
@@ -161,28 +168,30 @@ function bp_follow_total_follow_counts( $args = '' ) {
 	/* try to get locally-cached values first */
 
 	// logged-in user
-	if ( $r['user_id'] == bp_loggedin_user_id() && is_user_logged_in() ) {
-		global $bp;
+	if ( empty( $r['follow_type'] ) ) {
+		if ( $r['user_id'] == bp_loggedin_user_id() && is_user_logged_in() ) {
+			global $bp;
+	
+			if ( ! empty( $bp->loggedin_user->total_follow_counts ) ) {
+				$count = $bp->loggedin_user->total_follow_counts;
+			}
 
-		if ( ! empty( $bp->loggedin_user->total_follow_counts ) ) {
-			$count = $bp->loggedin_user->total_follow_counts;
-		}
-
-	// displayed user
-	} elseif ( $r['user_id'] == bp_displayed_user_id() && bp_is_user() ) {
-		global $bp;
-		
-		if ( ! empty( $bp->displayed_user->total_follow_counts ) ) {
-			$count = $bp->displayed_user->total_follow_counts;
+		// displayed user
+		} elseif ( $r['user_id'] == bp_displayed_user_id() && bp_is_user() ) {
+			global $bp;
+			
+			if ( ! empty( $bp->displayed_user->total_follow_counts ) ) {
+				$count = $bp->displayed_user->total_follow_counts;
+			}
 		}
 	}
 
 	// no cached value, so query for it
 	if ( $count === false ) {
-		$count = BP_Follow::get_counts( $r['user_id'] );
+		$count = BP_Follow::get_counts( $r['user_id'], $r['follow_type'] );
 	}
 
-	return apply_filters( 'bp_follow_total_follow_counts', $count, $r['user_id'] );
+	return apply_filters( 'bp_follow_total_follow_counts', $count, $r['user_id'], $r );
 }
 
 /**

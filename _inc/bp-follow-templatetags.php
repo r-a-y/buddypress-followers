@@ -12,9 +12,7 @@ if ( !defined( 'ABSPATH' ) ) exit;
 /**
  * Output a comma-separated list of user_ids for a given user's followers.
  *
- * @param mixed $args Arguments can be passed as an associative array or as a URL argument string
- * @global $bp The global BuddyPress settings variable created in bp_core_setup_globals()
- * @uses bp_get_follower_ids() Returns comma-seperated string of user IDs on success. Integer zero on failure.
+ * @param array $args See bp_get_follower_ids().
  */
 function bp_follower_ids( $args = '' ) {
 	echo bp_get_follower_ids( $args );
@@ -22,15 +20,14 @@ function bp_follower_ids( $args = '' ) {
 	/**
 	 * Returns a comma separated list of user_ids for a given user's followers.
 	 *
-	 * This can then be passed directly into the members loop querystring.
 	 * On failure, returns an integer of zero. Needed when used in a members loop to prevent SQL errors.
 	 *
-	 * Arguments include:
-	 * 	'user_id' - The user ID you want to check for followers
-	 *
-	 * @param mixed $args Arguments can be passed as an associative array or as a URL argument string
-	 * @global $bp The global BuddyPress settings variable created in bp_core_setup_globals()
-	 * @return Mixed Comma-seperated string of user IDs on success. Integer zero on failure.
+	 * @param array $args {
+	 *     Array of arguments.
+	 *     @type int $user_id The user ID you want to check for followers.
+	 *     @type string $follow_type The follow type
+	 * }
+	 * @return string|int Comma-seperated string of user IDs on success. Integer zero on failure.
 	 */
 	function bp_get_follower_ids( $args = '' ) {
 
@@ -48,37 +45,38 @@ function bp_follower_ids( $args = '' ) {
 /**
  * Output a comma-separated list of user_ids for a given user's following.
  *
- * @param mixed $args Arguments can be passed as an associative array or as a URL argument string
- * @global $bp The global BuddyPress settings variable created in bp_core_setup_globals()
- * @uses bp_get_following_ids() Returns comma-seperated string of user IDs on success. Integer zero on failure.
+ * @param array $args See bp_get_following_ids().
  */
 function bp_following_ids( $args = '' ) {
 	echo bp_get_following_ids( $args );
 }
 	/**
-	 * Returns a comma separated list of user_ids for a given user's following.
+	 * Returns a comma separated list of IDs for a given user's following.
 	 *
-	 * This can then be passed directly into the members loop querystring.
-	 * On failure, returns an integer of zero. Needed when used in a members loop to prevent SQL errors.
+	 * On failure, returns integer zero. Needed when used in a members loop to prevent SQL errors.
 	 *
-	 * Arguments include:
-	 * 	'user_id' - The user ID you want to check for a following
-	 *
-	 * @param mixed $args Arguments can be passed as an associative array or as a URL argument string
-	 * @global $bp The global BuddyPress settings variable created in bp_core_setup_globals()
-	 * @return Mixed Comma-seperated string of user IDs on success. Integer zero on failure.
+	 * @param array $args {
+	 *     Array of arguments.
+	 *     @type int $user_id The user ID to fetch following user IDs for.
+	 *     @type string $follow_type The follow type
+	 * }
+	 * @return string|int Comma-seperated string of user IDs on success. Integer zero on failure.
 	 */
 	function bp_get_following_ids( $args = '' ) {
 
 		$r = wp_parse_args( $args, array(
-			'user_id' => bp_displayed_user_id()
+			'user_id'     => bp_displayed_user_id(),
+			'follow_type' => '',
 		) );
 
-		$ids = implode( ',', (array)bp_follow_get_following( array( 'user_id' => $r['user_id'] ) ) );
+		$ids = implode( ',', (array) bp_follow_get_following( array(
+			'user_id'     => $r['user_id'],
+			'follow_type' => $r['follow_type'],
+		) ) );
 
 		$ids = empty( $ids ) ? 0 : $ids;
 
- 		return apply_filters( 'bp_get_following_ids', $ids, $r['user_id'] );
+ 		return apply_filters( 'bp_get_following_ids', $ids, $r['user_id'], $r );
 	}
 
 /**

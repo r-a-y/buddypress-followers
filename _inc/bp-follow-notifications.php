@@ -93,6 +93,11 @@ add_action( 'bp_follow_remove_data', 'bp_follow_remove_notifications_for_user' )
  * @param object $follow The BP_Follow object.
  */
 function bp_follow_notifications_add_on_follow( BP_Follow $follow ) {
+	// this only applies to users
+	if ( ! empty( $follow->follow_type ) ) {
+		return;
+	}
+
 	// Add a screen notification
 	//
 	// BP 1.9+
