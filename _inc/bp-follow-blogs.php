@@ -118,7 +118,7 @@ class BP_Follow_Blogs {
 				'title'  => _x( 'Followed Blogs', 'Adminbar activity subnav', 'bp-follow' ),
 				'href'   => bp_loggedin_user_domain() . bp_get_activity_slug() . '/' . constant( 'BP_FOLLOW_BLOGS_USER_ACTIVITY_SLUG' ) . '/',
 			);
-	
+
 			$inject = array();
 			$offset = 4;
 
@@ -160,6 +160,7 @@ class BP_Follow_Blogs {
 
 		// "Create a Site" is disabled; just add nav item to the end
 		} else {
+			$inject = array();
 			$inject[] = $new_item;
 			$retval = array_merge( $retval, $inject );
 		}
