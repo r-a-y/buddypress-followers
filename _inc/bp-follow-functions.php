@@ -41,7 +41,11 @@ function bp_follow_start_following( $args = '' ) {
 		return false;
 	}
 
-	do_action_ref_array( 'bp_follow_start_following', array( &$follow ) );
+	if ( empty( $r['follow_type'] ) ) {
+		do_action_ref_array( 'bp_follow_start_following', array( &$follow ) );
+	} else {
+		do_action_ref_array( 'bp_follow_start_following_' . $r['follow_type'], array( &$follow ) );	
+	}
 
 	return true;
 }
@@ -72,7 +76,11 @@ function bp_follow_stop_following( $args = '' ) {
 		return false;
 	}
 
-	do_action_ref_array( 'bp_follow_stop_following', array( &$follow ) );
+	if ( empty( $r['follow_type'] ) ) {
+		do_action_ref_array( 'bp_follow_stop_following', array( &$follow ) );
+	} else {
+		do_action_ref_array( 'bp_follow_stop_following_' . $r['follow_type'], array( &$follow ) );	
+	}
 
 	return true;
 }
@@ -99,7 +107,13 @@ function bp_follow_is_following( $args = '' ) {
 
 	$follow = new BP_Follow( $r['leader_id'], $r['follower_id'], $r['follow_type'] );
 
-	return apply_filters( 'bp_follow_is_following', (int)$follow->id, $follow );
+	if ( empty( $r['follow_type'] ) ) {
+		$retval = apply_filters( 'bp_follow_is_following', (int) $follow->id, $follow );
+	} else {
+		$retval = apply_filters( 'bp_follow_is_following_' . $r['follow_type'], (int) $follow->id, $follow );	
+	}
+
+	return $retval;
 }
 
 /**
@@ -141,7 +155,13 @@ function bp_follow_get_following( $args = '' ) {
 		'follow_type' => '',
 	) );
 
-	return apply_filters( 'bp_follow_get_following', BP_Follow::get_following( $r['user_id'], $r['follow_type'] ) );
+	if ( empty( $r['follow_type'] ) ) {
+		$retval = apply_filters( 'bp_follow_get_following', BP_Follow::get_following( $r['user_id'], $r['follow_type'] ) );
+	} else {
+		$retval = apply_filters( 'bp_follow_get_following_' .  $r['follow_type'], BP_Follow::get_following( $r['user_id'], $r['follow_type'] ) );
+	}
+
+	return $retval;
 }
 
 /**
