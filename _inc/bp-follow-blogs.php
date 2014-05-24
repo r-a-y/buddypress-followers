@@ -23,9 +23,10 @@ class BP_Follow_Blogs {
 	 */
 	public function __construct() {
 		// component hooks
-		add_action( 'bp_follow_setup_globals',       array( $this, 'constants' ) );
-		add_action( 'bp_follow_setup_nav',           array( $this, 'setup_nav' ) );
-		add_filter( 'bp_blogs_admin_nav',            array( $this, 'blogs_admin_nav' ) );
+		add_action( 'bp_follow_setup_globals', array( $this, 'constants' ) );
+		add_action( 'bp_follow_setup_nav',     array( $this, 'setup_nav' ) );
+		add_action( 'bp_activity_admin_nav',   array( $this, 'activity_admin_nav' ) );
+		add_filter( 'bp_blogs_admin_nav',      array( $this, 'blogs_admin_nav' ) );
 
 		// screen hooks
 		add_action( 'bp_after_member_blogs_content', array( BP_Follow_Blogs_Screens, 'user_blogs_inline_js' ) );
@@ -101,6 +102,35 @@ class BP_Follow_Blogs {
 				'item_css_id'     => 'activity-followblogs'
 			) );
 		}
+	}
+
+	/**
+	 * Inject "Followed Blogs" nav item to WP adminbar's "Activity" main nav.
+	 *
+	 * @param array $retval
+	 * @return array
+	 */
+	public function activity_admin_nav( $retval ) {
+		if ( bp_is_active( 'activity' ) && apply_filters( 'bp_follow_show_activity_subnav', true ) ) {
+			$new_item = array(
+				'parent' => 'my-account-activity',
+				'id'     => 'my-account-activity-followblogs',
+				'title'  => _x( 'Followed Blogs', 'Adminbar activity subnav', 'bp-follow' ),
+				'href'   => bp_loggedin_user_domain() . bp_get_activity_slug() . '/' . constant( 'BP_FOLLOW_BLOGS_USER_ACTIVITY_SLUG' ) . '/',
+			);
+	
+			$inject = array();
+			$offset = 4;
+
+			$inject[$offset] = $new_item;
+			$retval = array_merge(
+				array_slice( $retval, 0, $offset, true ),
+				$inject,
+				array_slice( $retval, $offset, NULL, true )
+			);
+		}
+
+		return $retval;
 	}
 
 	/**
