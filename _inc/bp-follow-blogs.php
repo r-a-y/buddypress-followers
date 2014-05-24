@@ -327,6 +327,7 @@ class BP_Follow_Blogs {
 		$following_ids = empty( $following_ids ) ? -1 : $following_ids;
 
 		$args = array(
+			'user_id'    => 0,
 			'object'     => 'blogs',
 			'primary_id' => $following_ids,
 		);
