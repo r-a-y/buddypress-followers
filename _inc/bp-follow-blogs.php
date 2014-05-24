@@ -35,11 +35,14 @@ class BP_Follow_Blogs {
 		add_action( 'bp_before_activity_type_tab_favorites', array( $this, 'add_activity_directory_tab' ) );
 		add_action( 'bp_blogs_directory_blog_types',         array( $this, 'add_blog_directory_tab' ) );
 
+		// activity scope setting
+		add_action( 'bp_activity_screen_index', array( $this, 'set_activity_scope_on_activity_directory' ) );
+		add_action( 'bp_before_activity_loop',  array( $this, 'set_activity_scope_on_user_activity' ) );
+
 		// loop filtering
-		add_action( 'bp_activity_screen_index', array( $this, 'set_activity_scope' ) );
-		add_filter( 'bp_ajax_querystring',      array( $this, 'add_blogs_scope_filter' ),    20, 2 );
-		add_filter( 'bp_ajax_querystring',      array( $this, 'add_activity_scope_filter' ), 20, 2 );
-		add_filter( 'bp_has_blogs',             array( $this, 'bulk_inject_blog_follow_status' ) );
+		add_filter( 'bp_ajax_querystring', array( $this, 'add_blogs_scope_filter' ),    20, 2 );
+		add_filter( 'bp_ajax_querystring', array( $this, 'add_activity_scope_filter' ), 20, 2 );
+		add_filter( 'bp_has_blogs',        array( $this, 'bulk_inject_blog_follow_status' ) );
 
 		// button injection
 		add_action( 'bp_directory_blogs_actions', array( $this, 'add_follow_button_to_loop' ),   20 );
@@ -50,8 +53,14 @@ class BP_Follow_Blogs {
 	 * Constants.
 	 */
 	public function constants() {
+		// /members/admin/blogs/[FOLLOWING]
 		if ( ! defined( 'BP_FOLLOW_BLOGS_USER_FOLLOWING_SLUG' ) ) {
 			define( 'BP_FOLLOW_BLOGS_USER_FOLLOWING_SLUG', constant( 'BP_FOLLOWING_SLUG' ) );
+		}
+
+		// /members/admin/activity/[FOLLOWBLOGS]
+		if ( ! defined( 'BP_FOLLOW_BLOGS_USER_ACTIVITY_SLUG' ) ) {
+			define( 'BP_FOLLOW_BLOGS_USER_ACTIVITY_SLUG', 'followblogs' );
 		}
 	}
 
@@ -79,6 +88,19 @@ class BP_Follow_Blogs {
 			'position'        => 20,
 			'item_css_id'     => 'blogs-following'
 		) );
+
+		// Add activity sub nav item
+		if ( bp_is_active( 'activity' ) && apply_filters( 'bp_follow_blogs_show_activity_subnav', true ) ) {
+			bp_core_new_subnav_item( array(
+				'name'            => _x( 'Followed Blogs', 'Activity subnav tab', 'bp-follow' ),
+				'slug'            => constant( 'BP_FOLLOW_BLOGS_USER_ACTIVITY_SLUG' ),
+				'parent_url'      => trailingslashit( $user_domain . bp_get_activity_slug() ),
+				'parent_slug'     => bp_get_activity_slug(),
+				'screen_function' => array( BP_Follow_Blogs_Screens, 'user_activity_screen' ),
+				'position'        => 22,
+				'item_css_id'     => 'activity-followblogs'
+			) );
+		}
 	}
 
 	/**
@@ -160,6 +182,59 @@ class BP_Follow_Blogs {
 		<li id="blogs-following"><a href="<?php echo esc_url( bp_loggedin_user_domain() . bp_get_blogs_slug() . '/' . constant( 'BP_FOLLOW_BLOGS_USER_FOLLOWING_SLUG' ). '/' ); ?>"><?php printf( __( 'Following <span>%d</span>', 'bp-follow' ), (int) $counts['following'] ) ?></a></li><?php
 	}
 
+	/** ACTIVITY SCOPE ************************************************/
+
+	/**
+	 * Set activity scope on the activity directory depending on GET parameter.
+	 *
+	 * @todo Maybe add this in BP Core?
+	 */
+	function set_activity_scope_on_activity_directory() {
+		if ( empty( $_GET['scope'] ) ) {
+			return;
+		}
+
+		$scope = wp_filter_kses( $_GET['scope'] );
+
+		// set the activity scope by faking an ajax request (loophole!)
+		$_POST['cookie'] = "bp-activity-scope%3D{$scope}%3B%20bp-activity-filter%3D-1";
+
+		// reset the selected tab
+		@setcookie( 'bp-activity-scope',  $scope, 0, '/' );
+
+		//reset the dropdown menu to 'Everything'
+		@setcookie( 'bp-activity-filter', '-1',   0, '/' );
+	}
+
+	/**
+	 * Set activity scope on a user's "Activity > Followed Sites" page
+	 */
+	function set_activity_scope_on_user_activity() {
+		if ( ! bp_is_current_action( constant( 'BP_FOLLOW_BLOGS_USER_ACTIVITY_SLUG' ) ) ) {
+			return;
+		}
+
+		$scope = 'followblogs';
+
+		// if we have a post value already, let's add our scope to the existing cookie value
+		if ( !empty( $_POST['cookie'] ) ) {
+			$_POST['cookie'] .= "%3B%20bp-activity-scope%3D{$scope}";
+		} else {
+			$_POST['cookie'] .= "bp-activity-scope%3D{$scope}";
+		}
+
+		// set the activity scope by faking an ajax request (loophole!)
+		if ( ! defined( 'DOING_AJAX' ) ) {
+			$_POST['cookie'] .= "%3B%20bp-activity-filter%3D-1";
+
+			// reset the selected tab
+			@setcookie( 'bp-activity-scope',  $scope, 0, '/' );
+
+			//reset the dropdown menu to 'Everything'
+			@setcookie( 'bp-activity-filter', '-1',   0, '/' );
+		}
+	}
+
 	/** LOOP-FILTERING ************************************************/
 
 	/**
@@ -234,6 +309,10 @@ class BP_Follow_Blogs {
 		// parse querystring into an array
 		wp_parse_str( $qs, $r );
 
+		if ( bp_is_current_action( constant( 'BP_FOLLOW_BLOGS_USER_ACTIVITY_SLUG' ) ) ) {
+			$r['scope'] = 'followblogs';
+		}
+
 		if ( 'followblogs' !== $r['scope'] ) {
 			return $qs;
 		}
@@ -260,28 +339,6 @@ class BP_Follow_Blogs {
 		$qs .= build_query( $args );
 
 		return $qs;
-	}
-
-	/**
-	 * Set activity scope on the activity directory depending on GET parameter.
-	 *
-	 * @todo Maybe add this in BP Core?
-	 */
-	function set_activity_scope() {
-		if ( empty( $_GET['scope'] ) ) {
-			return;
-		}
-
-		$scope = wp_filter_kses( $_GET['scope'] );
-
-		// set the activity scope by faking an ajax request (loophole!)
-		$_POST['cookie'] = "bp-activity-scope%3D{$scope}%3B%20bp-activity-filter%3D-1";
-
-		// reset the selected tab
-		@setcookie( 'bp-activity-scope',  $scope, 0, '/' );
-
-		//reset the dropdown menu to 'Everything'
-		@setcookie( 'bp-activity-filter', '-1',   0, '/' );
 	}
 
 	/**
@@ -588,6 +645,18 @@ class BP_Follow_Blogs_Screens {
 	<?php
 	}
 
+	/**
+	 * Sets up the user activity screen.
+	 *
+	 * eg. /members/admin/activity/followblogs/
+	 */
+	public static function user_activity_screen() {
+		do_action( 'bp_follow_blogs_screen_user_activity' );
+
+		// this is for bp-default themes
+		bp_core_load_template( 'members/single/home' );
+	}
+
 	/** ACTIONS *******************************************************/
 
 	/**
@@ -674,4 +743,5 @@ class BP_Follow_Blogs_Screens {
 		$redirect = wp_get_referer() ? wp_get_referer() : bp_displayed_user_domain() . bp_get_blogs_slug() . '/' . constant( 'BP_FOLLOW_BLOGS_USER_FOLLOWING_SLUG' ) . '/';
 		bp_core_redirect( $redirect );
 	}
+
 }
