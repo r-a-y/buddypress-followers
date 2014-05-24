@@ -271,8 +271,9 @@ class BP_Follow_Blogs {
 			'follow_type' => 'blogs',
 		) );
 
-		// if $following_ids is empty, pass a negative number so no blogs can be found
-		$following_ids = empty( $following_ids ) ? -1 : $following_ids;
+		// if $following_ids is empty, pass the largest bigint(20) value to ensure
+		// no blogs are matched
+		$following_ids = empty( $following_ids ) ? '18446744073709551615' : $following_ids;
 
 		$args = array(
 			'user_id'          => 0,
