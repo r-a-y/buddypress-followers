@@ -117,19 +117,21 @@ class BP_Follow_Blogs {
 			'href'   => bp_loggedin_user_domain() . bp_get_blogs_slug() . '/' . constant( 'BP_FOLLOW_BLOGS_USER_FOLLOWING_SLUG' ). '/',
 		);
 
+		$inject = array();
+		$last   = end( $retval );
+
 		// inject item in between "My Sites" and "Create a Site" subnav items
-		$last = end( $retval );
 		if ( 'my-account-blogs-create' === $last['id'] ) {
 			$offset = key( $retval );
 
-			$inject = array();
 			$inject[$offset] = $new_item;
 
 			$retval = array_merge( array_slice( $retval, 0, $offset, true ), $inject, array_slice( $retval, $offset, NULL, true ) );
 
 		// "Create a Site" is disabled; just add nav item to the end
 		} else {
-			$retval = array_merge( $retval, $new_item );
+			$inject[] = $new_item;
+			$retval = array_merge( $retval, $inject );
 		}
 
 		return $retval;
