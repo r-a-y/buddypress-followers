@@ -140,6 +140,9 @@ class BP_Follow_Component extends BP_Component {
 	 * Setup hooks.
 	 */
 	public function setup_hooks() {
+		// WP adminbar activity subnav
+		add_action( 'bp_activity_admin_nav', array( $this, 'activity_admin_nav' ) );
+
 		// javascript hook
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ), 11 );
 	}
@@ -243,19 +246,38 @@ class BP_Follow_Component extends BP_Component {
 				'href'   => trailingslashit( bp_loggedin_user_domain() . $bp->follow->followers->slug )
 			);
 
-			// "Activity > Following" subnav item
-			if ( bp_is_active( 'activity' ) && apply_filters( 'bp_follow_show_activity_subnav', true ) ) {
-				$wp_admin_nav[] = array(
-					'parent' => 'my-account-activity',
-					'id'     => 'my-account-activity-following',
-					'title'  => _x( 'Following', 'Adminbar activity subnav', 'bp-follow' ),
-					'href'   => trailingslashit( bp_loggedin_user_domain() . bp_get_activity_slug() . '/' . $bp->follow->following->slug )
-				);
-			}
-
 		}
 
 		parent::setup_admin_bar( apply_filters( 'bp_follow_toolbar', $wp_admin_nav ) );
+	}
+
+	/**
+	 * Inject "Following" nav item to WP adminbar's "Activity" main nav.
+	 *
+	 * @param array $retval
+	 * @return array
+	 */
+	public function activity_admin_nav( $retval ) {
+		if ( bp_is_active( 'activity' ) && apply_filters( 'bp_follow_show_activity_subnav', true ) ) {
+			$new_item = array(
+				'parent' => 'my-account-activity',
+				'id'     => 'my-account-activity-following',
+				'title'  => _x( 'Following', 'Adminbar activity subnav', 'bp-follow' ),
+				'href'   => trailingslashit( bp_loggedin_user_domain() . bp_get_activity_slug() . '/' . constant( 'BP_FOLLOWING_SLUG' ) ),
+			);
+	
+			$inject = array();
+			$offset = 3;
+
+			$inject[$offset] = $new_item;
+			$retval = array_merge(
+				array_slice( $retval, 0, $offset, true ),
+				$inject,
+				array_slice( $retval, $offset, NULL, true )
+			);
+		}
+
+		return $retval;
 	}
 
 	/**
