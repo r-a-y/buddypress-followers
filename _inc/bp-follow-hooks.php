@@ -201,13 +201,13 @@ add_action( 'bp_before_activity_type_tab_friends', 'bp_follow_add_activity_tab' 
  * This is so the logged-in user can filter the members directory to only
  * users that the current user is following.
  *
- * @global $bp The global BuddyPress settings variable created in bp_core_setup_globals()
  * @uses bp_follow_total_follow_counts() Get the following/followers counts for a user.
  */
 function bp_follow_add_following_tab() {
 
-	if ( bp_displayed_user_id() )
-		return false;
+	if ( ! is_user_logged_in() ) {
+		return;
+	}
 
 	$counts = bp_follow_total_follow_counts( array( 'user_id' => bp_loggedin_user_id() ) );
 
