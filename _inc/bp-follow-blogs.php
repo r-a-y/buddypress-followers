@@ -111,6 +111,10 @@ class BP_Follow_Blogs {
 	 * @return array
 	 */
 	public function activity_admin_nav( $retval ) {
+		if ( ! is_user_logged_in() ) {
+			return $retval;
+		}
+
 		if ( bp_is_active( 'activity' ) && apply_filters( 'bp_follow_show_activity_subnav', true ) ) {
 			$new_item = array(
 				'parent' => 'my-account-activity',
@@ -140,6 +144,10 @@ class BP_Follow_Blogs {
 	 * @return array
 	 */
 	public function blogs_admin_nav( $retval ) {
+		if ( ! is_user_logged_in() ) {
+			return $retval;
+		}
+
 		$new_item = array(
 			'parent' => 'my-account-blogs',
 			'id'     => 'my-account-blogs-following',

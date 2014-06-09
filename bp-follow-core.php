@@ -258,6 +258,10 @@ class BP_Follow_Component extends BP_Component {
 	 * @return array
 	 */
 	public function activity_admin_nav( $retval ) {
+		if ( ! is_user_logged_in() ) {
+			return $retval;
+		}
+
 		if ( bp_is_active( 'activity' ) && apply_filters( 'bp_follow_show_activity_subnav', true ) ) {
 			$new_item = array(
 				'parent' => 'my-account-activity',
