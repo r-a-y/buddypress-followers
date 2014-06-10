@@ -29,8 +29,8 @@ class BP_Follow_Blogs {
 		add_filter( 'bp_blogs_admin_nav',      array( $this, 'blogs_admin_nav' ) );
 
 		// screen hooks
-		add_action( 'bp_after_member_blogs_content', array( BP_Follow_Blogs_Screens, 'user_blogs_inline_js' ) );
-		add_action( 'bp_actions',                    array( BP_Follow_Blogs_Screens, 'action_handler' ) );
+		add_action( 'bp_after_member_blogs_content', 'BP_Follow_Blogs_Screens::user_blogs_inline_js' );
+		add_action( 'bp_actions',                    'BP_Follow_Blogs_Screens::action_handler' );
 
 		// directory tabs
 		add_action( 'bp_before_activity_type_tab_favorites', array( $this, 'add_activity_directory_tab' ) );
@@ -85,7 +85,7 @@ class BP_Follow_Blogs {
 			'slug'            => constant( 'BP_FOLLOW_BLOGS_USER_FOLLOWING_SLUG' ),
 			'parent_url'      => trailingslashit( $user_domain . bp_get_blogs_slug() ),
 			'parent_slug'     => bp_get_blogs_slug(),
-			'screen_function' => array( BP_Follow_Blogs_Screens, 'user_blogs_screen' ),
+			'screen_function' => 'BP_Follow_Blogs_Screens::user_blogs_screen',
 			'position'        => 20,
 			'item_css_id'     => 'blogs-following'
 		) );
@@ -97,7 +97,7 @@ class BP_Follow_Blogs {
 				'slug'            => constant( 'BP_FOLLOW_BLOGS_USER_ACTIVITY_SLUG' ),
 				'parent_url'      => trailingslashit( $user_domain . bp_get_activity_slug() ),
 				'parent_slug'     => bp_get_activity_slug(),
-				'screen_function' => array( BP_Follow_Blogs_Screens, 'user_activity_screen' ),
+				'screen_function' => 'BP_Follow_Blogs_Screens::user_activity_screen',
 				'position'        => 22,
 				'item_css_id'     => 'activity-followblogs'
 			) );
