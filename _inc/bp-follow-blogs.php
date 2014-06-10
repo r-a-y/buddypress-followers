@@ -31,6 +31,7 @@ class BP_Follow_Blogs {
 		// screen hooks
 		add_action( 'bp_after_member_blogs_content', 'BP_Follow_Blogs_Screens::user_blogs_inline_js' );
 		add_action( 'bp_actions',                    'BP_Follow_Blogs_Screens::action_handler' );
+		add_action( 'bp_actions',                    'BP_Follow_Blogs_Screens::rss_handler' );
 
 		// directory tabs
 		add_action( 'bp_before_activity_type_tab_favorites', array( $this, 'add_activity_directory_tab' ) );
@@ -701,6 +702,43 @@ class BP_Follow_Blogs_Screens {
 	}
 
 	/** ACTIONS *******************************************************/
+
+	public static function rss_handler() {
+		// only available in BP 1.8+
+		if ( ! class_exists( 'BP_Activity_Feed' ) ) {
+			return;
+		}
+
+		if ( ! bp_is_user_activity() || ! bp_is_current_action( constant( 'BP_FOLLOW_BLOGS_USER_ACTIVITY_SLUG' ) ) || ! bp_is_action_variable( 'feed', 0 ) ) {
+			return;
+		}
+
+		// get blog IDs that the user is following
+		$following_ids = bp_get_following_ids( array(
+			'follow_type' => 'blogs',
+		) );
+
+		// if $following_ids is empty, pass a negative number so no blogs can be found
+		$following_ids = empty( $following_ids ) ? -1 : $following_ids;
+
+		$args = array(
+			'user_id'    => 0,
+			'object'     => 'blogs',
+			'primary_id' => $following_ids,
+		);
+
+		// setup the feed
+		buddypress()->activity->feed = new BP_Activity_Feed( array(
+			'id'            => 'followedsites',
+
+			/* translators: User's following activity RSS title - "[Site Name] | [User Display Name] | Followed Site Activity" */
+			'title'         => sprintf( __( '%1$s | %2$s | Followed Site Activity', 'bp-follow' ), bp_get_site_name(), bp_get_displayed_user_fullname() ),
+
+			'link'          => trailingslashit( bp_displayed_user_domain() . bp_get_activity_slug() . '/' . constant( 'BP_FOLLOW_BLOGS_USER_ACTIVITY_SLUG' ) ),
+			'description'   => sprintf( __( "Activity feed for sites that %s is following.", 'buddypress' ), bp_get_displayed_user_fullname() ),
+			'activity_args' => $args,
+		) );
+	}
 
 	/**
 	 * Action handler when a follow blogs button is clicked.
