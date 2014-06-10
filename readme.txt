@@ -25,6 +25,7 @@ BP Follow has been translated into the following languages by these awesome peop
 
 * Brazilian Portuguese - [espellcaste](https://profiles.wordpress.org/espellcaste)
 * German - [solhuebner](https://profiles.wordpress.org/solhuebner)
+* Spanish - [saik003](https://github.com/saik003/buddypress-followers)
 
 For bug reports or to add patches or translation files, visit the [BP Follow Github page](https://github.com/r-a-y/buddypress-followers).
 
