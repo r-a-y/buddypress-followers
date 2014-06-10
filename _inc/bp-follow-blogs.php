@@ -49,6 +49,11 @@ class BP_Follow_Blogs {
 		// button injection
 		add_action( 'bp_directory_blogs_actions', array( $this, 'add_follow_button_to_loop' ),   20 );
 		add_action( 'wp_footer',                  array( $this, 'add_follow_button_to_footer' ), 999 );
+
+		// rss feed link
+		add_filter( 'bp_get_sitewide_activity_feed_link', array( $this, 'activity_feed_url' ) );
+		add_filter( 'bp_dtheme_activity_feed_url',        array( $this, 'activity_feed_url' ) );
+		add_filter( 'bp_legacy_theme_activity_feed_url',  array( $this, 'activity_feed_url' ) );
 	}
 
 	/**
@@ -632,6 +637,41 @@ class BP_Follow_Blogs {
 
 		// Filter and return the HTML button
 		return bp_get_button( apply_filters( 'bp_follow_blogs_get_follow_button', $button, $r, $is_following ) );
+	}
+
+	/** FEED URL ***********************************************************/
+
+	/**
+	 * Sets the "RSS" feed URL for the tab on the Sitewide Activity page.
+	 *
+	 * This occurs when the "Followed Sites" tab is clicked on the Sitewide
+	 * Activity page or when the activity scope is already set to "followblogs".
+	 *
+	 * Only do this for BuddyPress 1.8+.
+	 *
+	 * @param string $retval The feed URL.
+	 * @return string The feed URL.
+	 */
+	public function activity_feed_url( $retval ) {
+		// only available in BP 1.8+
+		if ( ! class_exists( 'BP_Activity_Feed' ) ) {
+			return $retval;
+		}
+
+		// this is done b/c we're filtering 'bp_get_sitewide_activity_feed_link' and
+		// we only want to alter the feed link for the "RSS" tab
+		if ( ! defined( 'DOING_AJAX' ) && ! did_action( 'bp_before_directory_activity' ) ) {
+			return $retval;
+		}
+
+		// get the activity scope
+		$scope = ! empty( $_COOKIE['bp-activity-scope'] ) ? $_COOKIE['bp-activity-scope'] : false;
+
+		if ( $scope == 'followblogs' && bp_loggedin_user_id() ) {
+			$retval = bp_loggedin_user_domain() . bp_get_activity_slug() . '/' . constant( 'BP_FOLLOW_BLOGS_USER_ACTIVITY_SLUG' ) . '/feed/';
+		}
+
+		return $retval;
 	}
 }
 
