@@ -452,6 +452,23 @@ class BP_Follow_Blogs {
 	}
 
 	/**
+	 * Whether to show the blog footer buttons.
+	 *
+	 * @return bool Defaults to true. False when on BP root blog and not on a blog
+	 *         page deemed by BuddyPress.
+	 */
+	public static function show_footer_button() {
+		$retval = true;
+
+		// @todo might need to tweak this a bit...
+		if ( bp_is_root_blog() && ! bp_is_blog_page() ) {
+			$retval = false;
+		}
+
+		return apply_filters( 'bp_follow_blogs_show_footer_button', $retval );
+	}
+
+	/**
 	 * Add a follow button to the footer.
 	 *
 	 * Also adds a "Home" link, which links to the activity directory's "Sites I
@@ -470,7 +487,7 @@ class BP_Follow_Blogs {
 		}
 
 		// disable the footer button using this filter if needed
-		if ( false === apply_filters( 'bp_follow_blogs_show_footer_button', true ) ) {
+		if ( false === self::show_footer_button() ) {
 			return;
 		}
 
