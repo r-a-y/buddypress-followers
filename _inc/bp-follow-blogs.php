@@ -514,7 +514,7 @@ class BP_Follow_Blogs {
 			}
 
 			#bpf-blogs-ftr a.home:before {
-				content: "\f102";
+				content: "\f155";
 				top: 2px;
 			}
 		</style>
@@ -525,7 +525,7 @@ class BP_Follow_Blogs {
 				'wrapper'   => false,
 			) ); ?>
 
-			<a class="home" href="<?php echo add_query_arg( 'scope', 'followblogs', bp_get_activity_directory_permalink() ); ?>"><?php _e( 'Home', 'bp-follow' ); ?></a>
+			<a class="home" href="<?php echo esc_url( bp_loggedin_user_domain() . bp_get_blogs_slug() . '/' . constant( 'BP_FOLLOW_BLOGS_USER_FOLLOWING_SLUG' ). '/' ); ?>"><?php _ex( 'Followed Sites', 'Footer button', 'bp-follow' ); ?></a>
 		</div>
 
 	<?php
