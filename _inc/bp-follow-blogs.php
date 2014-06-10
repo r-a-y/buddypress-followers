@@ -81,7 +81,7 @@ class BP_Follow_Blogs {
 		}
 
 		bp_core_new_subnav_item( array(
-			'name'            => _x( 'Sites I Follow', 'Sites subnav tab', 'bp-follow' ),
+			'name'            => _x( 'Followed Sites', 'Sites subnav tab', 'bp-follow' ),
 			'slug'            => constant( 'BP_FOLLOW_BLOGS_USER_FOLLOWING_SLUG' ),
 			'parent_url'      => trailingslashit( $user_domain . bp_get_blogs_slug() ),
 			'parent_slug'     => bp_get_blogs_slug(),
@@ -93,7 +93,7 @@ class BP_Follow_Blogs {
 		// Add activity sub nav item
 		if ( bp_is_active( 'activity' ) && apply_filters( 'bp_follow_blogs_show_activity_subnav', true ) ) {
 			bp_core_new_subnav_item( array(
-				'name'            => _x( 'Followed Blogs', 'Activity subnav tab', 'bp-follow' ),
+				'name'            => _x( 'Followed Sites', 'Activity subnav tab', 'bp-follow' ),
 				'slug'            => constant( 'BP_FOLLOW_BLOGS_USER_ACTIVITY_SLUG' ),
 				'parent_url'      => trailingslashit( $user_domain . bp_get_activity_slug() ),
 				'parent_slug'     => bp_get_activity_slug(),
@@ -105,7 +105,7 @@ class BP_Follow_Blogs {
 	}
 
 	/**
-	 * Inject "Followed Blogs" nav item to WP adminbar's "Activity" main nav.
+	 * Inject "Followed Sites" nav item to WP adminbar's "Activity" main nav.
 	 *
 	 * @param array $retval
 	 * @return array
@@ -119,7 +119,7 @@ class BP_Follow_Blogs {
 			$new_item = array(
 				'parent' => 'my-account-activity',
 				'id'     => 'my-account-activity-followblogs',
-				'title'  => _x( 'Followed Blogs', 'Adminbar activity subnav', 'bp-follow' ),
+				'title'  => _x( 'Followed Sites', 'Adminbar activity subnav', 'bp-follow' ),
 				'href'   => bp_loggedin_user_domain() . bp_get_activity_slug() . '/' . constant( 'BP_FOLLOW_BLOGS_USER_ACTIVITY_SLUG' ) . '/',
 			);
 
@@ -138,7 +138,7 @@ class BP_Follow_Blogs {
 	}
 
 	/**
-	 * Inject "Sites I Follow" nav item to WP adminbar's "Sites" main nav.
+	 * Inject "Followed Sites" nav item to WP adminbar's "Sites" main nav.
 	 *
 	 * @param array $retval
 	 * @return array
@@ -151,7 +151,7 @@ class BP_Follow_Blogs {
 		$new_item = array(
 			'parent' => 'my-account-blogs',
 			'id'     => 'my-account-blogs-following',
-			'title'  => _x( 'Sites I Follow', 'Adminbar blogs subnav', 'bp-follow' ),
+			'title'  => _x( 'Followed Sites', 'Adminbar blogs subnav', 'bp-follow' ),
 			'href'   => bp_loggedin_user_domain() . bp_get_blogs_slug() . '/' . constant( 'BP_FOLLOW_BLOGS_USER_FOLLOWING_SLUG' ). '/',
 		);
 
@@ -179,7 +179,7 @@ class BP_Follow_Blogs {
 	/** DIRECTORY TABS ************************************************/
 
 	/**
-	 * Adds a "Sites I Follow (X)" tab to the activity directory.
+	 * Adds a "Followed Sites (X)" tab to the activity directory.
 	 *
 	 * This is so the logged-in user can filter the activity stream to only sites
 	 * that the current user is following.
@@ -196,7 +196,7 @@ class BP_Follow_Blogs {
 		}
 		*/
 		?>
-		<li id="activity-followblogs"><a href="<?php echo esc_url( bp_loggedin_user_domain() . bp_get_blogs_slug() . '/' . constant( 'BP_FOLLOW_BLOGS_USER_FOLLOWING_SLUG' ). '/' ); ?>"><?php printf( __( 'Sites I Follow <span>%d</span>', 'bp-follow' ), (int) $counts['following'] ) ?></a></li><?php
+		<li id="activity-followblogs"><a href="<?php echo esc_url( bp_loggedin_user_domain() . bp_get_blogs_slug() . '/' . constant( 'BP_FOLLOW_BLOGS_USER_FOLLOWING_SLUG' ). '/' ); ?>"><?php printf( __( 'Followed Sites <span>%d</span>', 'bp-follow' ), (int) $counts['following'] ) ?></a></li><?php
 	}
 
 
@@ -282,7 +282,7 @@ class BP_Follow_Blogs {
 	 * Filter the blogs loop.
 	 *
 	 * Specifically, filter when we're on:
-	 *  - a user's "Sites I Follow" page
+	 *  - a user's "Followed Sites" page
 	 *  - the Sites directory and clicking on the "Following" tab
 	 *
 	 * @param str $qs The querystring for the BP loop
@@ -298,7 +298,7 @@ class BP_Follow_Blogs {
 		// parse querystring into an array
 		wp_parse_str( $qs, $r );
 
-		// set scope if a user is on a user's "Sites I Follow" page
+		// set scope if a user is on a user's "Followed Sites" page
 		if ( bp_is_user_blogs() && bp_is_current_action( constant( 'BP_FOLLOW_BLOGS_USER_FOLLOWING_SLUG' ) ) ) {
 			$r['scope'] = 'following';
 		}
