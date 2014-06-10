@@ -532,7 +532,7 @@ class BP_Follow_Blogs {
 		global $bp, $blogs_template;
 
 		$r = wp_parse_args( $args, array(
-			'leader_id'     => bp_get_blog_id(),
+			'leader_id'     => ! empty( $blogs_template->in_the_loop ) ? bp_get_blog_id() : get_current_blog_id(),
 			'follower_id'   => bp_loggedin_user_id(),
 			'link_text'     => '',
 			'link_title'    => '',
