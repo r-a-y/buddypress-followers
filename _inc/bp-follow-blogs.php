@@ -236,9 +236,9 @@ class BP_Follow_Blogs {
 	 *
 	 * @todo Maybe add this in BP Core?
 	 */
-	function set_activity_scope_on_activity_directory() {
+	function set_activity_scope_on_activity_directory( $template ) {
 		if ( empty( $_GET['scope'] ) ) {
-			return;
+			return $template;
 		}
 
 		$scope = wp_filter_kses( $_GET['scope'] );
@@ -251,6 +251,8 @@ class BP_Follow_Blogs {
 
 		//reset the dropdown menu to 'Everything'
 		@setcookie( 'bp-activity-filter', '-1',   0, '/' );
+		
+		return $template;
 	}
 
 	/**
