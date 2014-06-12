@@ -732,6 +732,12 @@ class BP_Follow_Blogs_Screens {
 
 	/** ACTIONS *******************************************************/
 
+	/**
+	 * RSS handler for a user's followed sites.
+	 *
+	 * When a user lands on /members/USERNAME/activity/followblogs/feed/, this
+	 * method generates the RSS feed for their followed sites.
+	 */
 	public static function rss_handler() {
 		// only available in BP 1.8+
 		if ( ! class_exists( 'BP_Activity_Feed' ) ) {
