@@ -533,7 +533,7 @@ class BP_Follow_Blogs {
 	 * Static method to generate a follow blogs button.
 	 */
 	public static function get_button( $args = '' ) {
-		global $bp, $blogs_template;
+		global $blogs_template;
 
 		$r = wp_parse_args( $args, array(
 			'leader_id'     => ! empty( $blogs_template->in_the_loop ) ? bp_get_blog_id() : get_current_blog_id(),
