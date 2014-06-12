@@ -1,18 +1,6 @@
 <?php
 
 /**
- * Follow Blogs Loader.
- *
- * @since 1.3.0
- */
-function bp_follow_blogs_init() {
-	global $bp;
-
-	$bp->follow->blogs = new BP_Follow_Blogs;
-}
-add_action( 'bp_loaded', 'bp_follow_blogs_init', 20 );
-
-/**
  * Follow Blogs module.
  *
  * @since 1.3.0
@@ -874,3 +862,16 @@ class BP_Follow_Blogs_Screens {
 	}
 
 }
+
+/**
+ * Follow Blogs Loader.
+ *
+ * @since 1.3.0
+ */
+function bp_follow_blogs_init() {
+	global $bp;
+
+	$bp->follow->blogs = new BP_Follow_Blogs;
+}
+
+bp_follow_blogs_init();
