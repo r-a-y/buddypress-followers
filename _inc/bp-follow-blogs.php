@@ -40,7 +40,6 @@ class BP_Follow_Blogs {
 		add_action( 'bp_blogs_directory_blog_types',         array( $this, 'add_blog_directory_tab' ) );
 
 		// activity scope setting
-		add_action( 'bp_activity_screen_index', array( $this, 'set_activity_scope_on_activity_directory' ) );
 		add_action( 'bp_before_activity_loop',  array( $this, 'set_activity_scope_on_user_activity' ) );
 
 		// loop filtering
@@ -232,28 +231,6 @@ class BP_Follow_Blogs {
 	}
 
 	/** ACTIVITY SCOPE ************************************************/
-
-	/**
-	 * Set activity scope on the activity directory depending on GET parameter.
-	 *
-	 * @todo Maybe add this in BP Core?
-	 */
-	function set_activity_scope_on_activity_directory() {
-		if ( empty( $_GET['scope'] ) ) {
-			return;
-		}
-
-		$scope = wp_filter_kses( $_GET['scope'] );
-
-		// set the activity scope by faking an ajax request (loophole!)
-		$_POST['cookie'] = "bp-activity-scope%3D{$scope}%3B%20bp-activity-filter%3D-1";
-
-		// reset the selected tab
-		@setcookie( 'bp-activity-scope',  $scope, 0, '/' );
-
-		//reset the dropdown menu to 'Everything'
-		@setcookie( 'bp-activity-filter', '-1',   0, '/' );
-	}
 
 	/**
 	 * Set activity scope on a user's "Activity > Followed Sites" page
