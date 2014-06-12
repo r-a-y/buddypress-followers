@@ -315,6 +315,7 @@ class BP_Follow_Blogs {
 
 		// get blog IDs that the user is following
 		$following_ids = bp_get_following_ids( array(
+			'user_id'     => bp_displayed_user_id() ? bp_displayed_user_id() : bp_loggedin_user_id(),
 			'follow_type' => 'blogs',
 		) );
 
@@ -367,6 +368,7 @@ class BP_Follow_Blogs {
 
 		// get blog IDs that the user is following
 		$following_ids = bp_get_following_ids( array(
+			'user_id'     => bp_displayed_user_id() ? bp_displayed_user_id() : bp_loggedin_user_id(),
 			'follow_type' => 'blogs',
 		) );
 
