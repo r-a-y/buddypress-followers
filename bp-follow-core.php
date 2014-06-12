@@ -399,5 +399,7 @@ function bp_follow_setup_component() {
 	if ( defined( 'WP_NETWORK_ADMIN' ) ) {
 		$bp->follow->updater = new BP_Follow_Updater;
 	}
+
+	do_action( 'bp_follow_loaded' );
 }
 add_action( 'bp_loaded', 'bp_follow_setup_component' );

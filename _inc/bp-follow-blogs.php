@@ -9,8 +9,10 @@ function bp_follow_blogs_init() {
 	global $bp;
 
 	$bp->follow->blogs = new BP_Follow_Blogs;
+
+	do_action( 'bp_follow_blogs_loaded' );
 }
-add_action( 'bp_loaded', 'bp_follow_blogs_init', 20 );
+add_action( 'bp_follow_loaded', 'bp_follow_blogs_init' );
 
 /**
  * Follow Blogs module.
