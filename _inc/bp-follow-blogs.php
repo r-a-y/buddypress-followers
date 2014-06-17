@@ -281,7 +281,7 @@ class BP_Follow_Blogs {
 		}
 
 		// parse querystring into an array
-		wp_parse_str( $qs, $r );
+		$r = wp_parse_args( $qs );
 
 		// set scope if a user is on a user's "Followed Sites" page
 		if ( bp_is_user_blogs() && bp_is_current_action( constant( 'BP_FOLLOW_BLOGS_USER_FOLLOWING_SLUG' ) ) ) {
@@ -335,7 +335,7 @@ class BP_Follow_Blogs {
 		}
 
 		// parse querystring into an array
-		wp_parse_str( $qs, $r );
+		$r = wp_parse_args( $qs );
 
 		if ( bp_is_current_action( constant( 'BP_FOLLOW_BLOGS_USER_ACTIVITY_SLUG' ) ) ) {
 			$r['scope'] = 'followblogs';
