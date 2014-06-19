@@ -183,35 +183,15 @@ function bp_follow_total_follow_counts( $args = '' ) {
 		'follow_type' => '',
 	) );
 
-	$count = false;
+	$counts = BP_Follow::get_counts( $r['user_id'], $r['follow_type'] );
 
-	/* try to get locally-cached values first */
-
-	// logged-in user
 	if ( empty( $r['follow_type'] ) ) {
-		if ( $r['user_id'] == bp_loggedin_user_id() && is_user_logged_in() ) {
-			global $bp;
-	
-			if ( ! empty( $bp->loggedin_user->total_follow_counts ) ) {
-				$count = $bp->loggedin_user->total_follow_counts;
-			}
-
-		// displayed user
-		} elseif ( $r['user_id'] == bp_displayed_user_id() && bp_is_user() ) {
-			global $bp;
-			
-			if ( ! empty( $bp->displayed_user->total_follow_counts ) ) {
-				$count = $bp->displayed_user->total_follow_counts;
-			}
-		}
+		$retval = apply_filters( 'bp_follow_total_follow_counts', $counts, $r['user_id'] );
+	} else {
+		$retval = apply_filters( 'bp_follow_total_follow_' . $r['follow_type'] . '_counts', $counts, $r['user_id'] );
 	}
 
-	// no cached value, so query for it
-	if ( $count === false ) {
-		$count = BP_Follow::get_counts( $r['user_id'], $r['follow_type'] );
-	}
-
-	return apply_filters( 'bp_follow_total_follow_counts', $count, $r['user_id'], $r );
+	return $retval;
 }
 
 /**

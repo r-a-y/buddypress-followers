@@ -223,8 +223,9 @@ class BP_Follow {
 		// do the query
 		$result = $wpdb->get_col( $sql );
 
-		// @todo count for query - cache this
-		//$wpdb->num_rows
+		// cache the count while we're at it
+		$type = ! empty( $follow_type ) ? "{$follow_type}_" : "";
+		wp_cache_set( $leader_id, $wpdb->num_rows, "bp_follow_followers_{$type}count" );
 
 		return $result;
 	}
@@ -251,8 +252,9 @@ class BP_Follow {
 		// do the query
 		$result = $wpdb->get_col( $sql );
 
-		// @todo count for query - cache this
-		//$wpdb->num_rows
+		// cache the count while we're at it
+		$type = ! empty( $follow_type ) ? "{$follow_type}_" : "";
+		wp_cache_set( $user_id, $wpdb->num_rows, "bp_follow_following_{$type}count" );
 
 		return $result;
 	}
@@ -268,21 +270,35 @@ class BP_Follow {
 	public static function get_counts( $id = 0, $follow_type = '' ) {
 		global $bp, $wpdb;
 
+		$type = ! empty( $follow_type ) ? "{$follow_type}_" : "";
+
+		// get cache if available
+		$followers = wp_cache_get( $id, "bp_follow_followers_{$type}count" );
+		$following = wp_cache_get( $id, "bp_follow_following_{$type}count" );
+
 		// query followers count
-		$followers_sql  = self::get_select_sql( 'COUNT(id)' );
-		$followers_sql .= self::get_where_sql( array(
-			'leader_id'   => $id,
-			'follow_type' => $follow_type,
-		) );
-		$followers = $wpdb->get_var( $followers_sql );
+		if ( false === $followers ) {
+			$followers_sql  = self::get_select_sql( 'COUNT(id)' );
+			$followers_sql .= self::get_where_sql( array(
+				'leader_id'   => $id,
+				'follow_type' => $follow_type,
+			) );
+
+			$followers = (int) $wpdb->get_var( $followers_sql );
+			wp_cache_set( $id, $followers, "bp_follow_followers_{$type}count" );
+		}
 
 		// query following count
-		$following_sql  = self::get_select_sql( 'COUNT(id)' );
-		$following_sql .= self::get_where_sql( array(
-			'follower_id' => $id,
-			'follow_type' => $follow_type,
-		) );
-		$following = $wpdb->get_var( $following_sql );
+		if ( false === $following ) {
+			$following_sql  = self::get_select_sql( 'COUNT(id)' );
+			$following_sql .= self::get_where_sql( array(
+				'follower_id' => $id,
+				'follow_type' => $follow_type,
+			) );
+
+			$following = (int) $wpdb->get_var( $following_sql );
+			wp_cache_set( $id, $following, "bp_follow_following_{$type}count" );
+		}
 
 		return array( 'followers' => $followers, 'following' => $following );
 	}

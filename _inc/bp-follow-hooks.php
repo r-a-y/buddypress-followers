@@ -177,6 +177,23 @@ function bp_follow_add_group_member_follow_button() {
 }
 add_action( 'bp_group_members_list_item_action', 'bp_follow_add_group_member_follow_button' );
 
+/** CACHE ****************************************************************/
+
+/**
+ * Clear cache when a user follows / unfollows another user.
+ *
+ * @since BuddyPress (1.3.0)
+ *
+ * @param BP_Follow $follow
+ */
+function bp_follow_clear_cache_on_follow( BP_Follow $follow ) {
+	// clear user count cache
+	wp_cache_delete( $follow->leader_id,   'bp_follow_followers_count' );
+	wp_cache_delete( $follow->follower_id, 'bp_follow_following_count' );
+}
+add_action( 'bp_follow_start_following', 'bp_follow_clear_cache_on_follow' );
+add_action( 'bp_follow_stop_following',  'bp_follow_clear_cache_on_follow' );
+
 /** DIRECTORIES **********************************************************/
 
 /**
@@ -479,9 +496,11 @@ function bp_follow_no_activity_text( $translated_text, $untranslated_text ) {
 				return __( "You are not following anyone yet.", 'bp-lists' );
 			}
 		} else {
-			global $bp;
+			$follow_counts = bp_follow_total_follow_counts( array(
+				'user_id' => bp_displayed_user_id()
+			) );
 
-			if ( ! empty( $bp->displayed_user->total_follow_counts['following'] ) ) {
+			if ( ! empty( $follow_counts['following'] ) ) {
 				return __( "This user is following some users, but they haven't posted yet.", 'bp-follow' );
 			} else {
 				return __( "This user isn't following anyone yet.", 'bp-follow' );

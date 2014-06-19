@@ -51,6 +51,10 @@ class BP_Follow_Blogs {
 		add_action( 'bp_directory_blogs_actions', array( $this, 'add_follow_button_to_loop' ),   20 );
 		add_action( 'wp_footer',                  array( $this, 'add_follow_button_to_footer' ), 999 );
 
+		// cache invalidation
+		add_action( 'bp_follow_start_following_blogs', array( $this, 'clear_cache_on_follow' ) );
+		add_action( 'bp_follow_stop_following_blogs',  array( $this, 'clear_cache_on_follow' ) );
+
 		// rss feed link
 		add_filter( 'bp_get_sitewide_activity_feed_link', array( $this, 'activity_feed_url' ) );
 		add_filter( 'bp_dtheme_activity_feed_url',        array( $this, 'activity_feed_url' ) );
@@ -626,6 +630,21 @@ class BP_Follow_Blogs {
 
 		// Filter and return the HTML button
 		return bp_get_button( apply_filters( 'bp_follow_blogs_get_follow_button', $button, $r, $is_following ) );
+	}
+
+	/** CACHE **************************************************************/
+
+	/**
+	 * Clear count cache when a user follows / unfolows a blog.
+	 *
+	 * @param BP_Follow $follow
+	 */
+	public function clear_cache_on_follow( BP_Follow $follow ) {
+		// clear followers count for blog
+		wp_cache_delete( $follow->leader_id,   'bp_follow_followers_blogs_count' );
+
+		// clear following blogs count for user
+		wp_cache_delete( $follow->follower_id, 'bp_follow_following_blogs_count' );
 	}
 
 	/** FEED URL ***********************************************************/

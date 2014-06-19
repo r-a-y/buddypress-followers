@@ -119,21 +119,6 @@ class BP_Follow_Component extends BP_Component {
 		$bp->follow->following = new stdClass;
 		$bp->follow->followers->slug = constant( 'BP_FOLLOWERS_SLUG' );
 		$bp->follow->following->slug = constant( 'BP_FOLLOWING_SLUG' );
-
-		// locally cache total count values for logged-in user if not in admin area
-		if ( ! defined( 'WP_NETWORK_ADMIN' ) && is_user_logged_in() ) {
-			$bp->loggedin_user->total_follow_counts = bp_follow_total_follow_counts( array(
-				'user_id' => bp_loggedin_user_id()
-			) );
-		}
-
-		// locally cache total count values for displayed user
-		if ( bp_is_user() && ( bp_loggedin_user_id() != bp_displayed_user_id() ) ) {
-			$bp->displayed_user->total_follow_counts = bp_follow_total_follow_counts( array(
-				'user_id' => bp_displayed_user_id()
-			) );
-		}
-
 	}
 
 	/**
