@@ -527,7 +527,12 @@ class BP_Follow_Blogs {
 				'wrapper'   => false,
 			) ); ?>
 
-			<a class="home" href="<?php echo esc_url( bp_loggedin_user_domain() . bp_get_blogs_slug() . '/' . constant( 'BP_FOLLOW_BLOGS_USER_FOLLOWING_SLUG' ). '/' ); ?>"><?php _ex( 'Followed Sites', 'Footer button', 'bp-follow' ); ?></a>
+			<?php
+			$url = esc_url( bp_loggedin_user_domain() . bp_get_blogs_slug() . '/' . constant( 'BP_FOLLOW_BLOGS_USER_FOLLOWING_SLUG' ). '/' );
+			$title = _x( 'Followed Sites', 'Footer button', 'bp-follow' );
+			$link = '<a class="home" href="' . $url . '">' . $title . '</a>';
+			echo apply_filters( 'bp_follow_blogs_get_followed_button', $link, $url, $title );
+			?>
 		</div>
 
 	<?php
