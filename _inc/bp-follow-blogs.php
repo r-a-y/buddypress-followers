@@ -345,6 +345,10 @@ class BP_Follow_Blogs {
 			$r['scope'] = 'followblogs';
 		}
 
+		if ( ! isset( $r['scope'] ) ) {
+			return $qs;
+		}
+
 		if ( 'followblogs' !== $r['scope'] ) {
 			return $qs;
 		}
