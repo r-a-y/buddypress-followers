@@ -85,6 +85,13 @@ class BP_Follow {
 
 		do_action_ref_array( 'bp_follow_before_save', array( &$this ) );
 
+		// leader ID is required
+		// this allows plugins to bail out of saving a follow relationship
+		// use hooks above to redeclare 'leader_id' so it is empty if you need to bail
+		if ( empty( $this->leader_id ) ) {
+			return false;
+		}
+
 		// update existing entry
 		if ( $this->id ) {
 			$result = $wpdb->query( $wpdb->prepare( "UPDATE {$bp->follow->table_name} SET leader_id = %d, follower_id = %d WHERE id = %d", $this->leader_id, $this->follower_id, $this->id ) );
