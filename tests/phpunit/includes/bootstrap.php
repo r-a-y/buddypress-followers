@@ -24,6 +24,12 @@ function _bp_follow_bootstrap() {
 	// Load up BP's specialized unit test loader
 	require BP_TESTS_DIR . '/includes/loader.php';
 
+	// make BP pass the bp_is_network_activated() check
+	// this is needed when the BP directory is symlinked
+	if ( is_multisite() ) {
+		tests_add_filter( 'bp_is_network_activated', '__return_true' );
+	}
+
 	// Now load BP Follow
 	require dirname( __FILE__ ) . '/../../../loader.php';
 }
