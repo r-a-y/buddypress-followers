@@ -194,6 +194,28 @@ function bp_follow_clear_cache_on_follow( BP_Follow $follow ) {
 add_action( 'bp_follow_start_following', 'bp_follow_clear_cache_on_follow' );
 add_action( 'bp_follow_stop_following',  'bp_follow_clear_cache_on_follow' );
 
+/**
+ * Clear follow cache when a user is deleted.
+ *
+ * @since BuddyPress (1.3.0)
+ *
+ * @param int $user_id The ID of the user being deleted
+ */
+function bp_follow_clear_cache_on_user_delete( $user_id ) {
+	// delete user's follow count
+	wp_cache_delete( $user_id, 'bp_follow_following_count' );
+	wp_cache_delete( $user_id, 'bp_follow_followers_count' );
+
+	// delete each user's followers count that the user was following
+	$users = BP_Follow::get_following( $user_id );
+	if ( ! empty( $users ) ) {
+		foreach ( $users as $user ) {
+			wp_cache_delete( $user, 'bp_follow_followers_count' );
+		}
+	}
+}
+add_action( 'bp_follow_before_remove_data', 'bp_follow_clear_cache_on_user_delete' );
+
 /** DIRECTORIES **********************************************************/
 
 /**
