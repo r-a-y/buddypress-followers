@@ -51,6 +51,9 @@ class BP_Follow_Blogs {
 		add_action( 'bp_directory_blogs_actions', array( $this, 'add_follow_button_to_loop' ),   20 );
 		add_action( 'wp_footer',                  array( $this, 'add_follow_button_to_footer' ), 999 );
 
+		// blog deletion
+		add_action( 'bp_blogs_remove_blog', array( $this, 'on_blog_delete' ) );
+
 		// cache invalidation
 		add_action( 'bp_follow_start_following_blogs', array( $this, 'clear_cache_on_follow' ) );
 		add_action( 'bp_follow_stop_following_blogs',  array( $this, 'clear_cache_on_follow' ) );
@@ -649,6 +652,21 @@ class BP_Follow_Blogs {
 		return bp_get_button( apply_filters( 'bp_follow_blogs_get_follow_button', $button, $r, $is_following ) );
 	}
 
+	/** DELETION ***********************************************************/
+
+	/**
+	 * Do stuff when a blog is deleted.
+	 *
+	 * @param int $blog_id The ID of the blog being deleted.
+	 */
+	public function on_blog_delete( $blog_id ) {
+		global $bp, $wpdb;
+
+		$this->clear_cache_on_blog_delete( $blog_id );
+
+		$wpdb->query( $wpdb->prepare( "DELETE FROM {$bp->follow->table_name} WHERE leader_id = %d AND follow_type = 'blogs'", $blog_id ) );
+	}
+
 	/** CACHE **************************************************************/
 
 	/**
@@ -678,6 +696,24 @@ class BP_Follow_Blogs {
 		if ( ! empty( $blogs ) ) {
 			foreach ( $blogs as $blog_id ) {
 				wp_cache_delete( $blog_id, 'bp_follow_followers_blogs_count' );
+			}
+		}
+	}
+
+	/**
+	 * Clear blog count cache when a blog is deleted.
+	 *
+	 * @param int $blog_id The ID of the blog being deleted
+	 */
+	public function clear_cache_on_blog_delete( $blog_id ) {
+		// clear followers count for blog
+		wp_cache_delete( $blog_id, 'bp_follow_followers_blogs_count' );
+
+		// delete each user's blog following count for those that followed the blog
+		$users = BP_Follow::get_followers( $blog_id, 'blogs' );
+		if ( ! empty( $users ) ) {
+			foreach ( $users as $user ) {
+				wp_cache_delete( $user, 'bp_follow_following_blogs_count' );
 			}
 		}
 	}
