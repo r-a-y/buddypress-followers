@@ -261,6 +261,28 @@ function bp_follow_add_following_tab() {
 }
 add_action( 'bp_members_directory_member_types', 'bp_follow_add_following_tab' );
 
+/** USER QUERY ***********************************************************/
+
+/**
+ * Override the BP User Query when our special follow type is in use.
+ *
+ * @since 1.3.0
+ *
+ * @param BP_User_Query $query
+ */
+function bp_follow_pre_user_query( $query ) {
+	// oldest follows
+	if ( 'oldest-follows' === $query->query_vars['type'] ) {
+		$query->query_vars['user_ids'] = $query->query_vars['include'];
+
+	// newest follows
+	} elseif ( 'newest-follows' === $query->query_vars['type'] ) {
+		// flip the order
+		$query->query_vars['user_ids'] = array_reverse( wp_parse_id_list( $query->query_vars['include'] ) );
+	}
+}
+add_action( 'bp_pre_user_query_construct', 'bp_follow_pre_user_query' );
+
 /** AJAX MANIPULATION ****************************************************/
 
 /**
@@ -383,6 +405,47 @@ function bp_follow_add_member_scope_filter( $qs, $object ) {
 
 }
 add_filter( 'bp_ajax_querystring', 'bp_follow_add_member_scope_filter', 20, 2 );
+
+/**
+ * Set some default parameters for a member loop.
+ *
+ * If we're on a user's following or followers page, set the member filter
+ * so users are sorted by newest follows instead of last active.
+ *
+ * If we're on a user's friends page or the members directory, reset the
+ * members filter to last active.
+ *
+ * Only applicable for BuddyPress 1.7+.
+ *
+ * @since 1.3.0
+ *
+ * @see bp_follow_add_members_dropdown_filter()
+ */
+function bp_follow_set_members_scope_default() {
+	// don't do this for older versions of BP
+	if ( ! class_exists( 'BP_User_Query' ) ) {
+		return;
+	}
+
+	// set default members filter to 'newest-follows' on member follow pages
+	if ( bp_is_user() && ( bp_is_current_action( 'following' ) || bp_is_current_action( 'followers' ) ) ) {
+		// set the members filter to 'newest-follows' by faking an ajax request (loophole!)
+		$_POST['cookie'] = 'bp-members-filter%3Dnewest-follows';
+
+		// reset the dropdown menu to 'Newest Follows'
+		@setcookie( 'bp-members-filter', 'newest-follows', 0, '/' );
+
+	// reset members filter on the user friends and members directory page
+	// this is done b/c the 'newest-follows' filter does not apply on these pages
+	} elseif ( bp_is_user_friends() || ( ! bp_is_user() && bp_is_members_component() ) ) {
+		// set the members filter to 'newest' by faking an ajax request (loophole!)
+		$_POST['cookie'] = 'bp-members-filter%3Dactive';
+
+		// reset the dropdown menu to 'Last Active'
+		@setcookie( 'bp-members-filter', 'active', 0, '/' );
+	}
+}
+add_action( 'bp_screens', 'bp_follow_set_members_scope_default' );
 
 /**
  * On a user's "Activity > Following" page, set the activity scope to
