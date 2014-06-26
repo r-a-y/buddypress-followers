@@ -317,81 +317,69 @@ add_filter( 'bp_dtheme_ajax_querystring',       'bp_follow_add_activity_scope_fi
 add_filter( 'bp_legacy_theme_ajax_querystring', 'bp_follow_add_activity_scope_filter', 10, 4 );
 
 /**
- * Modify the querystring passed to the members loop to return only users
- * that the current user is following.
- *
- * @global $bp The global BuddyPress settings variable created in bp_core_setup_globals()
- * @uses bp_get_following_ids() Get the user_ids of all users a user is following.
- */
-function bp_follow_add_member_directory_filter( $qs, $object, $filter, $scope  ) {
-	global $bp;
-
-	// Only filter on directory pages (no action) and the following scope on members object.
-	if ( !empty( $bp->current_action ) || 'following' != $scope || 'members' != $object )
-		return $qs;
-
-	$qs .= '&include=' . bp_get_following_ids( array( 'user_id' => bp_loggedin_user_id() ) );
-
-	return apply_filters( 'bp_follow_add_member_directory_filter', $qs, $filter );
-}
-add_filter( 'bp_dtheme_ajax_querystring',       'bp_follow_add_member_directory_filter', 10, 4 );
-add_filter( 'bp_legacy_theme_ajax_querystring', 'bp_follow_add_member_directory_filter', 10, 4 );
-
-/**
- * Filter the members loop on a user's "Following" or "Followers" page.
+ * Filter the members loop on a follow page.
  *
  * This is done so we can return the users that:
- *   - the current user is following; or
- *   - the users that are following the current user
+ *   - the current user is following (on a user page or member directory); or
+ *   - are following the displayed user on the displayed user's followers page
  *
  * @author r-a-y
  * @since 1.2
  *
- * @param str $qs The querystring for the BP loop
+ * @param array|string $qs The querystring for the BP loop
  * @param str $object The current object for the querystring
- * @return str Modified querystring
+ * @return array|string Modified querystring
  */
 function bp_follow_add_member_scope_filter( $qs, $object ) {
 
 	// not on the members object? stop now!
-	if ( $object != 'members' )
+	if ( $object != 'members' ) {
 		return $qs;
+	}
+
+	$set = false;
+
+	// members directory
+	// can't use bp_is_members_directory() yet since that's a BP 2.0 function
+	if ( ! bp_is_user() && bp_is_members_component() ) {
+		// check if members scope is following before manipulating
+		if ( isset( $_COOKIE['bp-members-scope'] ) && 'following' === $_COOKIE['bp-members-scope'] ) {
+			$set = true;
+			$action = 'following';
+		}
+
+	// user page
+	} elseif ( bp_is_user() ) {
+		$set = true;
+		$action = bp_current_action();
+	}
 
 	// not on a user page? stop now!
-	if ( ! bp_is_user() )
+	if ( ! $set ) {
 		return $qs;
+	}
 
 	// filter the members loop based on the current page
-	switch ( bp_current_action() ) {
+	switch ( $action ) {
 		case 'following':
-			$args = array(
-				'include'  => bp_get_following_ids(),
-				'per_page' => apply_filters( 'bp_follow_per_page', 20 )
-			);
+			// parse querystring into an array
+			$qs = wp_parse_args( $qs );
 
-			// make sure we add a separator if we have an existing querystring
-			if ( ! empty( $qs ) )
-				$qs .= '&';
-
-			// add our follow parameters to the end of the querystring
-			$qs .= build_query( $args );
+			$qs['include'] = bp_get_following_ids( array(
+				'user_id' => bp_displayed_user_id() ? bp_displayed_user_id() : bp_loggedin_user_id(),
+			) );
+			$qs['per_page'] = apply_filters( 'bp_follow_per_page', 20 );
 
 			return $qs;
 
 			break;
 
 		case 'followers' :
-			$args = array(
-				'include'  => bp_get_follower_ids(),
-				'per_page' => apply_filters( 'bp_follow_per_page', 20 )
-			);
+			// parse querystring into an array
+			$qs = wp_parse_args( $qs );
 
-			// make sure we add a separator if we have an existing querystring
-			if ( ! empty( $qs ) )
-				$qs .= '&';
-
-			// add our follow parameters to the end of the querystring
-			$qs .= build_query( $args );
+			$qs['include'] = bp_get_follower_ids();
+			$qs['per_page'] = apply_filters( 'bp_follow_per_page', 20 );
 
 			return $qs;
 
