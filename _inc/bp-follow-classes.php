@@ -160,7 +160,7 @@ class BP_Follow {
 
 	/**
 	 * Generate the SELECT SQL statement used to query follow relationships.
-	 * 
+	 *
 	 * @since 1.3.0
 	 *
 	 * @param string $column
@@ -209,15 +209,57 @@ class BP_Follow {
 	}
 
 	/**
+	 * Generate the ORDER BY SQL statement used to query follow relationships.
+	 *
+	 * @since 1.3.0
+	 *
+	 * @param array $params {
+	 *     Array of arguments.
+	 *     @type string $orderby The DB column to order results by. Default: 'id'.
+	 *     @type string $order The order. Either 'ASC' or 'DESC'. Default: 'ASC'.
+	 * }
+	 * @return string
+	 */
+	protected static function get_orderby_sql( $params = array() ) {
+		$r = wp_parse_args( $params, array(
+			'orderby' => 'id',
+			'order'   => 'ASC',
+		) );
+
+		// sanitize 'orderby' DB oclumn lookup
+		switch ( $r['orderby'] ) {
+			// columns available for lookup
+			case 'id' :
+			case 'leader_id' :
+			case 'follower_id' :
+			case 'follow_type' :
+				break;
+
+			// fallback to 'id' column on anything else
+			default :
+				$r['orderby'] = 'id';
+				break;
+		}
+
+		// only allow ASC or DESC for order
+		if ( 'ASC' !== $r['order'] || 'DESC' !== $r['order'] ) {
+			$r['order'] = 'ASC';
+		}
+
+		return sprintf( " ORDER BY %s %s", $r['orderby'], $r['order'] );
+	}
+
+	/**
 	 * Get the follower IDs for a given item.
 	 *
 	 * @since 1.0.0
 	 *
 	 * @param int $leader_id The leader ID.
-	 * @param string $follow_type The follow type.
+	 * @param string $follow_type The follow type.  Leave blank to query users.
+	 * @param array $orderby Order by parameters. See {@link BP_Follow::get_orderby_sql()}.
 	 * @return array
 	 */
-	public static function get_followers( $leader_id = 0, $follow_type = '' ) {
+	public static function get_followers( $leader_id = 0, $follow_type = '', $orderby = array() ) {
 		global $wpdb;
 
 		// SQL statement
@@ -226,6 +268,7 @@ class BP_Follow {
 			'leader_id'   => $leader_id,
 			'follow_type' => $follow_type,
 		) );
+		$sql .= self::get_orderby_sql( $orderby );
 
 		// do the query
 		$result = $wpdb->get_col( $sql );
@@ -243,10 +286,11 @@ class BP_Follow {
 	 * @since 1.0.0
 	 *
 	 * @param int $user_id The user ID.
-	 * @param string $follow_type The follow type.
+	 * @param string $follow_type The follow type.  Leave blank to query users.
+	 * @param array $orderby Order by parameters. See {@link BP_Follow::get_orderby_sql()}.
 	 * @return array
 	 */
-	public static function get_following( $user_id = 0, $follow_type = '' ) {
+	public static function get_following( $user_id = 0, $follow_type = '', $orderby = array() ) {
 		global $wpdb;
 
 		// SQL statement
@@ -255,6 +299,7 @@ class BP_Follow {
 			'follower_id' => $user_id,
 			'follow_type' => $follow_type,
 		) );
+		$sql .= self::get_orderby_sql( $orderby );
 
 		// do the query
 		$result = $wpdb->get_col( $sql );
