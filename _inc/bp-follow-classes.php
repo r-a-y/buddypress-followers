@@ -216,14 +216,14 @@ class BP_Follow {
 	 * @param array $params {
 	 *     Array of arguments.
 	 *     @type string $orderby The DB column to order results by. Default: 'id'.
-	 *     @type string $order The order. Either 'ASC' or 'DESC'. Default: 'ASC'.
+	 *     @type string $order The order. Either 'ASC' or 'DESC'. Default: 'DESC'.
 	 * }
 	 * @return string
 	 */
 	protected static function get_orderby_sql( $params = array() ) {
 		$r = wp_parse_args( $params, array(
 			'orderby' => 'id',
-			'order'   => 'ASC',
+			'order'   => 'DESC',
 		) );
 
 		// sanitize 'orderby' DB oclumn lookup
@@ -243,7 +243,7 @@ class BP_Follow {
 
 		// only allow ASC or DESC for order
 		if ( 'ASC' !== $r['order'] || 'DESC' !== $r['order'] ) {
-			$r['order'] = 'ASC';
+			$r['order'] = 'DESC';
 		}
 
 		return sprintf( " ORDER BY %s %s", $r['orderby'], $r['order'] );

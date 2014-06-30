@@ -273,12 +273,12 @@ add_action( 'bp_members_directory_member_types', 'bp_follow_add_following_tab' )
 function bp_follow_pre_user_query( $query ) {
 	// oldest follows
 	if ( 'oldest-follows' === $query->query_vars['type'] ) {
-		$query->query_vars['user_ids'] = $query->query_vars['include'];
+		// flip the order
+		$query->query_vars['user_ids'] = array_reverse( wp_parse_id_list( $query->query_vars['include'] ) );
 
 	// newest follows
 	} elseif ( 'newest-follows' === $query->query_vars['type'] ) {
-		// flip the order
-		$query->query_vars['user_ids'] = array_reverse( wp_parse_id_list( $query->query_vars['include'] ) );
+		$query->query_vars['user_ids'] = $query->query_vars['include'];
 	}
 }
 add_action( 'bp_pre_user_query_construct', 'bp_follow_pre_user_query' );
