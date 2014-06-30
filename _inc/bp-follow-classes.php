@@ -166,7 +166,7 @@ class BP_Follow {
 	 * @param string $column
 	 * @return string
 	 */
-	public static function get_select_sql( $column = '' ) {
+	protected static function get_select_sql( $column = '' ) {
 		global $bp;
 
 		return sprintf( "SELECT %s FROM %s ", mysql_real_escape_string( $column ), mysql_real_escape_string( $bp->follow->table_name ) );
