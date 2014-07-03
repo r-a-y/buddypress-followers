@@ -602,3 +602,52 @@ function bp_follow_after_activity_loop() {
 	}
 }
 add_action( 'bp_after_activity_loop', 'bp_follow_after_activity_loop' );
+
+/** SUGGESTIONS *********************************************************/
+
+/**
+ * Override BP's friend suggestions with followers.
+ *
+ * This takes effect for private messages currently. Available in BP 2.1+.
+ *
+ * @since 1.3.0
+ *
+ * @param array $retval Parameters for the user query.
+ */
+function bp_follow_user_suggestions_args( $retval ) {
+	// if only friends, override with followers instead
+	if ( true === (bool) $retval['only_friends'] ) {
+		// set marker
+		buddypress()->follow->only_friends_override = 1;
+
+		// we set 'only_friends' to 0 to bypass friends component check
+		$retval['only_friends'] = 0;
+
+		// add our user query filter
+		add_filter( 'bp_members_suggestions_query_args', 'bp_follow_user_follow_suggestions' );
+	}
+
+	return $retval;
+}
+add_filter( 'bp_members_suggestions_args', 'bp_follow_user_suggestions_args' );
+
+/**
+ * Filters the user suggestions query to limit by followers only.
+ *
+ * Only available in BP 2.1+.
+ *
+ * @since 1.3.0
+ *
+ * @see bp_follow_user_suggestions_args()
+ * @param BP_User_Query $user_query
+ */
+function bp_follow_user_follow_suggestions( $user_query ) {
+	if ( isset( buddypress()->follow->only_friends_override ) ) {
+		unset( buddypress()->follow->only_friends_override );
+
+		// limit suggestions to followers
+		$user_query['include'] = bp_follow_get_followers( array( 'user_id' => bp_loggedin_user_id() ) );
+	}
+
+	return $user_query;
+}
