@@ -639,7 +639,7 @@ add_filter( 'bp_members_suggestions_args', 'bp_follow_user_suggestions_args' );
  * @since 1.3.0
  *
  * @see bp_follow_user_suggestions_args()
- * @param BP_User_Query $user_query
+ * @param array $user_query User query arguments. See {@link BP_User_Query}.
  */
 function bp_follow_user_follow_suggestions( $user_query ) {
 	if ( isset( buddypress()->follow->only_friends_override ) ) {
