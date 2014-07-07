@@ -21,14 +21,14 @@ Domain Path: /languages
 // Exit if accessed directly
 if ( !defined( 'ABSPATH' ) ) exit;
 
+// some pertinent defines
+define( 'BP_FOLLOW_DIR', dirname( __FILE__ ) );
+define( 'BP_FOLLOW_URL', plugins_url( basename( BP_FOLLOW_DIR ) ) . '/' );
+
 /**
  * Only load the plugin code if BuddyPress is activated.
  */
 function bp_follow_init() {
-	// some pertinent defines
-	define( 'BP_FOLLOW_DIR', dirname( __FILE__ ) );
-	define( 'BP_FOLLOW_URL', plugins_url( basename( BP_FOLLOW_DIR ) ) . '/' );
-
 	// only supported in BP 1.5+
 	if ( version_compare( BP_VERSION, '1.3', '>' ) ) {
 		require( constant( 'BP_FOLLOW_DIR' ) . '/bp-follow-core.php' );
@@ -47,22 +47,23 @@ add_action( 'bp_include', 'bp_follow_init' );
 /**
  * Custom textdomain loader.
  *
- * Checks WP_LANG_DIR for the .mo file first, then the plugin's language folder.
+ * Checks WP_LANG_DIR for the .mo file first, then WP_LANG_DIR/plugins/, then
+ * the plugin's language folder.
+ *
  * Allows for a custom language file other than those packaged with the plugin.
  *
- * @uses load_textdomain() Loads a .mo file into WP
+ * @since 1.1.0
+ *
+ * @return bool True if textdomain loaded; false if not.
  */
 function bp_follow_localization() {
-	$mofile		= sprintf( 'bp-follow-%s.mo', get_locale() );
-	$mofile_global	= trailingslashit( WP_LANG_DIR ) . $mofile;
-	$mofile_local	= plugin_dir_path( __FILE__ ) . 'languages/' . $mofile;
+	$domain = 'bp-follow';
+	$mofile_custom = trailingslashit( WP_LANG_DIR ) . sprintf( '%s-%s.mo', $domain, get_locale() );
 
-	if ( is_readable( $mofile_global ) ) {
-		return load_textdomain( 'bp-follow', $mofile_global );
-	} elseif ( is_readable( $mofile_local ) ) {
-		return load_textdomain( 'bp-follow', $mofile_local );
+	if ( is_readable( $mofile_custom ) ) {
+		return load_textdomain( $domain, $mofile_custom );
 	} else {
-		return false;
+		return load_plugin_textdomain( $domain, false, basename( BP_FOLLOW_DIR ) . '/languages/' );
 	}
 }
 add_action( 'plugins_loaded', 'bp_follow_localization' );
