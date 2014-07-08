@@ -24,6 +24,7 @@ This plugin adds:
 BP Follow has been translated into the following languages by these awesome people:
 
 * Brazilian Portuguese - [espellcaste](https://profiles.wordpress.org/espellcaste)
+* French - [lauranshow](https://profiles.wordpress.org/lauranshow)
 * German - [solhuebner](https://profiles.wordpress.org/solhuebner)
 * Spanish - [saik003](https://github.com/saik003/buddypress-followers)
 
