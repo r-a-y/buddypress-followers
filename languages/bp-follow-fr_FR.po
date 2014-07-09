@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: BuddyPress Follow v1.2.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2014-07-08 11:40+0100\n"
+"PO-Revision-Date: 2014-07-09 10:58+0100\n"
 "Last-Translator: Universpodcast <laurent@universpodcast.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -35,7 +35,7 @@ msgstr "Oops, petit problème pour suivre %s, essayez une nouvelle fois."
 #: _inc/bp-follow-actions.php:41
 #, php-format
 msgid "You are now following %s."
-msgstr "Membre suivi %s."
+msgstr "Vous suivez maintenant %s."
 
 #@ bp-follow
 #: _inc/bp-follow-actions.php:74
@@ -68,7 +68,7 @@ msgstr "Erreur sur l'utilisateur suivi"
 #@ bp-follow
 #: _inc/bp-follow-actions.php:212
 msgid "Not following"
-msgstr "Pas suivi"
+msgstr "Non suivi"
 
 #@ bp-follow
 #: _inc/bp-follow-actions.php:218
@@ -113,7 +113,7 @@ msgstr "Un nouveau membre suit votre activité"
 #: _inc/bp-follow-notifications.php:33
 #, php-format
 msgid "%d more users are now following you"
-msgstr "%d plusieurs nouveaux membres"
+msgstr "%d membres de plus vous suivent"
 
 #@ bp-follow
 #: _inc/bp-follow-notifications.php:29
@@ -256,7 +256,7 @@ msgstr "Vous ne suivez encore personne, c'est le moment de le faire !"
 #@ bp-follow
 #: _inc/bp-follow-hooks.php:489
 msgid "This user is following some users, but they haven't posted yet."
-msgstr "Les utilisateurs n'ont encore rien posté"
+msgstr "Cet utilisateur suit des utilisateurs, mais ils n'ont encore rien posté"
 
 #@ bp-follow
 #: _inc/bp-follow-hooks.php:491
@@ -318,5 +318,5 @@ msgstr "1.2.1"
 #: loader.php:38
 #, php-format
 msgid "Hey! BP Follow v1.2 requires BuddyPress 1.5 or higher.  If you are still using BuddyPress 1.2 and you don't plan on upgrading, use <a href='%s'>BP Follow v1.1.1 instead</a>."
-msgstr ""
+msgstr "Hello ! BP Follow v1.2 nécessite BuddyPress 1.5 minimum. Si vous utilisez toujours BuddyPress 1.2 et que vous n'avez pas l'intention de faire la mise à jour, merci d'utiliser <a href='%s'>BP Follow v1.1.1</a>."
 
