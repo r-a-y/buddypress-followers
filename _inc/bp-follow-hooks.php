@@ -651,3 +651,51 @@ function bp_follow_user_follow_suggestions( $user_query ) {
 
 	return $user_query;
 }
+
+/**
+ * Remove at-mention primed results for the friends component.
+ *
+ * We'll use a logged-in user's followers instead.
+ *
+ * @see bp_follow_prime_mentions_results()
+ */
+remove_action( 'bp_activity_mentions_prime_results', 'bp_friends_prime_mentions_results' );
+
+/**
+ * Print a JSON list of the current user's followers for use with at-mentions.
+ *
+ * This is intended to speed up @mentions lookups for a majority of use cases.
+ *
+ * @since 1.3.0
+ *
+ * @see bp_activity_mentions_script()
+ */
+function bp_follow_prime_mentions_results() {
+	if ( ! bp_activity_do_mentions() || ! bp_is_user_active() ) {
+		return;
+	}
+
+	$followers_query = array(
+		'count_total'     => '', // Prevents total count
+		'populate_extras' => false,
+		'type'            => 'alphabetical',
+		'include'         => bp_follow_get_followers( array( 'user_id' => bp_loggedin_user_id() ) )
+	);
+
+	$followers_query = new BP_User_Query( $followers_query );
+	$results = array();
+
+	foreach ( $followers_query->results as $user ) {
+		$result        = new stdClass();
+		$result->ID    = $user->user_nicename;
+		$result->image = bp_core_fetch_avatar( array( 'html' => false, 'item_id' => $user->ID ) );
+		$result->name  = bp_core_get_user_displayname( $user->ID );
+
+		$results[] = $result;
+	}
+
+	wp_localize_script( 'bp-mentions', 'BP_Suggestions', array(
+		'friends' => $results,
+	) );
+}
+add_action( 'bp_activity_mentions_prime_results', 'bp_follow_prime_mentions_results' );
