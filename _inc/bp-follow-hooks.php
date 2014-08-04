@@ -655,16 +655,16 @@ function bp_follow_user_follow_suggestions( $user_query ) {
 /**
  * Remove at-mention primed results for the friends component.
  *
- * We'll use a logged-in user's followers instead.
+ * We'll use a list of members the logged-in user is following instead.
  *
  * @see bp_follow_prime_mentions_results()
  */
 remove_action( 'bp_activity_mentions_prime_results', 'bp_friends_prime_mentions_results' );
 
 /**
- * Print a JSON list of the current user's followers for use with at-mentions.
+ * Set up a list of members the current user is following for at-mention use.
  *
- * This is intended to speed up @mentions lookups for a majority of use cases.
+ * This is intended to speed up at-mention lookups for a majority of use cases.
  *
  * @since 1.3.0
  *
@@ -679,7 +679,7 @@ function bp_follow_prime_mentions_results() {
 		'count_total'     => '', // Prevents total count
 		'populate_extras' => false,
 		'type'            => 'alphabetical',
-		'include'         => bp_follow_get_followers( array( 'user_id' => bp_loggedin_user_id() ) )
+		'include'         => bp_follow_get_following( array( 'user_id' => bp_loggedin_user_id() ) )
 	) );
 	$results = array();
 
