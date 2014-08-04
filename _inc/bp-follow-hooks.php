@@ -671,7 +671,7 @@ remove_action( 'bp_activity_mentions_prime_results', 'bp_friends_prime_mentions_
  * @see bp_activity_mentions_script()
  */
 function bp_follow_prime_mentions_results() {
-	if ( ! bp_activity_do_mentions() || ! bp_is_user_active() ) {
+	if ( ! bp_activity_maybe_load_mentions_scripts() ) {
 		return;
 	}
 
