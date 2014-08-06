@@ -34,6 +34,11 @@ function bp_follow_format_notifications( $action, $item_id, $secondary_item_id, 
 
 				if ( bp_is_active( 'notifications' ) ) {
 					$link = bp_get_notifications_permalink();
+
+					// filter notifications by 'new_follow' action
+					if ( version_compare( BP_VERSION, '2.0.9' ) >= 0 ) {
+						$link .= '?action=' . $action;
+					}
 				} else {
 					$link = bp_loggedin_user_domain() . $bp->follow->followers->slug . '/?new';
 				}
@@ -238,6 +243,39 @@ function bp_follow_notifications_remove_queryarg_from_userlink( $retval ) {
 	return $retval;
 }
 add_filter( 'bp_follow_new_followers_notification', 'bp_follow_notifications_remove_queryarg_from_userlink' );
+
+/**
+ * Filter notifications by component action.
+ *
+ * Only applicable in BuddyPress 2.1+.
+ *
+ * @since 1.3.0
+ *
+ * @param array $retval Current notification parameters.
+ * @return array
+ */
+function bp_follow_filter_unread_notifications( $retval ) {
+	// make sure we're on a user's notification page
+	if ( ! bp_is_user_notifications() ) {
+		return $retval;
+	}
+
+	// make sure we're doing this for the main notifications loop
+	if ( ! did_action( 'bp_before_member_body' ) ) {
+		return $retval;
+	}
+
+	// filter notifications by action
+	if ( ! empty( $_GET['action'] ) ) {
+		$retval['component_action'] = sanitize_title( $_GET['action'] );
+
+		// remove this filter to prevent any other notification loop getting filtered
+		remove_filter( 'bp_after_has_notifications_parse_args', 'bp_follow_filter_unread_notifications' );
+	}
+
+	return $retval;
+}
+add_filter( 'bp_after_has_notifications_parse_args', 'bp_follow_filter_unread_notifications' );
 
 /** SETTINGS ************************************************************/
 
