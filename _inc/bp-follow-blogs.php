@@ -329,8 +329,8 @@ class BP_Follow_Blogs {
 	/**
 	 * Filter the activity loop.
 	 *
-	 * Specifically, when on the activity directory and clicking on the "Sites I
-	 * Follow" tab.
+	 * Specifically, when on the activity directory and clicking on the "Followed
+	 * Sites" tab.
 	 *
 	 * @param str $qs The querystring for the BP loop
 	 * @param str $object The current object for the querystring
@@ -380,7 +380,47 @@ class BP_Follow_Blogs {
 		// add our follow parameters to the end of the querystring
 		$qs .= build_query( $args );
 
+		// support BP Groupblog
+		// We need to filter the MySQL query directly to do this
+		if ( function_exists( 'bp_groupblog_init' ) ) {
+			add_filter( 'bp_activity_paged_activities_sql', array( $this, 'groupblog_activity_sql_filter' ) );
+			add_filter( 'bp_activity_total_activities_sql', array( $this, 'groupblog_activity_sql_filter' ) );
+		}
+
 		return $qs;
+	}
+
+	/**
+	 * Filter the follow blogs activity query to support BP groupblogs.
+	 *
+	 * Gymnastics-time!
+	 *
+	 * @param string $query
+	 * @return string
+	 */
+	public function groupblog_activity_sql_filter( $query ) {
+		global $bp;
+
+		// grab the blog IDs from the current query
+		$start_pos = strpos( $query, 'a.item_id IN (' );
+		$blog_ids = substr(
+			$query,
+			$start_pos + 15,
+			strpos( $query, 'AND a.hide_sitewide' ) - $start_pos - 18
+		);
+
+		// For BP Groupblog, we need to grab the group IDs that are connected to blogs
+		// This is what this query is for, which will form our groupblog subquery
+		$group_ids_connected_to_blogs_subquery = "SELECT group_id FROM {$bp->groups->table_name_groupmeta} WHERE meta_key = 'groupblog_blog_id' AND meta_value IN ( " . $blog_ids . " )";
+
+		// WHERE ( [original WHERE clauses] OR component = 'groups' AND
+		// item_id in (group_ids_connected_to_blogs_subquery) )
+		$query = preg_replace( '|WHERE (.*?) ORDER|', 'WHERE ( ( $1 ) OR ( component = \'groups\' AND item_id IN ( ' . $group_ids_connected_to_blogs_subquery . ' ) AND type =\'new_groupblog_post\' ) ) ORDER', $query );
+
+		// Don't run this function on future activity loops
+		remove_filter( current_filter(), 'groupblog_activity_sql_filter' );
+
+		return $query;
 	}
 
 	/**
