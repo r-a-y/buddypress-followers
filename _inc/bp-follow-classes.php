@@ -52,6 +52,14 @@ class BP_Follow {
 	public $follow_type = '';
 
 	/**
+	 * The UTC date the follow item was recorded in 'Y-m-d h:i:s' format.
+	 *
+	 * @since 1.3.0
+	 * @var string
+	 */
+	public $date_recorded;
+
+	/**
 	 * Constructor.
 	 *
 	 * @param int $leader_id The ID of the item wewant to follow.
@@ -113,23 +121,30 @@ class BP_Follow {
 			return false;
 		}
 
+		// make sure a date is added for those directly using the save() method
+		if ( empty( $this->date_recorded ) ) {
+			$this->date_recorded = bp_core_current_time();
+		}
+
 		// update existing entry
 		if ( $this->id ) {
 			$result = $wpdb->query( $wpdb->prepare(
-				"UPDATE {$bp->follow->table_name} SET leader_id = %d, follower_id = %d, follow_type = %s WHERE id = %d",
+				"UPDATE {$bp->follow->table_name} SET leader_id = %d, follower_id = %d, follow_type = %s, date_recorded = %s WHERE id = %d",
 					$this->leader_id,
 					$this->follower_id,
 					$this->follow_type,
-					$this->id
+					$this->id,
+					$this->date_recorded
 			) );
 
 		// add new entry
 		} else {
 			$result = $wpdb->query( $wpdb->prepare(
-				"INSERT INTO {$bp->follow->table_name} ( leader_id, follower_id, follow_type ) VALUES ( %d, %d, %s )",
+				"INSERT INTO {$bp->follow->table_name} ( leader_id, follower_id, follow_type, date_recorded ) VALUES ( %d, %d, %s, %s )",
 					$this->leader_id,
 					$this->follower_id,
-					$this->follow_type
+					$this->follow_type,
+					$this->date_recorded
 			) );
 			$this->id = $wpdb->insert_id;
 		}
@@ -176,6 +191,8 @@ class BP_Follow {
 	 * Generate the WHERE SQL statement used to query follow relationships.
 	 *
 	 * @since 1.3.0
+	 *
+	 * @todo Add support for date ranges with 'date_recorded' column
 	 *
 	 * @param array $params
 	 * @return string

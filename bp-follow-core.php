@@ -24,7 +24,7 @@ class BP_Follow_Component extends BP_Component {
 	/**
 	 * @var string The current revision date.
 	 */
-	public $revision_date = '2014-05-06 05:00 UTC';
+	public $revision_date = '2014-08-07 22:00 UTC';
 
 	/**
 	 * Constructor.

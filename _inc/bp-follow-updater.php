@@ -39,8 +39,9 @@ class BP_Follow_Updater {
 	protected function init() {
 		$installed_date = (int) self::get_installed_revision_date();
 
-		// v1.3.0 - May 5, 2014
-		if ( $installed_date < 1399352400 ) {
+		// May 5, 2014    - added 'follow_type' DB column
+		// August 7, 2014 - added 'date_recorded' DB column
+		if ( $installed_date < 1399352400 || $installed_date < 1407474000 ) {
 			$this->install();
 		}
 
@@ -67,8 +68,10 @@ class BP_Follow_Updater {
 				leader_id bigint(20) NOT NULL,
 				follower_id bigint(20) NOT NULL,
 				follow_type varchar(75) NOT NULL,
+				date_recorded datetime NOT NULL default '0000-00-00 00:00:00',
 			        KEY followers (leader_id,follower_id),
-			        KEY follow_type (follow_type)
+			        KEY follow_type (follow_type),
+			        KEY date_recorded(date_recorded)
 			) {$charset_collate};";
 
 		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );

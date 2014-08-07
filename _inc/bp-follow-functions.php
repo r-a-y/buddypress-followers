@@ -25,9 +25,10 @@ function bp_follow_start_following( $args = '' ) {
 	global $bp;
 
 	$r = wp_parse_args( $args, array(
-		'leader_id'   => bp_displayed_user_id(),
-		'follower_id' => bp_loggedin_user_id(),
-		'follow_type' => '',
+		'leader_id'     => bp_displayed_user_id(),
+		'follower_id'   => bp_loggedin_user_id(),
+		'follow_type'   => '',
+		'date_recorded' => bp_core_current_time(),
 	) );
 
 	$follow = new BP_Follow( $r['leader_id'], $r['follower_id'], $r['follow_type'] );
@@ -37,10 +38,15 @@ function bp_follow_start_following( $args = '' ) {
 		return false;
 	}
 
+	// add other properties before save
+	$follow->date_recorded = $r['date_recorded'];
+
+	// save!
 	if ( ! $follow->save() ) {
 		return false;
 	}
 
+	// hooks!
 	if ( empty( $r['follow_type'] ) ) {
 		do_action_ref_array( 'bp_follow_start_following', array( &$follow ) );
 	} else {
