@@ -139,7 +139,7 @@ class BP_Follow {
 					$this->follower_id,
 					$this->follow_type,
 					$this->date_recorded,
-					$this->id,
+					$this->id
 			) );
 
 		// add new entry
