@@ -87,15 +87,20 @@ class BP_Follow {
 		global $wpdb;
 
 		// SQL statement
-		$sql =  self::get_select_sql( 'id' );
+		$sql =  self::get_select_sql( 'id, date_recorded' );
 		$sql .= self::get_where_sql( array(
 			'leader_id'   => $this->leader_id,
 			'follower_id' => $this->follower_id,
 			'follow_type' => $this->follow_type,
 		) );
 
-		if ( $follow_id = $wpdb->get_var( $sql ) ) {
-			$this->id = $follow_id;
+		// Run the query
+		$data = $wpdb->get_results( $sql );
+
+		// Got a result!
+		if ( ! empty( $data ) ) {
+			$this->id = $data[0]->id;
+			$this->date_recorded = $data[0]->date_recorded;
 		}
 	}
 
