@@ -41,7 +41,7 @@ class BP_Follow_Updater {
 
 		// May 5, 2014    - added 'follow_type' DB column
 		// August 7, 2014 - added 'date_recorded' DB column
-		if ( $installed_date < 1399352400 || $installed_date < 1407474000 ) {
+		if ( $installed_date < 1399352400 || $installed_date < 1407448800 ) {
 			$this->install();
 		}
 
