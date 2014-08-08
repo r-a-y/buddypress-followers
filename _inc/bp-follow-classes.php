@@ -255,6 +255,7 @@ class BP_Follow {
 			case 'leader_id' :
 			case 'follower_id' :
 			case 'follow_type' :
+			case 'date_recorded' :
 				break;
 
 			// fallback to 'id' column on anything else
@@ -278,10 +279,15 @@ class BP_Follow {
 	 *
 	 * @param int $leader_id The leader ID.
 	 * @param string $follow_type The follow type.  Leave blank to query users.
-	 * @param array $orderby Order by parameters. See {@link BP_Follow::get_orderby_sql()}.
+	 * @param array $query_args {
+	 *     Various query arguments
+	 *     @type array $date_query See {@link WP_Date_Query}.
+	 *     @type string $orderby The DB column to order results by. Default: 'id'.
+	 *     @type string $order The order. Either 'ASC' or 'DESC'. Default: 'DESC'.
+	 * }
 	 * @return array
 	 */
-	public static function get_followers( $leader_id = 0, $follow_type = '', $orderby = array() ) {
+	public static function get_followers( $leader_id = 0, $follow_type = '', $query_args = array() ) {
 		global $wpdb;
 
 		// SQL statement
@@ -290,6 +296,23 @@ class BP_Follow {
 			'leader_id'   => $leader_id,
 			'follow_type' => $follow_type,
 		) );
+
+		// Setup date query
+		if ( ! empty( $query_args['date_query'] ) && class_exists( 'WP_Date_Query' ) ) {
+			add_filter( 'date_query_valid_columns', array( __CLASS__, 'register_date_column' ) );
+			$date_query = new WP_Date_Query( $query_args['date_query'], 'date_recorded' );
+			$sql .= $date_query->get_sql();
+			remove_filter( 'date_query_valid_columns', array( __CLASS__, 'register_date_column' ) );
+		}
+
+		// Setup orderby query
+		$orderby = array();
+		if ( ! empty( $query_args['orderby'] ) ) {
+			$orderby = $query_args['orderby'];
+		}
+		if ( ! empty( $query_args['order'] ) ) {
+			$orderby = $query_args['order'];
+		}
 		$sql .= self::get_orderby_sql( $orderby );
 
 		// do the query
@@ -309,10 +332,15 @@ class BP_Follow {
 	 *
 	 * @param int $user_id The user ID.
 	 * @param string $follow_type The follow type.  Leave blank to query users.
-	 * @param array $orderby Order by parameters. See {@link BP_Follow::get_orderby_sql()}.
+	 * @param array $query_args {
+	 *     Various query arguments
+	 *     @type array $date_query See {@link WP_Date_Query}.
+	 *     @type string $orderby The DB column to order results by. Default: 'id'.
+	 *     @type string $order The order. Either 'ASC' or 'DESC'. Default: 'DESC'.
+	 * }
 	 * @return array
 	 */
-	public static function get_following( $user_id = 0, $follow_type = '', $orderby = array() ) {
+	public static function get_following( $user_id = 0, $follow_type = '', $query_args = array() ) {
 		global $wpdb;
 
 		// SQL statement
@@ -321,6 +349,23 @@ class BP_Follow {
 			'follower_id' => $user_id,
 			'follow_type' => $follow_type,
 		) );
+
+		// Setup date query
+		if ( ! empty( $query_args['date_query'] ) && class_exists( 'WP_Date_Query' ) ) {
+			add_filter( 'date_query_valid_columns', array( __CLASS__, 'register_date_column' ) );
+			$date_query = new WP_Date_Query( $query_args['date_query'], 'date_recorded' );
+			$sql .= $date_query->get_sql();
+			remove_filter( 'date_query_valid_columns', array( __CLASS__, 'register_date_column' ) );
+		}
+
+		// Setup orderby query
+		$orderby = array();
+		if ( ! empty( $query_args['orderby'] ) ) {
+			$orderby = $query_args['orderby'];
+		}
+		if ( ! empty( $query_args['order'] ) ) {
+			$orderby = $query_args['order'];
+		}
 		$sql .= self::get_orderby_sql( $orderby );
 
 		// do the query
@@ -420,5 +465,18 @@ class BP_Follow {
 		global $bp, $wpdb;
 
 		$wpdb->query( $wpdb->prepare( "DELETE FROM {$bp->follow->table_name} WHERE leader_id = %d OR follower_id = %d AND follow_type = ''", $user_id, $user_id ) );
+	}
+
+	/**
+	 * Register our 'date_recorded' DB column to WP's date query columns.
+	 *
+	 * @since 1.3.0
+	 *
+	 * @param array $retval Current DB columns
+	 * @return array
+	 */
+	public static function register_date_column( $retval ) {
+		$retval[] = 'date_recorded';
+		return $retval;
 	}
 }

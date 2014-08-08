@@ -123,23 +123,34 @@ function bp_follow_is_following( $args = '' ) {
 }
 
 /**
- * Fetch the user IDs of all the followers of a particular user.
+ * Fetch the IDs of all the followers of a particular item.
  *
  * @since 1.0.0
  *
  * @param array $args {
  *     Array of arguments.
  *     @type int $user_id The user ID to get followers for.
+ *     @type string $follow_type The follow type
+ *     @type array $query_args The query args.  See $query_args parameter in
+ *           {@link BP_Follow::get_followers()}.
  * }
  * @return array
  */
 function bp_follow_get_followers( $args = '' ) {
 
 	$r = wp_parse_args( $args, array(
-		'user_id' => bp_displayed_user_id()
+		'user_id'     => bp_displayed_user_id(),
+		'follow_type' => '',
+		'query_args'  => array()
 	) );
 
-	return apply_filters( 'bp_follow_get_followers', BP_Follow::get_followers( $r['user_id'] ) );
+	if ( empty( $r['follow_type'] ) ) {
+		$retval = apply_filters( 'bp_follow_get_followers', BP_Follow::get_followers( $r['user_id'], $r['follow_type'], $r['query_args'] ) );
+	} else {
+		$retval = apply_filters( 'bp_follow_get_followers_' .  $r['follow_type'], BP_Follow::get_followers( $r['user_id'], $r['follow_type'], $r['query_args'] ) );
+	}
+
+	return $retval;
 }
 
 /**
@@ -151,6 +162,8 @@ function bp_follow_get_followers( $args = '' ) {
  *     Array of arguments.
  *     @type int $user_id The user ID to fetch following user IDs for.
  *     @type string $follow_type The follow type
+ *     @type array $query_args The query args.  See $query_args parameter in
+ *           {@link BP_Follow::get_following()}.
  * }
  * @return array
  */
@@ -159,12 +172,13 @@ function bp_follow_get_following( $args = '' ) {
 	$r = wp_parse_args( $args, array(
 		'user_id'     => bp_displayed_user_id(),
 		'follow_type' => '',
+		'query_args'  => array()
 	) );
 
 	if ( empty( $r['follow_type'] ) ) {
-		$retval = apply_filters( 'bp_follow_get_following', BP_Follow::get_following( $r['user_id'], $r['follow_type'] ) );
+		$retval = apply_filters( 'bp_follow_get_following', BP_Follow::get_following( $r['user_id'], $r['follow_type'], $r['query_args'] ) );
 	} else {
-		$retval = apply_filters( 'bp_follow_get_following_' .  $r['follow_type'], BP_Follow::get_following( $r['user_id'], $r['follow_type'] ) );
+		$retval = apply_filters( 'bp_follow_get_following_' .  $r['follow_type'], BP_Follow::get_following( $r['user_id'], $r['follow_type'], $r['query_args'] ) );
 	}
 
 	return $retval;
