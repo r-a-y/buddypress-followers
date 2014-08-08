@@ -30,6 +30,8 @@ function _bp_follow_bootstrap() {
 		tests_add_filter( 'bp_is_network_activated', '__return_true' );
 	}
 
+	_bp_follow_install();
+
 	// Now load BP Follow
 	require dirname( __FILE__ ) . '/../../../loader.php';
 }
@@ -39,10 +41,18 @@ tests_add_filter( 'muplugins_loaded', '_bp_follow_bootstrap' );
  * Install BP Follow's DB tables.
  */
 function _bp_follow_install() {
-	global $wpdb, $wp_actions;
+	global $wpdb, $wp_actions, $bp;
 
 	// require BP Follow updater class
 	require dirname( __FILE__ ) . '/../../../_inc/bp-follow-updater.php';
+
+	if ( ! $table_prefix = $bp->table_prefix ) {
+		$table_prefix = apply_filters( 'bp_core_get_table_prefix', $wpdb->base_prefix );
+	}
+
+	// Drop BP Follow table if it exists to prevent errors from prior runs.
+	// BP Follow revision date appears to get wiped out from DB after every run...
+	$wpdb->query( "DROP TABLE IF EXISTS {$table_prefix}bp_follow" );
 
 	// Set DB tables to InnoDB
 	$wpdb->query( 'SET storage_engine = INNODB' );
@@ -58,7 +68,6 @@ function _bp_follow_install() {
 	// undo the hack
 	unset( $wp_actions['admin_init'] );
 }
-tests_add_filter( 'plugins_loaded', '_bp_follow_install', 20 );
 
 // Load WP's test suite
 require getenv( 'WP_TESTS_DIR' ) . '/includes/bootstrap.php';
