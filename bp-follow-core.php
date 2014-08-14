@@ -70,7 +70,6 @@ class BP_Follow_Component extends BP_Component {
 		// core
 		require( $this->path . '/bp-follow-classes.php' );
 		require( $this->path . '/bp-follow-functions.php' );
-		require( $this->path . '/bp-follow-templatetags.php' );
 
 		// users module
 		if ( true === (bool) apply_filters( 'bp_follow_enable_users', true ) ) {
