@@ -50,7 +50,7 @@ function bp_follow_start_following( $args = '' ) {
 	if ( empty( $r['follow_type'] ) ) {
 		do_action_ref_array( 'bp_follow_start_following', array( &$follow ) );
 	} else {
-		do_action_ref_array( 'bp_follow_start_following_' . $r['follow_type'], array( &$follow ) );	
+		do_action_ref_array( 'bp_follow_start_following_' . $r['follow_type'], array( &$follow ) );
 	}
 
 	return true;
@@ -85,7 +85,7 @@ function bp_follow_stop_following( $args = '' ) {
 	if ( empty( $r['follow_type'] ) ) {
 		do_action_ref_array( 'bp_follow_stop_following', array( &$follow ) );
 	} else {
-		do_action_ref_array( 'bp_follow_stop_following_' . $r['follow_type'], array( &$follow ) );	
+		do_action_ref_array( 'bp_follow_stop_following_' . $r['follow_type'], array( &$follow ) );
 	}
 
 	return true;
@@ -116,7 +116,7 @@ function bp_follow_is_following( $args = '' ) {
 	if ( empty( $r['follow_type'] ) ) {
 		$retval = apply_filters( 'bp_follow_is_following', (int) $follow->id, $follow );
 	} else {
-		$retval = apply_filters( 'bp_follow_is_following_' . $r['follow_type'], (int) $follow->id, $follow );	
+		$retval = apply_filters( 'bp_follow_is_following_' . $r['follow_type'], (int) $follow->id, $follow );
 	}
 
 	return $retval;
