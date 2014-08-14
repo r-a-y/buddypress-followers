@@ -67,20 +67,27 @@ class BP_Follow_Component extends BP_Component {
 			require( $this->path . '/bp-follow-backpat.php' );
 		}
 
+		// core
 		require( $this->path . '/bp-follow-classes.php' );
 		require( $this->path . '/bp-follow-functions.php' );
-		require( $this->path . '/bp-follow-screens.php' );
-		require( $this->path . '/bp-follow-actions.php' );
-		require( $this->path . '/bp-follow-hooks.php' );
 		require( $this->path . '/bp-follow-templatetags.php' );
-		require( $this->path . '/bp-follow-notifications.php' );
-		require( $this->path . '/bp-follow-widgets.php' );
 
-		// Follow blog support on multisite and BP 2.0+ only
-		if ( function_exists( 'bp_add_option' ) && bp_is_active( 'blogs' ) && is_multisite() && bp_is_network_activated() && apply_filters( 'bp_follow_enable_blogs', true ) ) {
-			require( $this->path . '/bp-follow-blogs.php' );		
+		// users module
+		if ( true === (bool) apply_filters( 'bp_follow_enable_users', true ) ) {
+			require( $this->path . '/users/screens.php' );
+			require( $this->path . '/users/actions.php' );
+			require( $this->path . '/users/hooks.php' );
+			require( $this->path . '/users/template.php' );
+			require( $this->path . '/users/notifications.php' );
+			require( $this->path . '/users/widgets.php' );
 		}
 
+		// blogs module - on multisite and BP 2.0+ only
+		if ( function_exists( 'bp_add_option' ) && bp_is_active( 'blogs' ) && is_multisite() && bp_is_network_activated() && apply_filters( 'bp_follow_enable_blogs', true ) ) {
+			require( $this->path . '/modules/blogs.php' );		
+		}
+
+		// updater
 		if ( defined( 'WP_NETWORK_ADMIN' ) ) {
 			require( $this->path . '/bp-follow-updater.php' );
 		}

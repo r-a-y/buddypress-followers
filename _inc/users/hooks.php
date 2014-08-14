@@ -177,7 +177,25 @@ function bp_follow_add_group_member_follow_button() {
 }
 add_action( 'bp_group_members_list_item_action', 'bp_follow_add_group_member_follow_button' );
 
-/** CACHE ****************************************************************/
+/** CACHE / DELETION ****************************************************/
+
+/**
+ * Removes follow relationships for all users from a user who is deleted or spammed
+ *
+ * @since 1.0.0
+ *
+ * @uses BP_Follow::delete_all_for_user() Deletes user ID from all following / follower records
+ */
+function bp_follow_remove_data( $user_id ) {
+	do_action( 'bp_follow_before_remove_data', $user_id );
+
+	BP_Follow::delete_all_for_user( $user_id );
+
+	do_action( 'bp_follow_remove_data', $user_id );
+}
+add_action( 'wpmu_delete_user',	'bp_follow_remove_data' );
+add_action( 'delete_user',	'bp_follow_remove_data' );
+add_action( 'make_spam_user',	'bp_follow_remove_data' );
 
 /**
  * Clear cache when a user follows / unfollows another user.

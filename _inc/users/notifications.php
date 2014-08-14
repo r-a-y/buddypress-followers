@@ -12,64 +12,6 @@ if ( !defined( 'ABSPATH' ) ) exit;
 /** NOTIFICATIONS API ***************************************************/
 
 /**
- * Format on screen notifications into something readable by users.
- *
- * @global $bp The global BuddyPress settings variable created in bp_core_setup_globals()
- */
-function bp_follow_format_notifications( $action, $item_id, $secondary_item_id, $total_items, $format = 'string' ) {
-	global $bp;
-
-	do_action( 'bp_follow_format_notifications', $action, $item_id, $secondary_item_id, $total_items, $format );
-
-	switch ( $action ) {
-		case 'new_follow':
-			$link = $text = false;
-
-			if ( 1 == $total_items ) {
-				$text = sprintf( __( '%s is now following you', 'bp-follow' ), bp_core_get_user_displayname( $item_id ) );
-				$link = bp_core_get_user_domain( $item_id  ) . '?bpf_read';
-
-			} else {
-				$text = sprintf( __( '%d more users are now following you', 'bp-follow' ), $total_items );
-
-				if ( bp_is_active( 'notifications' ) ) {
-					$link = bp_get_notifications_permalink();
-
-					// filter notifications by 'new_follow' action
-					if ( version_compare( BP_VERSION, '2.0.9' ) >= 0 ) {
-						$link .= '?action=' . $action;
-					}
-				} else {
-					$link = bp_loggedin_user_domain() . $bp->follow->followers->slug . '/?new';
-				}
-			}
-
-		break;
-
-		default :
-			$link = apply_filters( 'bp_follow_extend_notification_link', false, $action, $item_id, $secondary_item_id, $total_items );
-			$text = apply_filters( 'bp_follow_extend_notification_text', false, $action, $item_id, $secondary_item_id, $total_items );
-		break;
-	}
-
-	if ( ! $link || ! $text ) {
-		return false;
-	}
-
-	if ( 'string' == $format ) {
-		return apply_filters( 'bp_follow_new_followers_notification', '<a href="' . $link . '">' . $text . '</a>', $total_items, $link, $text, $item_id, $secondary_item_id );
-
-	} else {
-		$array = array(
-			'text' => $text,
-			'link' => $link
-		);
-
-		return apply_filters( 'bp_follow_new_followers_return_notification', $array, $item_id, $secondary_item_id, $total_items );
-	}
-}
-
-/**
  * Removes notifications made by a user.
  *
  * @since 1.2.1
