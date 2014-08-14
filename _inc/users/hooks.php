@@ -12,6 +12,231 @@
 // Exit if accessed directly
 if ( !defined( 'ABSPATH' ) ) exit;
 
+/** USER NAV *************************************************************/
+
+/**
+ * Setup profile / BuddyBar navigation.
+ *
+ * This function was moved from {@link BP_Follow_Component} in v1.3.0 due
+ * to the users module being toggleable.
+ *
+ * @since 1.3.0
+ */
+function bp_follow_user_setup_nav( $main_nav = array(), $sub_nav = array() ) {
+	global $bp;
+
+	// If we're in the admin area and we're using the WP toolbar, we don't need
+	// to run the rest of this method
+	if ( defined( 'WP_NETWORK_ADMIN' ) && bp_use_wp_admin_bar() ) {
+		return;
+	}
+
+	// Need to change the user ID, so if we're not on a member page, $counts variable is still calculated
+	$user_id = bp_is_user() ? bp_displayed_user_id() : bp_loggedin_user_id();
+	$counts  = bp_follow_total_follow_counts( array( 'user_id' => $user_id ) );
+
+	// BuddyBar compatibility
+	$domain = bp_displayed_user_domain() ? bp_displayed_user_domain() : bp_loggedin_user_domain();
+
+	/** FOLLOWERS NAV ************************************************/
+
+	bp_core_new_nav_item( array(
+		'name'                => sprintf( __( 'Following <span>%d</span>', 'bp-follow' ), $counts['following'] ),
+		'slug'                => $bp->follow->following->slug,
+		'position'            => $bp->follow->params['adminbar_myaccount_order'],
+		'screen_function'     => 'bp_follow_screen_following',
+		'default_subnav_slug' => 'following',
+		'item_css_id'         => 'members-following'
+	) );
+
+	/** FOLLOWING NAV ************************************************/
+
+	bp_core_new_nav_item( array(
+		'name'                => sprintf( __( 'Followers <span>%d</span>', 'bp-follow' ), $counts['followers'] ),
+		'slug'                => $bp->follow->followers->slug,
+		'position'            => apply_filters( 'bp_follow_followers_nav_position', 62 ),
+		'screen_function'     => 'bp_follow_screen_followers',
+		'default_subnav_slug' => 'followers',
+		'item_css_id'         => 'members-followers'
+	) );
+
+	/** ACTIVITY SUBNAV **********************************************/
+
+	// Add activity sub nav item
+	if ( bp_is_active( 'activity' ) && apply_filters( 'bp_follow_show_activity_subnav', true ) ) {
+
+		bp_core_new_subnav_item( array(
+			'name'            => _x( 'Following', 'Activity subnav tab', 'bp-follow' ),
+			'slug'            => constant( 'BP_FOLLOWING_SLUG' ),
+			'parent_url'      => trailingslashit( $domain . bp_get_activity_slug() ),
+			'parent_slug'     => bp_get_activity_slug(),
+			'screen_function' => 'bp_follow_screen_activity_following',
+			'position'        => 21,
+			'item_css_id'     => 'activity-following'
+		) );
+	}
+
+	// BuddyBar compatibility
+	add_action( 'bp_adminbar_menus', 'bp_follow_group_buddybar_items' );
+}
+add_action( 'bp_follow_setup_nav', 'bp_follow_user_setup_nav', 10, 2 );
+
+/**
+ * Set up WP Toolbar / Admin Bar.
+ *
+ * This function was moved from {@link BP_Follow_Component} in v1.3.0 due
+ * to the users module being toggleable.
+ *
+ * @since 1.3.0
+ */
+function bp_follow_user_setup_toolbar() {
+	global $wp_admin_bar, $bp;
+
+	// "Follow" parent nav menu
+	$wp_admin_nav[] = array(
+		'parent' => $bp->my_account_menu_id,
+		'id'     => 'my-account-' . $bp->follow->id,
+		'title'  => _x( 'Follow', 'Adminbar main nav', 'bp-follow' ),
+		'href'   => trailingslashit( bp_loggedin_user_domain() . $bp->follow->following->slug )
+	);
+
+	// "Following" subnav item
+	$wp_admin_nav[] = array(
+		'parent' => 'my-account-' . $bp->follow->id,
+		'id'     => 'my-account-' . $bp->follow->id . '-following',
+		'title'  => _x( 'Following', 'Adminbar follow subnav', 'bp-follow' ),
+		'href'   => trailingslashit( bp_loggedin_user_domain() . $bp->follow->following->slug )
+	);
+
+	// "Followers" subnav item
+	$wp_admin_nav[] = array(
+		'parent' => 'my-account-' . $bp->follow->id,
+		'id'     => 'my-account-' . $bp->follow->id . '-followers',
+		'title'  => _x( 'Followers', 'Adminbar follow subnav', 'bp-follow' ),
+		'href'   => trailingslashit( bp_loggedin_user_domain() . $bp->follow->followers->slug )
+	);
+
+	// Add each admin menu
+	foreach( apply_filters( 'bp_follow_toolbar', $wp_admin_nav ) as $admin_menu ) {
+		$wp_admin_bar->add_menu( $admin_menu );
+	}
+}
+add_action( 'bp_follow_setup_admin_bar', 'bp_follow_user_setup_toolbar' );
+
+/**
+ * Inject "Following" nav item to WP adminbar's "Activity" main nav.
+ *
+ * This function was moved from {@link BP_Follow_Component} in v1.3.0 due
+ * to the users module being toggleable.
+ *
+ * @param array $retval
+ * @return array
+ */
+function bp_follow_user_activity_admin_nav_toolbar( $retval ) {
+	if ( ! is_user_logged_in() ) {
+		return $retval;
+	}
+
+	if ( bp_is_active( 'activity' ) && apply_filters( 'bp_follow_show_activity_subnav', true ) ) {
+		$new_item = array(
+			'parent' => 'my-account-activity',
+			'id'     => 'my-account-activity-following',
+			'title'  => _x( 'Following', 'Adminbar activity subnav', 'bp-follow' ),
+			'href'   => trailingslashit( bp_loggedin_user_domain() . bp_get_activity_slug() . '/' . constant( 'BP_FOLLOWING_SLUG' ) ),
+		);
+
+		$inject = array();
+		$offset = 3;
+
+		$inject[$offset] = $new_item;
+		$retval = array_merge(
+			array_slice( $retval, 0, $offset, true ),
+			$inject,
+			array_slice( $retval, $offset, NULL, true )
+		);
+	}
+
+	return $retval;
+}
+add_action( 'bp_activity_admin_nav', 'bp_follow_user_activity_admin_nav_toolbar' );
+
+/**
+ * Groups follow nav items together in the BuddyBar.
+ *
+ * For BP Follow, we use separate nav items for the "Following" and
+ * "Followers" pages, but for the BuddyBar, we want to group them together.
+ *
+ * Because of the way BuddyPress renders both the BuddyBar and profile nav
+ * with the same code, to alter just the BuddyBar, you need to resort to
+ * hacking the $bp global later on.
+ *
+ * This will probably break in future versions of BP, when that happens we'll
+ * remove this entirely.
+ *
+ * If the WP Toolbar is in use, this method is skipped.
+ *
+ * This function was moved from {@link BP_Follow_Component} in v1.3.0 due
+ * to the users module being toggleable.
+ *
+ * @since 1.3.0
+ */
+function bp_follow_group_buddybar_items() {
+	// don't do this if we're using the WP Admin Bar / Toolbar
+	if ( defined( 'BP_USE_WP_ADMIN_BAR' ) && BP_USE_WP_ADMIN_BAR )
+		return;
+
+	if ( ! bp_loggedin_user_id() )
+		return;
+
+	global $bp;
+
+	// get follow nav positions
+	$following_position = $bp->follow->params['adminbar_myaccount_order'];
+	$followers_position = apply_filters( 'bp_follow_followers_nav_position', 62 );
+
+	// clobberin' time!
+	unset( $bp->bp_nav[$following_position] );
+	unset( $bp->bp_nav[$followers_position] );
+	unset( $bp->bp_options_nav['following'] );
+	unset( $bp->bp_options_nav['followers'] );
+
+	// Add the "Follow" nav menu
+	$bp->bp_nav[$following_position] = array(
+		'name'                    => _x( 'Follow', 'Adminbar main nav', 'bp-follow' ),
+		'link'                    => trailingslashit( bp_loggedin_user_domain() . $bp->follow->following->slug ),
+		'slug'                    => 'follow',
+		'css_id'                  => 'follow',
+		'position'                => $following_position,
+		'show_for_displayed_user' => 1,
+		'screen_function'         => 'bp_follow_screen_followers'
+	);
+
+	// "Following" subnav item
+	$bp->bp_options_nav['follow'][10] = array(
+		'name'            => _x( 'Following', 'Adminbar follow subnav', 'bp-follow' ),
+		'link'            => trailingslashit( bp_loggedin_user_domain() . $bp->follow->following->slug ),
+		'slug'            => $bp->follow->following->slug,
+		'css_id'          => 'following',
+		'position'        => 10,
+		'user_has_access' => 1,
+		'screen_function' => 'bp_follow_screen_followers'
+	);
+
+	// "Followers" subnav item
+	$bp->bp_options_nav['follow'][20] = array(
+		'name'            => _x( 'Followers', 'Adminbar follow subnav', 'bp-follow' ),
+		'link'            => trailingslashit( bp_loggedin_user_domain() . $bp->follow->followers->slug ),
+		'slug'            => $bp->follow->followers->slug,
+		'css_id'          => 'followers',
+		'position'        => 20,
+		'user_has_access' => 1,
+		'screen_function' => 'bp_follow_screen_followers'
+	);
+
+	// Resort the nav items to account for the late change made above
+	ksort( $bp->bp_nav );
+}
+
 /** LOOP INJECTION *******************************************************/
 
 /**
