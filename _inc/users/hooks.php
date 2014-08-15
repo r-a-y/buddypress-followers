@@ -90,6 +90,10 @@ add_action( 'bp_follow_setup_nav', 'bp_follow_user_setup_nav', 10, 2 );
  * @since 1.3.0
  */
 function bp_follow_user_setup_toolbar() {
+	if ( ! is_user_logged_in() ) {
+		return;
+	}
+
 	global $wp_admin_bar, $bp;
 
 	// "Follow" parent nav menu
