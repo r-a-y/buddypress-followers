@@ -434,9 +434,11 @@ add_action( 'make_spam_user',	'bp_follow_remove_data' );
  * @param BP_Follow $follow
  */
 function bp_follow_clear_cache_on_follow( BP_Follow $follow ) {
-	// clear user count cache
+	// clear follow cache
 	wp_cache_delete( $follow->leader_id,   'bp_follow_followers_count' );
 	wp_cache_delete( $follow->follower_id, 'bp_follow_following_count' );
+	wp_cache_delete( $follow->leader_id,   'bp_follow_followers' );
+	wp_cache_delete( $follow->follower_id, 'bp_follow_following' );
 
 	// clear follow relationship
 	wp_cache_delete( "{$follow->leader_id}:{$follow->follower_id}:", 'bp_follow_data' );
@@ -452,9 +454,11 @@ add_action( 'bp_follow_stop_following',  'bp_follow_clear_cache_on_follow' );
  * @param int $user_id The ID of the user being deleted
  */
 function bp_follow_clear_cache_on_user_delete( $user_id ) {
-	// delete user's follow count
+	// delete follow cache
 	wp_cache_delete( $user_id, 'bp_follow_following_count' );
 	wp_cache_delete( $user_id, 'bp_follow_followers_count' );
+	wp_cache_delete( $user_id, 'bp_follow_following' );
+	wp_cache_delete( $user_id, 'bp_follow_followers' );
 
 	// delete each user's followers count that the user was following
 	$users = BP_Follow::get_following( $user_id );

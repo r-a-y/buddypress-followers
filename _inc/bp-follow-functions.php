@@ -144,13 +144,38 @@ function bp_follow_get_followers( $args = '' ) {
 		'query_args'  => array()
 	) );
 
-	if ( empty( $r['follow_type'] ) ) {
-		$retval = apply_filters( 'bp_follow_get_followers', BP_Follow::get_followers( $r['user_id'], $r['follow_type'], $r['query_args'] ) );
+	$retval   = array();
+	$do_query = true;
+
+	// setup some variables based on the follow type
+	if ( ! empty( $r['follow_type'] ) ) {
+		$filter = 'bp_follow_get_followers_' .  $r['follow_type'];
+		$cachegroup = 'bp_follow_followers_' .  $r['follow_type'];
 	} else {
-		$retval = apply_filters( 'bp_follow_get_followers_' .  $r['follow_type'], BP_Follow::get_followers( $r['user_id'], $r['follow_type'], $r['query_args'] ) );
+		$filter = 'bp_follow_get_followers';
+		$cachegroup = 'bp_follow_followers';
 	}
 
-	return $retval;
+	// check for cache if 'query_args' is empty
+	if ( empty( $r['query_args'] ) ) {
+		$retval = wp_cache_get( $r['user_id'], $cachegroup );
+
+		if ( false !== $retval ) {
+			$do_query = false;
+		}
+	}
+
+	// query if necessary
+	if ( true === $do_query ) {
+		$retval = BP_Follow::get_followers( $r['user_id'], $r['follow_type'], $r['query_args'] );
+
+		// cache if necessary
+		if ( empty( $r['query_args'] ) && ! empty( $retval ) ) {
+			wp_cache_set( $r['user_id'], $retval, $cachegroup );
+		}
+	}
+
+	return apply_filters( $filter, $retval );
 }
 
 /**
@@ -175,13 +200,38 @@ function bp_follow_get_following( $args = '' ) {
 		'query_args'  => array()
 	) );
 
-	if ( empty( $r['follow_type'] ) ) {
-		$retval = apply_filters( 'bp_follow_get_following', BP_Follow::get_following( $r['user_id'], $r['follow_type'], $r['query_args'] ) );
+	$retval   = array();
+	$do_query = true;
+
+	// setup some variables based on the follow type
+	if ( ! empty( $r['follow_type'] ) ) {
+		$filter = 'bp_follow_get_following_' .  $r['follow_type'];
+		$cachegroup = 'bp_follow_following_' .  $r['follow_type'];
 	} else {
-		$retval = apply_filters( 'bp_follow_get_following_' .  $r['follow_type'], BP_Follow::get_following( $r['user_id'], $r['follow_type'], $r['query_args'] ) );
+		$filter = 'bp_follow_get_following';
+		$cachegroup = 'bp_follow_following';
 	}
 
-	return $retval;
+	// check for cache if 'query_args' is empty
+	if ( empty( $r['query_args'] ) ) {
+		$retval = wp_cache_get( $r['user_id'], $cachegroup );
+
+		if ( false !== $retval ) {
+			$do_query = false;
+		}
+	}
+
+	// query if necessary
+	if ( true === $do_query ) {
+		$retval = BP_Follow::get_following( $r['user_id'], $r['follow_type'], $r['query_args'] );
+
+		// cache if necessary
+		if ( empty( $r['query_args'] ) && ! empty( $retval ) ) {
+			wp_cache_set( $r['user_id'], $retval, $cachegroup );
+		}
+	}
+
+	return apply_filters( $filter, $retval );
 }
 
 /**

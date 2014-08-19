@@ -69,4 +69,82 @@ class BP_Follow_Test_Cache extends BP_UnitTestCase {
 		// assert
 		$this->assertEmpty( wp_cache_get( $key, 'bp_follow_data' ) );
 	}
+
+	/**
+	 * @group bp_follow_get_following
+	 */
+	public function test_bp_get_following() {
+		$u1 = $this->factory->user->create();
+		$u2 = $this->factory->user->create();
+		$u3 = $this->factory->user->create();
+		$u4 = $this->factory->user->create();
+
+		// let user 1 follow everyone
+		bp_follow_start_following( array(
+			'leader_id'   => $u2,
+			'follower_id' => $u1,
+		) );
+		bp_follow_start_following( array(
+			'leader_id'   => $u3,
+			'follower_id' => $u1,
+		) );
+		bp_follow_start_following( array(
+			'leader_id'   => $u4,
+			'follower_id' => $u1,
+		) );
+
+		// get following for user 1
+		bp_follow_get_following( array( 'user_id' => $u1 ) );
+
+		// assert
+		$this->assertEqualSets( array( $u2, $u3, $u4 ), wp_cache_get( $u1, 'bp_follow_following' ) );
+
+		// stop following one user
+		bp_follow_stop_following( array(
+			'leader_id'   => $u4,
+			'follower_id' => $u1,
+		) );
+
+		// make sure cache is invalidated
+		$this->assertEmpty( wp_cache_get( $u1, 'bp_follow_following' ) );
+	}
+
+	/**
+	 * @group bp_follow_get_followers
+	 */
+	public function test_bp_get_followers() {
+		$u1 = $this->factory->user->create();
+		$u2 = $this->factory->user->create();
+		$u3 = $this->factory->user->create();
+		$u4 = $this->factory->user->create();
+
+		// let user 1 be followed by everyone
+		bp_follow_start_following( array(
+			'leader_id'   => $u1,
+			'follower_id' => $u2,
+		) );
+		bp_follow_start_following( array(
+			'leader_id'   => $u1,
+			'follower_id' => $u3,
+		) );
+		bp_follow_start_following( array(
+			'leader_id'   => $u1,
+			'follower_id' => $u4,
+		) );
+
+		// get followers for user 1
+		bp_follow_get_followers( array( 'user_id' => $u1 ) );
+
+		// assert
+		$this->assertEqualSets( array( $u2, $u3, $u4 ), wp_cache_get( $u1, 'bp_follow_followers' ) );
+
+		// one user stops following user 1
+		bp_follow_stop_following( array(
+			'leader_id'   => $u1,
+			'follower_id' => $u4,
+		) );
+
+		// make sure cache is invalidated
+		$this->assertEmpty( wp_cache_get( $u1, 'bp_follow_followers' ) );
+	}
 }

@@ -721,6 +721,10 @@ class BP_Follow_Blogs {
 		// clear following blogs count for user
 		wp_cache_delete( $follow->follower_id, 'bp_follow_following_blogs_count' );
 
+		// clear queried followers / following
+		wp_cache_delete( $follow->leader_id,   'bp_follow_followers_blogs' );
+		wp_cache_delete( $follow->follower_id, 'bp_follow_following_blogs' );
+
 		// clear follow relationship
 		wp_cache_delete( "{$follow->leader_id}:{$follow->follower_id}:blogs", 'bp_follow_data' );
 	}
@@ -733,6 +737,9 @@ class BP_Follow_Blogs {
 	public function clear_cache_on_user_delete( $user_id = 0 ) {
 		// delete user's blog follow count
 		wp_cache_delete( $user_id, 'bp_follow_following_blogs_count' );
+
+		// delete queried blogs that user was following
+		wp_cache_delete( $user_id, 'bp_follow_following_blogs' );
 
 		// delete each blog's followers count that the user was following
 		$blogs = BP_Follow::get_following( $user_id, 'blogs' );
@@ -754,6 +761,9 @@ class BP_Follow_Blogs {
 	public function clear_cache_on_blog_delete( $blog_id ) {
 		// clear followers count for blog
 		wp_cache_delete( $blog_id, 'bp_follow_followers_blogs_count' );
+
+		// clear queried followers for blog
+		wp_cache_delete( $blog_id, 'bp_follow_followers_blogs' );
 
 		// delete each user's blog following count for those that followed the blog
 		$users = BP_Follow::get_followers( $blog_id, 'blogs' );
