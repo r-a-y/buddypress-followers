@@ -169,8 +169,8 @@ function bp_follow_get_followers( $args = '' ) {
 	if ( true === $do_query ) {
 		$retval = BP_Follow::get_followers( $r['user_id'], $r['follow_type'], $r['query_args'] );
 
-		// cache if necessary
-		if ( empty( $r['query_args'] ) && ! empty( $retval ) ) {
+		// cache if no extra query args - we only cache default args for now
+		if ( empty( $r['query_args'] ) ) {
 			wp_cache_set( $r['user_id'], $retval, $cachegroup );
 		}
 	}
@@ -225,8 +225,8 @@ function bp_follow_get_following( $args = '' ) {
 	if ( true === $do_query ) {
 		$retval = BP_Follow::get_following( $r['user_id'], $r['follow_type'], $r['query_args'] );
 
-		// cache if necessary
-		if ( empty( $r['query_args'] ) && ! empty( $retval ) ) {
+		// cache if no extra query args - we only cache default args for now
+		if ( empty( $r['query_args'] ) ) {
 			wp_cache_set( $r['user_id'], $retval, $cachegroup );
 		}
 	}
