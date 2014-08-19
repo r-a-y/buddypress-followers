@@ -437,6 +437,9 @@ function bp_follow_clear_cache_on_follow( BP_Follow $follow ) {
 	// clear user count cache
 	wp_cache_delete( $follow->leader_id,   'bp_follow_followers_count' );
 	wp_cache_delete( $follow->follower_id, 'bp_follow_following_count' );
+
+	// clear follow relationship
+	wp_cache_delete( "{$follow->leader_id}:{$follow->follower_id}:", 'bp_follow_data' );
 }
 add_action( 'bp_follow_start_following', 'bp_follow_clear_cache_on_follow' );
 add_action( 'bp_follow_stop_following',  'bp_follow_clear_cache_on_follow' );
@@ -458,6 +461,9 @@ function bp_follow_clear_cache_on_user_delete( $user_id ) {
 	if ( ! empty( $users ) ) {
 		foreach ( $users as $user ) {
 			wp_cache_delete( $user, 'bp_follow_followers_count' );
+
+			// clear follow relationship
+			wp_cache_delete( "{$user_id}:{$user}:", 'bp_follow_data' );
 		}
 	}
 }

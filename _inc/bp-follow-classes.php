@@ -86,21 +86,39 @@ class BP_Follow {
 	protected function populate() {
 		global $wpdb;
 
-		// SQL statement
-		$sql =  self::get_select_sql( 'id, date_recorded' );
-		$sql .= self::get_where_sql( array(
-			'leader_id'   => $this->leader_id,
-			'follower_id' => $this->follower_id,
-			'follow_type' => $this->follow_type,
-		) );
+		// we always require a leader ID
+		if ( empty( $this->leader_id ) ) {
+			return;
+		}
 
-		// Run the query
-		$data = $wpdb->get_results( $sql );
+		// check cache first
+		$key = "{$this->leader_id}:{$this->follower_id}:{$this->follow_type}";
+		$data = wp_cache_get( $key, 'bp_follow_data' );
 
-		// Got a result!
+		// Run query if no cache
+		if ( false === $data ) {
+			// SQL statement
+			$sql =  self::get_select_sql( 'id, date_recorded' );
+			$sql .= self::get_where_sql( array(
+				'leader_id'   => $this->leader_id,
+				'follower_id' => $this->follower_id,
+				'follow_type' => $this->follow_type,
+			) );
+
+			// Run the query
+			$data = $wpdb->get_results( $sql );
+
+			// Set cache on successful fetch
+			if ( ! empty( $data ) ) {
+				$data = $data[0];
+				wp_cache_set( $key, $data, 'bp_follow_data' );
+			}
+		}
+
+		// Populate some other properties
 		if ( ! empty( $data ) ) {
-			$this->id = $data[0]->id;
-			$this->date_recorded = $data[0]->date_recorded;
+			$this->id = $data->id;
+			$this->date_recorded = $data->date_recorded;
 		}
 	}
 

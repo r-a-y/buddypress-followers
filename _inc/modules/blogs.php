@@ -720,6 +720,9 @@ class BP_Follow_Blogs {
 
 		// clear following blogs count for user
 		wp_cache_delete( $follow->follower_id, 'bp_follow_following_blogs_count' );
+
+		// clear follow relationship
+		wp_cache_delete( "{$follow->leader_id}:{$follow->follower_id}:blogs", 'bp_follow_data' );
 	}
 
 	/**
@@ -736,6 +739,9 @@ class BP_Follow_Blogs {
 		if ( ! empty( $blogs ) ) {
 			foreach ( $blogs as $blog_id ) {
 				wp_cache_delete( $blog_id, 'bp_follow_followers_blogs_count' );
+
+				// clear follow relationship
+				wp_cache_delete( "{$blog_id}:{$user_id}:blogs", 'bp_follow_data' );
 			}
 		}
 	}
@@ -754,6 +760,9 @@ class BP_Follow_Blogs {
 		if ( ! empty( $users ) ) {
 			foreach ( $users as $user ) {
 				wp_cache_delete( $user, 'bp_follow_following_blogs_count' );
+
+				// clear follow relationship
+				wp_cache_delete( "{$blog_id}:{$user}:blogs", 'bp_follow_data' );
 			}
 		}
 	}
