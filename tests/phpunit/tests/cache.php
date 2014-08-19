@@ -73,7 +73,7 @@ class BP_Follow_Test_Cache extends BP_UnitTestCase {
 	/**
 	 * @group bp_follow_get_following
 	 */
-	public function test_bp_get_following() {
+	public function test_bp_follow_get_following() {
 		$u1 = $this->factory->user->create();
 		$u2 = $this->factory->user->create();
 		$u3 = $this->factory->user->create();
@@ -110,9 +110,47 @@ class BP_Follow_Test_Cache extends BP_UnitTestCase {
 	}
 
 	/**
+	 * @group bp_follow_get_following
+	 */
+	public function test_bp_follow_get_following_no_cache() {
+		$u1 = $this->factory->user->create();
+		$u2 = $this->factory->user->create();
+		$u3 = $this->factory->user->create();
+		$u4 = $this->factory->user->create();
+
+		// let user 1 follow everyone
+		bp_follow_start_following( array(
+			'leader_id'   => $u2,
+			'follower_id' => $u1,
+		) );
+		bp_follow_start_following( array(
+			'leader_id'   => $u3,
+			'follower_id' => $u1,
+		) );
+		bp_follow_start_following( array(
+			'leader_id'   => $u4,
+			'follower_id' => $u1,
+		) );
+
+		// get following for user 1
+		bp_follow_get_following( array(
+			'user_id' => $u1,
+
+			// add query args
+			'query_args' => array(
+				'orderby' => 'id',
+				'order'   => 'ASC',
+			)
+		) );
+
+		// we do not cache following calls with query args at the moment
+		$this->assertEmpty( wp_cache_get( $u1, 'bp_follow_following' ) );
+	}
+
+	/**
 	 * @group bp_follow_get_followers
 	 */
-	public function test_bp_get_followers() {
+	public function test_bp_follow_get_followers() {
 		$u1 = $this->factory->user->create();
 		$u2 = $this->factory->user->create();
 		$u3 = $this->factory->user->create();
