@@ -207,7 +207,7 @@ class BP_Follow {
 	protected static function get_select_sql( $column = '' ) {
 		global $bp;
 
-		return sprintf( "SELECT %s FROM %s ", mysql_real_escape_string( $column ), mysql_real_escape_string( $bp->follow->table_name ) );
+		return sprintf( "SELECT %s FROM %s ", esc_sql( $column ), esc_sql( $bp->follow->table_name ) );
 	}
 
 	/**
