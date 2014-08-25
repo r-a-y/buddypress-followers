@@ -859,7 +859,7 @@ class BP_Follow_Blogs_Screens {
 	?>
 
 		<script type="text/javascript">
-		jQuery('div.item-list-tabs').on( 'click', function(event) {
+		jQuery('#subnav a').on( 'click', function(event) {
 			event.stopImmediatePropagation();
 		});
 		</script>
