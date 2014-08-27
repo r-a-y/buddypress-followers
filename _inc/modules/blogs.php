@@ -383,8 +383,8 @@ class BP_Follow_Blogs {
 		// support BP Groupblog
 		// We need to filter the MySQL query directly to do this
 		if ( function_exists( 'bp_groupblog_init' ) ) {
-			add_filter( 'bp_activity_paged_activities_sql', array( $this, 'groupblog_activity_sql_filter' ) );
-			add_filter( 'bp_activity_total_activities_sql', array( $this, 'groupblog_activity_sql_filter' ) );
+			add_filter( 'bp_activity_paged_activities_sql', array( $this, 'groupblog_activity_sql_filter' ), 10, 2 );
+			add_filter( 'bp_activity_total_activities_sql', array( $this, 'groupblog_activity_sql_filter' ), 10, 2 );
 		}
 
 		return $qs;
@@ -395,27 +395,30 @@ class BP_Follow_Blogs {
 	 *
 	 * Gymnastics-time!
 	 *
-	 * @param string $query
+	 * @param string $query Current SQL statement
+	 * @param array $r Current activity arguments
 	 * @return string
 	 */
-	public function groupblog_activity_sql_filter( $query ) {
+	public function groupblog_activity_sql_filter( $query, $r ) {
 		global $bp;
 
 		// grab the blog IDs from the current query
-		$start_pos = strpos( $query, 'a.item_id IN (' );
-		$blog_ids = substr(
-			$query,
-			$start_pos + 15,
-			strpos( $query, 'AND a.hide_sitewide' ) - $start_pos - 18
-		);
+		$blog_ids = $r['filter']['primary_id'];
+
+		// support heartbeat in groupblog query
+		$extra = '';
+		if ( ! empty( $r['filter']['since'] ) ) {
+			$extra = BP_Activity_Activity::get_filter_sql( array( 'since' => $r['filter']['since'] ) );
+			$extra = ' AND ' . $extra;
+		}
 
 		// For BP Groupblog, we need to grab the group IDs that are connected to blogs
 		// This is what this query is for, which will form our groupblog subquery
 		$group_ids_connected_to_blogs_subquery = "SELECT group_id FROM {$bp->groups->table_name_groupmeta} WHERE meta_key = 'groupblog_blog_id' AND meta_value IN ( " . $blog_ids . " )";
 
 		// WHERE ( [original WHERE clauses] OR component = 'groups' AND
-		// item_id in (group_ids_connected_to_blogs_subquery) )
-		$query = preg_replace( '|WHERE (.*?) ORDER|', 'WHERE ( ( $1 ) OR ( component = \'groups\' AND item_id IN ( ' . $group_ids_connected_to_blogs_subquery . ' ) AND type =\'new_groupblog_post\' ) ) ORDER', $query );
+		// item_id IN (group_ids_connected_to_blogs_subquery) )
+		$query = preg_replace( '|WHERE (.*?) ORDER|', 'WHERE ( ( $1 ) OR ( component = \'groups\' AND item_id IN ( ' . $group_ids_connected_to_blogs_subquery . ' ) AND type =\'new_groupblog_post\'' . $extra . ' ) ) ORDER', $query );
 
 		// Don't run this function on future activity loops
 		remove_filter( current_filter(), 'groupblog_activity_sql_filter' );
