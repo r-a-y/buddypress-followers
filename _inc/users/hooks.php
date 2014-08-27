@@ -543,35 +543,63 @@ add_action( 'bp_pre_user_query_construct', 'bp_follow_pre_user_query' );
 /** AJAX MANIPULATION ****************************************************/
 
 /**
- * Modify the querystring passed to the activity loop to return only users
- * that the current user is following.
+ * Filter the activity loop when we're on a "Following" page
  *
- * @global $bp The global BuddyPress settings variable created in bp_core_setup_globals()
- * @uses bp_get_following_ids() Get the user_ids of all users a user is following.
+ * This is done:
+ *   - On the activity directory and clicking on the "Following" tab
+ *   - On a user's "Activity > Following" page
+ *
+ * @since 1.0.0
+ *
+ * @param string|array Current activity querystring
+ * @param string $object The current object or component
+ * @return array
  */
-function bp_follow_add_activity_scope_filter( $qs, $object, $filter, $scope ) {
+function bp_follow_add_activity_scope_filter( $qs, $object ) {
 	global $bp;
 
-	// Only filter on directory pages (no action) and the following scope on activity object.
-	if ( ( !empty( $bp->current_action ) && !bp_is_current_action( 'following' ) ) || 'following' != $scope || 'activity' != $object )
+	// not on the activity object? stop now!
+	if ( $object != 'activity' ) {
 		return $qs;
+	}
+
+	$set = false;
+
+	// activity directory
+	// can't use bp_is_activity_directory() yet since that's a BP 2.0 function
+	if ( ! bp_displayed_user_id() && bp_is_activity_component() && ! bp_current_action() ) {
+		// check if activity scope is following before manipulating
+		if ( isset( $_COOKIE['bp-activity-scope'] ) && 'following' === $_COOKIE['bp-activity-scope'] ) {
+			$set = true;
+		}
+
+	// user's activity following page
+	} elseif ( bp_is_user_activity() && bp_is_current_action( 'following' ) ) {
+		$set = true;
+	}
+
+	// not on a user page? stop now!
+	if ( ! $set ) {
+		return $qs;
+	}
 
 	// set internal marker noting that our activity scope is applied
 	$bp->follow->activity_scope_set = 1;
 
-	$user_id = bp_displayed_user_id() ? bp_displayed_user_id() : bp_loggedin_user_id();
+	$qs = wp_parse_args( $qs );
 
-	$following_ids = bp_get_following_ids( array( 'user_id' => $user_id ) );
+	$following_ids = bp_get_following_ids( array(
+		'user_id' => bp_displayed_user_id() ? bp_displayed_user_id() : bp_loggedin_user_id(),
+	) );
 
 	// if $following_ids is empty, pass a negative number so no activity can be found
 	$following_ids = empty( $following_ids ) ? -1 : $following_ids;
 
-	$qs .= '&user_id=' . $following_ids;
+	$qs['user_id'] = $following_ids;
 
-	return apply_filters( 'bp_follow_add_activity_scope_filter', $qs, $filter );
+	return apply_filters( 'bp_follow_add_activity_scope_filter', $qs, false );
 }
-add_filter( 'bp_dtheme_ajax_querystring',       'bp_follow_add_activity_scope_filter', 10, 4 );
-add_filter( 'bp_legacy_theme_ajax_querystring', 'bp_follow_add_activity_scope_filter', 10, 4 );
+add_filter( 'bp_ajax_querystring', 'bp_follow_add_activity_scope_filter', 20, 2 );
 
 /**
  * Filter the members loop on a follow page.
