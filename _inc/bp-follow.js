@@ -39,6 +39,7 @@ jq( function() {
 		jq.post( ajaxurl, {
 			action: 'bp_' + action,
 			'uid': uid,
+			'link_class': link.attr( 'class' ),
 			'_wpnonce': nonce
 		},
 		function(response) {

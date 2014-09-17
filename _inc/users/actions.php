@@ -139,23 +139,27 @@ function bp_follow_ajax_action_start() {
 
 	check_admin_referer( 'start_following' );
 
+	$link_class = ! empty( $_POST['link_class'] ) ? str_replace( 'follow ', '', $_POST['link_class'] ) : false;
+
 	// successful follow
 	if ( bp_follow_start_following( array( 'leader_id' => $_POST['uid'], 'follower_id' => bp_loggedin_user_id() ) ) ) {
 		// output unfollow button
 		$output = bp_follow_get_add_follow_button( array(
 			'leader_id'   => $_POST['uid'],
 			'follower_id' => bp_loggedin_user_id(),
-			'wrapper'     => false
+			'wrapper'     => false,
+			'link_class'  => $link_class
 		) );
 
 	// failed follow
 	} else {
 		// output fallback invalid button
 		$args = array(
-			'id'        => 'invalid',
-			'link_href' => 'javascript:;',
-			'component' => 'follow',
-			'wrapper'   => false
+			'id'         => 'invalid',
+			'link_href'  => 'javascript:;',
+			'component'  => 'follow',
+			'wrapper'    => false,
+			'link_class' => $link_class
 		);
 
 		if ( bp_follow_is_following( array( 'leader_id' => $_POST['uid'], 'follower_id' => bp_loggedin_user_id() ) ) ) {
@@ -188,23 +192,27 @@ function bp_follow_ajax_action_stop() {
 
 	check_admin_referer( 'stop_following' );
 
+	$link_class = ! empty( $_POST['link_class'] ) ? str_replace( 'unfollow ', '', $_POST['link_class'] ) : false;
+
 	// successful unfollow
 	if ( bp_follow_stop_following( array( 'leader_id' => $_POST['uid'], 'follower_id' => bp_loggedin_user_id() ) ) ) {
 		// output follow button
 		$output = bp_follow_get_add_follow_button( array(
 			'leader_id'   => $_POST['uid'],
 			'follower_id' => bp_loggedin_user_id(),
-			'wrapper'     => false
+			'wrapper'     => false,
+			'link_class'  => $link_class
 		) );
 
 	// failed unfollow
 	} else {
 		// output fallback invalid button
 		$args = array(
-			'id'        => 'invalid',
-			'link_href' => 'javascript:;',
-			'component' => 'follow',
-			'wrapper'   => false
+			'id'         => 'invalid',
+			'link_href'  => 'javascript:;',
+			'component'  => 'follow',
+			'wrapper'    => false,
+			'link_class' => $link_class
 		);
 
 		if ( ! bp_follow_is_following( array( 'leader_id' => $_POST['uid'], 'follower_id' => bp_loggedin_user_id() ) ) ) {
