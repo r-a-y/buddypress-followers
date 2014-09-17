@@ -290,7 +290,7 @@ function bp_follow_new_follow_email_notification( $args = '' ) {
 	$has_notified[] = $r['leader_id'];
 	bp_update_user_meta( $r['follower_id'], 'bp_follow_has_notified', $has_notified );
 
-	$follower_name = wp_specialchars_decode( bp_core_get_user_displayname( $r['follower_id'] ) );
+	$follower_name = wp_specialchars_decode( bp_core_get_user_displayname( $r['follower_id'] ), ENT_QUOTES );
 	$follower_link = bp_core_get_user_domain( $r['follower_id'] ) . '?bpf_read';
 
 	$leader_ud = bp_core_get_core_userdata( $r['leader_id'] );
@@ -318,7 +318,7 @@ To disable these notifications please log in and go to:
 	// Send the message
 	$to      = apply_filters( 'bp_follow_notification_to', $to );
 	$subject = apply_filters( 'bp_follow_notification_subject', $subject, $follower_name );
-	$message = apply_filters( 'bp_follow_notification_message', wp_specialchars_decode( $message ), $follower_name, $follower_link );
+	$message = apply_filters( 'bp_follow_notification_message', wp_specialchars_decode( $message, ENT_QUOTES ), $follower_name, $follower_link );
 
 	wp_mail( $to, $subject, $message );
 }
