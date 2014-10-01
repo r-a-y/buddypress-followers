@@ -254,7 +254,7 @@ class BP_Follow_Blogs {
 		if ( !empty( $_POST['cookie'] ) ) {
 			$_POST['cookie'] .= "%3B%20bp-activity-scope%3D{$scope}";
 		} else {
-			$_POST['cookie'] .= "bp-activity-scope%3D{$scope}";
+			$_POST['cookie'] = "bp-activity-scope%3D{$scope}";
 		}
 
 		// set the activity scope by faking an ajax request (loophole!)
@@ -296,7 +296,7 @@ class BP_Follow_Blogs {
 			$r['scope'] = 'following';
 		}
 
-		if ( 'following' !== $r['scope'] ) {
+		if ( empty( $r['scope'] ) || 'following' !== $r['scope'] ) {
 			return $qs;
 		}
 
