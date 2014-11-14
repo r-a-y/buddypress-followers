@@ -108,11 +108,17 @@ class BP_Follow {
 			// Run the query
 			$data = $wpdb->get_results( $sql );
 
-			// Set cache on successful fetch
+			// Got a match; grab the results
 			if ( ! empty( $data ) ) {
 				$data = $data[0];
-				wp_cache_set( $key, $data, 'bp_follow_data' );
+
+			// No match; set cache to zero to prevent further hits to database
+			} else {
+				$data = 0;
 			}
+
+			// Set the cache
+			wp_cache_set( $key, $data, 'bp_follow_data' );
 		}
 
 		// Populate some other properties
