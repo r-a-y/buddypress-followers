@@ -122,6 +122,7 @@ function bp_follow_notifications_mark_follower_profile_as_read() {
 	}
 }
 add_action( 'bp_members_screen_display_profile', 'bp_follow_notifications_mark_follower_profile_as_read' );
+add_action( 'bp_activity_screen_my_activity',    'bp_follow_notifications_mark_follower_profile_as_read' );
 
 /**
  * Delete notifications when a logged-in user visits their followers page.
