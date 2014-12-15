@@ -14,7 +14,7 @@ class BP_Follow_Test_Blogs extends BP_UnitTestCase {
 		}
 
 		// create user and blog
-		$u = $this->create_user();
+		$u = $this->factory->user->create();
 		$b = $this->factory->blog->create( array(
 			'title' => 'The Foo Bar Blog',
 			'user_id' => $u,
@@ -56,7 +56,7 @@ class BP_Follow_Test_Blogs extends BP_UnitTestCase {
 
 		// save the current user and override logged-in user
 		$old_user = get_current_user_id();
-		$u  = $this->create_user();
+		$u = $this->factory->user->create();
 		$this->set_current_user( $u );
 
 		// create some blogs
