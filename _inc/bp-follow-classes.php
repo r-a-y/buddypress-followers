@@ -347,4 +347,17 @@ class BP_Follow {
 
 		$wpdb->query( $wpdb->prepare( "DELETE FROM {$bp->follow->table_name} WHERE leader_id = %d OR follower_id = %d AND follow_type = ''", $user_id, $user_id ) );
 	}
+
+	/**
+	 * Deletes all follow relationships for a given blog.
+	 *
+	 * @since 1.3.0
+	 *
+	 * @param int $blog_id The blog ID
+	 */
+	public static function delete_all_for_blog( $blog_id = 0 ) {
+		global $bp, $wpdb;
+
+		$wpdb->query( $wpdb->prepare( "DELETE FROM {$bp->follow->table_name} WHERE leader_id = %d AND follow_type = 'blogs'", $blog_id ) );
+	}
 }

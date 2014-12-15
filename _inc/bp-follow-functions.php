@@ -213,6 +213,24 @@ add_action( 'delete_user',	'bp_follow_remove_data' );
 add_action( 'make_spam_user',	'bp_follow_remove_data' );
 
 /**
+ * Removes follow relationships for all users from a blog which is deleted or spammed
+ *
+ * @since 1.3.0
+ *
+ * @uses BP_Follow::delete_all_for_user() Deletes user ID from all following / follower records
+ *
+ * @param int $blog_id The numeric ID of the blog
+ */
+function bp_follow_blog_deleted( $blog_id, $drop = false ) {
+	do_action( 'bp_follow_before_blog_deleted', $blog_id );
+
+	BP_Follow::delete_all_for_blog( $blog_id );
+
+	do_action( 'bp_follow_blog_deleted', $blog_id );
+}
+add_action( 'delete_blog', 'bp_follow_blog_deleted', 10, 1 );
+
+/**
  * Is an AJAX request currently taking place?
  *
  * Since BP Follow still supports BP 1.5, we can't simply use the DOING_AJAX
