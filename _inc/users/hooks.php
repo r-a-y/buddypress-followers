@@ -851,7 +851,7 @@ function bp_follow_no_activity_text( $translated_text, $untranslated_text ) {
 			if ( $follow_counts['following'] ) {
 				return __( "You are following some users, but they haven't posted yet.", 'bp-follow' );
 			} else {
-				return __( "You are not following anyone yet.", 'bp-lists' );
+				return __( "You are not following anyone yet.", 'bp-follow' );
 			}
 		} else {
 			$follow_counts = bp_follow_total_follow_counts( array(
