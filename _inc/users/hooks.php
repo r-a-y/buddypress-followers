@@ -543,63 +543,69 @@ add_action( 'bp_pre_user_query_construct', 'bp_follow_pre_user_query' );
 /** AJAX MANIPULATION ****************************************************/
 
 /**
- * Filter the activity loop when we're on a "Following" page
+ * Set up activity arguments for use with the 'following' scope.
  *
- * This is done:
- *   - On the activity directory and clicking on the "Following" tab
- *   - On a user's "Activity > Following" page
+ * For details on the syntax, see {@link BP_Activity_Query}.
  *
- * @since 1.0.0
+ * Only applicable to BuddyPress 2.2+.  Older BP installs uses the code
+ * available in /backpat/activity-scope.php.
  *
- * @param string|array Current activity querystring
- * @param string $object The current object or component
+ * @since 1.3.0
+ *
+ * @param array $retval Empty array by default
+ * @param array $filter Current activity arguments
  * @return array
  */
-function bp_follow_add_activity_scope_filter( $qs, $object ) {
-	global $bp;
-
-	// not on the activity object? stop now!
-	if ( $object != 'activity' ) {
-		return $qs;
+function bp_follow_users_filter_activity_scope( $retval = array(), $filter = array() ) {
+	// Determine the user_id
+	if ( ! empty( $filter['user_id'] ) ) {
+		$user_id = $filter['user_id'];
+	} else {
+		$user_id = bp_displayed_user_id()
+			? bp_displayed_user_id()
+			: bp_loggedin_user_id();
 	}
 
-	$set = false;
-
-	// activity directory
-	// can't use bp_is_activity_directory() yet since that's a BP 2.0 function
-	if ( ! bp_displayed_user_id() && bp_is_activity_component() && ! bp_current_action() ) {
-		// check if activity scope is following before manipulating
-		if ( isset( $_COOKIE['bp-activity-scope'] ) && 'following' === $_COOKIE['bp-activity-scope'] ) {
-			$set = true;
-		}
-
-	// user's activity following page
-	} elseif ( bp_is_user_activity() && bp_is_current_action( 'following' ) ) {
-		$set = true;
+	// Determine friends of user
+	$following_ids = bp_follow_get_following( array( 'user_id' => $user_id ) );
+	if ( empty( $following_ids ) ) {
+		$following_ids = array( 0 );
 	}
 
-	// not on a user page? stop now!
-	if ( ! $set ) {
-		return $qs;
-	}
+	/**
+	 * Since BP Follow supports down to BP 1.5, BP 1.5 lacks the third parameter
+	 * for the 'bp_has_activities' filter. So we must resort to this to mark that
+	 * our 'following' scope is in effect
+	 *
+	 * Primarily used to alter the 'no activity found' text.
+	 */
+	buddypress()->follow->activity_scope_set = 1;
 
-	// set internal marker noting that our activity scope is applied
-	$bp->follow->activity_scope_set = 1;
+	$retval = array(
+		'relation' => 'AND',
+		array(
+			'column'  => 'user_id',
+			'compare' => 'IN',
+			'value'   => (array) $following_ids
+		),
 
-	$qs = wp_parse_args( $qs );
+		// we should only be able to view sitewide activity content for those the user
+		// is following
+		array(
+			'column' => 'hide_sitewide',
+			'value'  => 0
+		),
 
-	$following_ids = bp_get_following_ids( array(
-		'user_id' => bp_displayed_user_id() ? bp_displayed_user_id() : bp_loggedin_user_id(),
-	) );
+		// overrides
+		'override' => array(
+			'filter'      => array( 'user_id' => 0 ),
+			'show_hidden' => true
+		),
+	);
 
-	// if $following_ids is empty, pass a negative number so no activity can be found
-	$following_ids = empty( $following_ids ) ? -1 : $following_ids;
-
-	$qs['user_id'] = $following_ids;
-
-	return apply_filters( 'bp_follow_add_activity_scope_filter', $qs, false );
+	return $retval;
 }
-add_filter( 'bp_ajax_querystring', 'bp_follow_add_activity_scope_filter', 20, 2 );
+add_filter( 'bp_activity_set_following_scope_args', 'bp_follow_users_filter_activity_scope', 10, 2 );
 
 /**
  * Filter the members loop on a follow page.
@@ -719,55 +725,6 @@ function bp_follow_set_members_scope_default() {
 	}
 }
 add_action( 'bp_screens', 'bp_follow_set_members_scope_default' );
-
-/**
- * On a user's "Activity > Following" page, set the activity scope to
- * "following".
- *
- * Unfortunately for 3rd-party components, this is the only way to set the
- * scope in {@link bp_dtheme_ajax_querystring()} due to the way that function
- * handles cookies.
- *
- * Yes, this is considered a hack, or more appropriately, a loophole!
- *
- * @author r-a-y
- * @since 1.1.1
- */
-function bp_follow_set_activity_following_scope() {
-	// set the activity scope to 'following' by faking an ajax request (loophole!)
-	$_POST['cookie'] = 'bp-activity-scope%3Dfollowing%3B%20bp-activity-filter%3D-1';
-
-	// reset the dropdown menu to 'Everything'
-	@setcookie( 'bp-activity-filter', '-1', 0, '/' );
-}
-add_action( 'bp_activity_screen_following', 'bp_follow_set_activity_following_scope' );
-
-/**
- * On a user's "Activity > Following" screen, set the activity scope to
- * "following" during AJAX requests ("Load More" button or via activity
- * dropdown filter menu).
- *
- * Unfortunately for 3rd-party components, this is the only way to set the
- * scope in {@link bp_dtheme_ajax_querystring()} due to the way that function
- * handles cookies.
- *
- * Yes, this is considered a hack, or more appropriately, a loophole!
- *
- * @author r-a-y
- * @since 1.1.1
- */
-function bp_follow_set_activity_following_scope_on_ajax() {
-
-	// set the activity scope to 'following'
-	if ( bp_is_current_action( 'following' ) && bp_follow_is_doing_ajax() ) {
-		// if we have a post value already, let's add our scope to the existing cookie value
-		if ( !empty( $_POST['cookie'] ) )
-			$_POST['cookie'] .= '%3B%20bp-activity-scope%3Dfollowing';
-		else
-			$_POST['cookie'] .= 'bp-activity-scope%3Dfollowing';
-	}
-}
-add_action( 'bp_before_activity_loop', 'bp_follow_set_activity_following_scope_on_ajax' );
 
 /**
  * Sets the "RSS" feed URL for the tab on the Sitewide Activity page.
