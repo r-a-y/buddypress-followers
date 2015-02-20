@@ -86,7 +86,7 @@ class BP_Follow_Component extends BP_Component {
 
 		// blogs module - on multisite and BP 2.0+ only
 		if ( function_exists( 'bp_add_option' ) && bp_is_active( 'blogs' ) && is_multisite() && bp_is_network_activated() && apply_filters( 'bp_follow_enable_blogs', true ) ) {
-			require( $this->path . '/modules/blogs.php' );		
+			require( $this->path . '/modules/blogs.php' );
 		}
 
 		// updater
