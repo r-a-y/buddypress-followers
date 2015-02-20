@@ -1,6 +1,6 @@
 <?php
 /**
- * Backwards compatibililty functions for < BP 1.7.
+ * Template stack backwards compatibililty functions for < BP 1.7.
  *
  * @author r-a-y
  * @package BP-Follow

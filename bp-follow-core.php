@@ -62,12 +62,15 @@ class BP_Follow_Component extends BP_Component {
 	 */
 	public function includes( $includes = array() ) {
 
-		// Backpat functions for BP < 1.7
+		/**  Backwards-compatibility ******************************************/
+
+		// template stack for BP < 1.7
 		if ( ! class_exists( 'BP_Theme_Compat' ) ) {
-			require( $this->path . '/bp-follow-backpat.php' );
+			require( $this->path . '/backpat/template-stack.php' );
 		}
 
-		// core
+
+		/** Core **************************************************************/
 		require( $this->path . '/bp-follow-classes.php' );
 		require( $this->path . '/bp-follow-functions.php' );
 
