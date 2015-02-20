@@ -69,6 +69,10 @@ class BP_Follow_Component extends BP_Component {
 			require( $this->path . '/backpat/template-stack.php' );
 		}
 
+		// activity scope for BP < 2.2
+		if ( ! class_exists( 'BP_Activity_Query' ) ) {
+			require( $this->path . '/backpat/activity-scope.php' );
+		}
 
 		/** Core **************************************************************/
 		require( $this->path . '/bp-follow-classes.php' );
