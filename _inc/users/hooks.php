@@ -429,7 +429,7 @@ add_action( 'make_spam_user',	'bp_follow_remove_data' );
 /**
  * Clear cache when a user follows / unfollows another user.
  *
- * @since BuddyPress (1.3.0)
+ * @since 1.3.0
  *
  * @param BP_Follow $follow
  */
@@ -449,7 +449,7 @@ add_action( 'bp_follow_stop_following',  'bp_follow_clear_cache_on_follow' );
 /**
  * Clear follow cache when a user is deleted.
  *
- * @since BuddyPress (1.3.0)
+ * @since 1.3.0
  *
  * @param int $user_id The ID of the user being deleted
  */
