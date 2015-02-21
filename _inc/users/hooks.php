@@ -186,11 +186,13 @@ add_action( 'bp_activity_admin_nav', 'bp_follow_user_activity_admin_nav_toolbar'
  */
 function bp_follow_group_buddybar_items() {
 	// don't do this if we're using the WP Admin Bar / Toolbar
-	if ( defined( 'BP_USE_WP_ADMIN_BAR' ) && BP_USE_WP_ADMIN_BAR )
+	if ( defined( 'BP_USE_WP_ADMIN_BAR' ) && BP_USE_WP_ADMIN_BAR ) {
 		return;
+	}
 
-	if ( ! bp_loggedin_user_id() )
+	if ( ! bp_loggedin_user_id() ) {
 		return;
+	}
 
 	global $bp;
 
@@ -265,30 +267,35 @@ function bp_follow_group_buddybar_items() {
 function bp_follow_inject_member_follow_status( $has_members ) {
 	global $members_template;
 
-	if ( empty( $has_members ) )
+	if ( empty( $has_members ) ) {
 		return $has_members;
+	}
 
 	$user_ids = array();
 
-	foreach( (array)$members_template->members as $i => $member ) {
-		if ( $member->id != bp_loggedin_user_id() )
+	foreach( (array) $members_template->members as $i => $member ) {
+		if ( $member->id != bp_loggedin_user_id() ) {
 			$user_ids[] = $member->id;
+		}
 
 		$members_template->members[$i]->is_following = false;
 	}
 
-	if ( empty( $user_ids ) )
+	if ( empty( $user_ids ) ) {
 		return $has_members;
+	}
 
 	$following = BP_Follow::bulk_check_follow_status( $user_ids );
 
-	if ( empty( $following ) )
+	if ( empty( $following ) ) {
 		return $has_members;
+	}
 
-	foreach( (array)$following as $is_following ) {
-		foreach( (array)$members_template->members as $i => $member ) {
-			if ( $is_following->leader_id == $member->id )
+	foreach( (array) $following as $is_following ) {
+		foreach( (array) $members_template->members as $i => $member ) {
+			if ( $is_following->leader_id == $member->id ) {
 				$members_template->members[$i]->is_following = true;
+			}
 		}
 	}
 
@@ -318,30 +325,35 @@ add_filter( 'bp_has_members', 'bp_follow_inject_member_follow_status' );
 function bp_follow_inject_group_member_follow_status( $has_members ) {
 	global $members_template;
 
-	if ( empty( $has_members ) )
+	if ( empty( $has_members ) ) {
 		return $has_members;
+	}
 
 	$user_ids = array();
 
-	foreach( (array)$members_template->members as $i => $member ) {
-		if ( $member->user_id != bp_loggedin_user_id() )
+	foreach( (array) $members_template->members as $i => $member ) {
+		if ( $member->user_id != bp_loggedin_user_id() ) {
 			$user_ids[] = $member->user_id;
+		}
 
 		$members_template->members[$i]->is_following = false;
 	}
 
-	if ( empty( $user_ids ) )
+	if ( empty( $user_ids ) ) {
 		return $has_members;
+	}
 
 	$following = BP_Follow::bulk_check_follow_status( $user_ids );
 
-	if ( empty( $following ) )
+	if ( empty( $following ) ) {
 		return $has_members;
+	}
 
-	foreach( (array)$following as $is_following ) {
-		foreach( (array)$members_template->members as $i => $member ) {
-			if ( $is_following->leader_id == $member->user_id )
+	foreach( (array) $following as $is_following ) {
+		foreach( (array) $members_template->members as $i => $member ) {
+			if ( $is_following->leader_id == $member->user_id ) {
 				$members_template->members[$i]->is_following = true;
+			}
 		}
 	}
 
@@ -379,8 +391,9 @@ add_action( 'bp_member_header_actions', 'bp_follow_add_profile_follow_button' );
 function bp_follow_add_listing_follow_button() {
 	global $members_template;
 
-	if ( $members_template->member->id == bp_loggedin_user_id() )
-		return false;
+	if ( $members_template->member->id == bp_loggedin_user_id() ) {
+		return;
+	}
 
 	bp_follow_add_follow_button( 'leader_id=' . $members_template->member->id );
 }
@@ -399,8 +412,9 @@ add_action( 'bp_directory_members_actions', 'bp_follow_add_listing_follow_button
 function bp_follow_add_group_member_follow_button() {
 	global $members_template;
 
-	if ( $members_template->member->user_id == bp_loggedin_user_id() || !bp_loggedin_user_id() )
-		return false;
+	if ( $members_template->member->user_id == bp_loggedin_user_id() || ! bp_loggedin_user_id() ) {
+		return;
+	}
 
 	bp_follow_add_follow_button( 'leader_id=' . $members_template->member->user_id );
 }
@@ -488,10 +502,14 @@ function bp_follow_add_activity_tab() {
 
 	$counts = bp_follow_total_follow_counts( array( 'user_id' => bp_loggedin_user_id() ) );
 
-	if ( empty( $counts['following'] ) )
-		return false;
-	?>
-	<li id="activity-following"><a href="<?php echo bp_loggedin_user_domain() . BP_ACTIVITY_SLUG . '/' . BP_FOLLOWING_SLUG . '/' ?>" title="<?php _e( 'The public activity for everyone you are following on this site.', 'bp-follow' ) ?>"><?php printf( __( 'Following <span>%d</span>', 'bp-follow' ), (int)$counts['following'] ) ?></a></li><?php
+	if ( empty( $counts['following'] ) ) {
+		return;
+	}
+?>
+
+	<li id="activity-following"><a href="<?php echo bp_loggedin_user_domain() . BP_ACTIVITY_SLUG . '/' . BP_FOLLOWING_SLUG . '/' ?>" title="<?php _e( 'The public activity for everyone you are following on this site.', 'bp-follow' ) ?>"><?php printf( __( 'Following <span>%d</span>', 'bp-follow' ), (int)$counts['following'] ) ?></a></li>
+
+<?php
 }
 add_action( 'bp_before_activity_type_tab_friends', 'bp_follow_add_activity_tab' );
 
@@ -511,10 +529,14 @@ function bp_follow_add_following_tab() {
 
 	$counts = bp_follow_total_follow_counts( array( 'user_id' => bp_loggedin_user_id() ) );
 
-	if ( empty( $counts['following'] ) )
+	if ( empty( $counts['following'] ) ) {
 		return false;
-	?>
-	<li id="members-following"><a href="<?php echo bp_loggedin_user_domain() . BP_FOLLOWING_SLUG ?>"><?php printf( __( 'Following <span>%d</span>', 'bp-follow' ), $counts['following'] ) ?></a></li><?php
+	}
+?>
+
+	<li id="members-following"><a href="<?php echo bp_loggedin_user_domain() . BP_FOLLOWING_SLUG ?>"><?php printf( __( 'Following <span>%d</span>', 'bp-follow' ), $counts['following'] ) ?></a></li>
+
+<?php
 }
 add_action( 'bp_members_directory_member_types', 'bp_follow_add_following_tab' );
 
