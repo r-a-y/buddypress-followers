@@ -24,6 +24,9 @@ class BP_Follow_Blogs {
 	 * Constructor.
 	 */
 	public function __construct() {
+		// includes
+		$this->includes();
+
 		// component hooks
 		add_action( 'bp_follow_setup_globals', array( $this, 'constants' ) );
 		add_action( 'bp_follow_setup_globals', array( $this, 'setup_global_cachegroups' ) );
@@ -40,12 +43,9 @@ class BP_Follow_Blogs {
 		add_action( 'bp_before_activity_type_tab_favorites', array( $this, 'add_activity_directory_tab' ) );
 		add_action( 'bp_blogs_directory_blog_types',         array( $this, 'add_blog_directory_tab' ) );
 
-		// activity scope setting
-		add_action( 'bp_before_activity_loop',  array( $this, 'set_activity_scope_on_user_activity' ) );
-
 		// loop filtering
+		add_filter( 'bp_activity_set_followblogs_scope_args', array( $this, 'filter_activity_scope' ), 10, 2 );
 		add_filter( 'bp_ajax_querystring', array( $this, 'add_blogs_scope_filter' ),    20, 2 );
-		add_filter( 'bp_ajax_querystring', array( $this, 'add_activity_scope_filter' ), 20, 2 );
 		add_filter( 'bp_has_blogs',        array( $this, 'bulk_inject_blog_follow_status' ) );
 
 		// button injection
@@ -64,6 +64,15 @@ class BP_Follow_Blogs {
 		add_filter( 'bp_get_sitewide_activity_feed_link', array( $this, 'activity_feed_url' ) );
 		add_filter( 'bp_dtheme_activity_feed_url',        array( $this, 'activity_feed_url' ) );
 		add_filter( 'bp_legacy_theme_activity_feed_url',  array( $this, 'activity_feed_url' ) );
+	}
+
+	/**
+	 * Includes.
+	 */
+	protected function includes() {
+		if ( ! class_exists( 'BP_Activity_Query' ) ) {
+			require( buddypress()->follow->path . '/modules/blogs-backpat.php' );
+		}
 	}
 
 	/**
@@ -254,38 +263,126 @@ class BP_Follow_Blogs {
 		<li id="blogs-following"><a href="<?php echo esc_url( bp_loggedin_user_domain() . bp_get_blogs_slug() . '/' . constant( 'BP_FOLLOW_BLOGS_USER_FOLLOWING_SLUG' ). '/' ); ?>"><?php printf( __( 'Following <span>%d</span>', 'bp-follow' ), (int) $counts['following'] ) ?></a></li><?php
 	}
 
-	/** ACTIVITY SCOPE ************************************************/
+	/** LOOP-FILTERING ************************************************/
 
 	/**
-	 * Set activity scope on a user's "Activity > Followed Sites" page
+	 * Set up activity arguments for use with the 'followblogs' scope.
+	 *
+	 * For details on the syntax, see {@link BP_Activity_Query}.
+	 *
+	 * Only applicable to BuddyPress 2.2+.  Older BP installs uses the code
+	 * available in /modules/blogs-backpat.php.
+	 *
+	 * @since 1.3.0
+	 *
+	 * @param array $retval Empty array by default
+	 * @param array $filter Current activity arguments
+	 * @return array
 	 */
-	function set_activity_scope_on_user_activity() {
-		if ( ! bp_is_current_action( constant( 'BP_FOLLOW_BLOGS_USER_ACTIVITY_SLUG' ) ) ) {
-			return;
-		}
-
-		$scope = 'followblogs';
-
-		// if we have a post value already, let's add our scope to the existing cookie value
-		if ( !empty( $_POST['cookie'] ) ) {
-			$_POST['cookie'] .= "%3B%20bp-activity-scope%3D{$scope}";
+	function filter_activity_scope( $retval = array(), $filter = array() ) {
+		// Determine the user_id
+		if ( ! empty( $filter['user_id'] ) ) {
+			$user_id = $filter['user_id'];
 		} else {
-			$_POST['cookie'] = "bp-activity-scope%3D{$scope}";
+			$user_id = bp_displayed_user_id()
+				? bp_displayed_user_id()
+				: bp_loggedin_user_id();
 		}
 
-		// set the activity scope by faking an ajax request (loophole!)
-		if ( ! defined( 'DOING_AJAX' ) ) {
-			$_POST['cookie'] .= "%3B%20bp-activity-filter%3D-1";
-
-			// reset the selected tab
-			@setcookie( 'bp-activity-scope',  $scope, 0, '/' );
-
-			//reset the dropdown menu to 'Everything'
-			@setcookie( 'bp-activity-filter', '-1',   0, '/' );
+		// Get blogs that the user is following
+		$following_ids = bp_follow_get_following( array(
+			'user_id'     => $user_id,
+			'follow_type' => 'blogs',
+		) );
+		if ( empty( $following_ids ) ) {
+			$following_ids = array( 0 );
 		}
+
+		// Should we show all items regardless of sitewide visibility?
+		$show_hidden = array();
+		if ( ! empty( $user_id ) && ( $user_id !== bp_loggedin_user_id() ) ) {
+			$show_hidden = array(
+				'column' => 'hide_sitewide',
+				'value'  => 0
+			);
+		}
+
+		// support BP Groupblog
+		if ( function_exists( 'bp_groupblog_init' ) && $following_ids !== array( 0 ) ) {
+			global $wpdb;
+
+			$bp = buddypress();
+
+			// comma-delimit the blog IDs
+			$delimited_ids = implode( ',', $following_ids );
+			$group_ids_connected_to_blogs = $wpdb->get_col( "SELECT group_id FROM {$bp->groups->table_name_groupmeta} WHERE meta_key = 'groupblog_blog_id' AND meta_value IN ( " . $delimited_ids . " )" );
+
+			$clause = array(
+				'relation' => 'OR',
+
+				// general blog activity items
+				array(
+					'relation' => 'AND',
+					array(
+						'column' => 'component',
+						'value'  => buddypress()->blogs->id
+					),
+					array(
+						'column'  => 'item_id',
+						'compare' => 'IN',
+						'value'   => (array) $following_ids
+					),
+				),
+
+				// groupblog posts
+				array(
+					'relation' => 'AND',
+					array(
+						'column' => 'component',
+						'value'  => buddypress()->groups->id
+					),
+					array(
+						'column'  => 'item_id',
+						'compare' => 'IN',
+						'value'   => (array) $group_ids_connected_to_blogs
+					),
+					array(
+						'column'  => 'type',
+						'value'   => 'new_groupblog_post'
+					),
+				),
+			);
+
+		// Regular follow blog clause
+		} else {
+			$clause = array(
+				'relation' => 'AND',
+				array(
+					'column' => 'component',
+					'value'  => buddypress()->blogs->id
+				),
+				array(
+					'column'  => 'item_id',
+					'compare' => 'IN',
+					'value'   => (array) $following_ids
+				),
+			);
+		}
+
+		$retval = array(
+			'relation' => 'AND',
+			$clause,
+			$show_hidden,
+
+			// overrides
+			'override' => array(
+				'filter'      => array( 'user_id' => 0 ),
+				'show_hidden' => true
+			),
+		);
+
+		return $retval;
 	}
-
-	/** LOOP-FILTERING ************************************************/
 
 	/**
 	 * Filter the blogs loop.
@@ -340,96 +437,6 @@ class BP_Follow_Blogs {
 		$qs .= build_query( $args );
 
 		return $qs;
-	}
-
-	/**
-	 * Filter the activity loop.
-	 *
-	 * Specifically, when on the activity directory and clicking on the "Followed
-	 * Sites" tab.
-	 *
-	 * @param str $qs The querystring for the BP loop
-	 * @param str $object The current object for the querystring
-	 * @return str Modified querystring
-	 */
-	function add_activity_scope_filter( $qs, $object ) {
-		// not on the blogs object? stop now!
-		if ( $object != 'activity' ) {
-			return $qs;
-		}
-
-		// parse querystring into an array
-		$r = wp_parse_args( $qs );
-
-		if ( bp_is_current_action( constant( 'BP_FOLLOW_BLOGS_USER_ACTIVITY_SLUG' ) ) ) {
-			$r['scope'] = 'followblogs';
-		}
-
-		if ( ! isset( $r['scope'] ) ) {
-			return $qs;
-		}
-
-		if ( 'followblogs' !== $r['scope'] ) {
-			return $qs;
-		}
-
-		// get blog IDs that the user is following
-		$following_ids = bp_get_following_ids( array(
-			'user_id'     => bp_displayed_user_id() ? bp_displayed_user_id() : bp_loggedin_user_id(),
-			'follow_type' => 'blogs',
-		) );
-
-		// if $following_ids is empty, pass a negative number so no blogs can be found
-		$following_ids = empty( $following_ids ) ? -1 : $following_ids;
-
-		$args = array(
-			'user_id'    => 0,
-			'object'     => 'blogs',
-			'primary_id' => $following_ids,
-		);
-
-		// make sure we add a separator if we have an existing querystring
-		if ( ! empty( $qs ) ) {
-			$qs .= '&';
-		}
-
-		// add our follow parameters to the end of the querystring
-		$qs .= build_query( $args );
-
-		// support BP Groupblog
-		// We need to filter the WHERE SQL conditions to do this
-		if ( function_exists( 'bp_groupblog_init' ) ) {
-			add_filter( 'bp_activity_get_where_conditions', array( $this, 'groupblog_activity_where_conditions' ), 10, 2 );
-		}
-
-		return $qs;
-	}
-
-	/**
-	 * Filter the activity WHERE SQL conditions to support groupblog entries.
-	 *
-	 * @param array $retval Current MySQL WHERE conditions
-	 * @param array $r Current activity get arguments
-	 * @return array
-	 */
-	public function groupblog_activity_where_conditions( $retval, $r ) {
-		global $bp;
-
-		// support heartbeat in groupblog query
-		$extra = '';
-		if ( ! empty( $r['filter']['since'] ) ) {
-			$extra = BP_Activity_Activity::get_filter_sql( array( 'since' => $r['filter']['since'] ) );
-			$extra = ' AND ' . $extra;
-		}
-
-		// For BP Groupblog, we need to grab the group IDs that are connected to blogs
-		// This is what this query is for, which will form our groupblog subquery
-		$group_ids_connected_to_blogs_subquery = "SELECT group_id FROM {$bp->groups->table_name_groupmeta} WHERE meta_key = 'groupblog_blog_id' AND meta_value IN ( " . $r['filter']['primary_id'] . " )";
-
-		$retval['filter_sql'] = "( ( {$retval['filter_sql']} ) OR ( component = 'groups' AND item_id IN ( {$group_ids_connected_to_blogs_subquery} ) AND type = 'new_groupblog_post'{$extra} ) )";
-
-		remove_filter( 'bp_activity_get_where_conditions', array( $this, 'activity_where_conditions' ), 10, 2 );
-		return $retval;
 	}
 
 	/**
