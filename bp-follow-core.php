@@ -112,6 +112,17 @@ class BP_Follow_Component extends BP_Component {
 
 		if ( ! defined( 'BP_FOLLOWING_SLUG' ) )
 			define( 'BP_FOLLOWING_SLUG', 'following' );
+		}
+
+		/**
+		 * Register other globals here since BP isn't really flexible enough to add it
+		 * in the parent::setup_globals() method
+		 */
+		// slugs; would rather do away with this, but keeping it for backpat
+		$this->followers = new stdClass;
+		$this->following = new stdClass;
+		$this->followers->slug = constant( 'BP_FOLLOWERS_SLUG' );
+		$this->following->slug = constant( 'BP_FOLLOWING_SLUG' );
 
 		// Set up the $globals array
 		$globals = array(
@@ -123,15 +134,6 @@ class BP_Follow_Component extends BP_Component {
 
 		// Let BP_Component::setup_globals() do its work.
 		parent::setup_globals( $globals );
-
-		// register other globals since BP isn't really flexible enough to add it
-		// in the setup_globals() method
-		//
-		// would rather do away with this, but keeping it for backpat
-		$bp->follow->followers = new stdClass;
-		$bp->follow->following = new stdClass;
-		$bp->follow->followers->slug = constant( 'BP_FOLLOWERS_SLUG' );
-		$bp->follow->following->slug = constant( 'BP_FOLLOWING_SLUG' );
 	}
 
 	/**
