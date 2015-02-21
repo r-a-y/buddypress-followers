@@ -1,3 +1,4 @@
+<?php
 /**
  * Blogs activity scope backwards compatibililty functions for < BP 2.2
  *
