@@ -26,6 +26,7 @@ class BP_Follow_Blogs {
 	public function __construct() {
 		// component hooks
 		add_action( 'bp_follow_setup_globals', array( $this, 'constants' ) );
+		add_action( 'bp_follow_setup_globals', array( $this, 'setup_global_cachegroups' ) );
 		add_action( 'bp_follow_setup_nav',     array( $this, 'setup_nav' ) );
 		add_action( 'bp_activity_admin_nav',   array( $this, 'activity_admin_nav' ) );
 		add_filter( 'bp_blogs_admin_nav',      array( $this, 'blogs_admin_nav' ) );
@@ -78,6 +79,21 @@ class BP_Follow_Blogs {
 		if ( ! defined( 'BP_FOLLOW_BLOGS_USER_ACTIVITY_SLUG' ) ) {
 			define( 'BP_FOLLOW_BLOGS_USER_ACTIVITY_SLUG', 'followblogs' );
 		}
+	}
+
+	/**
+	 * Set up global cachegroups.
+	 */
+	public function setup_global_cachegroups() {
+		$bp = buddypress();
+
+		// blog counts
+		$bp->follow->global_cachegroups[] = 'bp_follow_followers_blogs_count';
+		$bp->follow->global_cachegroups[] = 'bp_follow_following_blogs_count';
+
+		// blog data query
+		$bp->follow->global_cachegroups[] = 'bp_follow_followers_blogs';
+		$bp->follow->global_cachegroups[] = 'bp_follow_following_blogs';
 	}
 
 	/**

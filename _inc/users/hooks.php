@@ -423,6 +423,24 @@ add_action( 'bp_group_members_list_item_action', 'bp_follow_add_group_member_fol
 /** CACHE / DELETION ****************************************************/
 
 /**
+ * Set up global cachegroups for users module in BP Follow.
+ *
+ * @since 1.3.0
+ */
+function bp_follow_users_setup_global_cachegroups() {
+	global $bp;
+
+	// user counts
+	$bp->follow->global_cachegroups[] = 'bp_follow_followers_count';
+	$bp->follow->global_cachegroups[] = 'bp_follow_following_count';
+
+	// user data query
+	$bp->follow->global_cachegroups[] = 'bp_follow_followers';
+	$bp->follow->global_cachegroups[] = 'bp_follow_following';
+}
+add_action( 'bp_follow_setup_globals', 'bp_follow_users_setup_global_cachegroups' );
+
+/**
  * Removes follow relationships for all users from a user who is deleted or spammed
  *
  * @since 1.0.0

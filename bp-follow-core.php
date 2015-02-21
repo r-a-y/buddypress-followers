@@ -102,7 +102,7 @@ class BP_Follow_Component extends BP_Component {
 	/**
 	 * Setup globals.
 	 *
-	 * @global obj $bp BuddyPress instance
+	 * @since 1.3.0 Add 'global_cachegroups' property
 	 */
 	public function setup_globals( $args = array() ) {
 		global $bp;
@@ -120,6 +120,9 @@ class BP_Follow_Component extends BP_Component {
 		 * Register other globals here since BP isn't flexible enough to add them in
 		 * the parent::setup_globals() method
 		 */
+		// global cachegroups
+		$this->global_cachegroups = array( 'bp_follow_data' );
+
 		// slugs; would rather do away with this, but keeping it for backpat
 		$this->followers = new stdClass;
 		$this->following = new stdClass;
@@ -140,8 +143,26 @@ class BP_Follow_Component extends BP_Component {
 	 * Setup hooks.
 	 */
 	public function setup_hooks() {
+		// register global cachegroups
+		add_action( 'bp_init', array( $this, 'register_global_cachegroups' ), 5 );
+
 		// javascript hook
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ), 11 );
+	}
+
+	/**
+	 * Register global cachegroups.
+	 *
+	 * Replacement for {@link BP_Component::setup_cache_groups()}, made available in BP
+	 * 2.2.0.  That class method runs too early.  This is an alternative way to
+	 * register global cachegroups.
+	 *
+	 * @since 1.3.0
+	 *
+	 * @see BP_Follow_Component::setup_globals()
+	 */
+	public function register_global_cachegroups() {
+		wp_cache_add_global_groups( (array) $this->global_cachegroups );
 	}
 
 	/**
@@ -162,7 +183,6 @@ class BP_Follow_Component extends BP_Component {
 
 		wp_enqueue_script( 'bp-follow-js', constant( 'BP_FOLLOW_URL' ) . '_inc/bp-follow.js', array( 'jquery' ), strtotime( $this->revision_date ) );
 	}
-
 }
 
 /**
