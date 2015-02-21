@@ -342,9 +342,11 @@ class BP_Follow {
 		// do the query
 		$result = $wpdb->get_col( $sql );
 
-		// cache the count while we're at it
-		$type = ! empty( $follow_type ) ? "{$follow_type}_" : "";
-		wp_cache_set( $leader_id, $wpdb->num_rows, "bp_follow_followers_{$type}count" );
+		// if query args is empty, cache the count while we're here
+		if ( empty( $query_args ) ) {
+			$type = ! empty( $follow_type ) ? "{$follow_type}_" : "";
+			wp_cache_set( $leader_id, $wpdb->num_rows, "bp_follow_followers_{$type}count" );
+		}
 
 		return $result;
 	}
@@ -395,9 +397,11 @@ class BP_Follow {
 		// do the query
 		$result = $wpdb->get_col( $sql );
 
-		// cache the count while we're at it
-		$type = ! empty( $follow_type ) ? "{$follow_type}_" : "";
-		wp_cache_set( $user_id, $wpdb->num_rows, "bp_follow_following_{$type}count" );
+		// if query args is empty, cache the count while we're here
+		if ( empty( $query_args ) ) {
+			$type = ! empty( $follow_type ) ? "{$follow_type}_" : "";
+			wp_cache_set( $user_id, $wpdb->num_rows, "bp_follow_following_{$type}count" );
+		}
 
 		return $result;
 	}
