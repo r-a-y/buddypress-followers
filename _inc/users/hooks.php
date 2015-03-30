@@ -957,6 +957,11 @@ function bp_follow_prime_mentions_results() {
 		return;
 	}
 
+	// Bail out if the site has a ton of users.
+	if ( is_multisite() && wp_is_large_network( 'users' ) ) {
+		return;
+	}
+
 	$followers_query = new BP_User_Query( array(
 		'count_total'     => '', // Prevents total count
 		'populate_extras' => false,
