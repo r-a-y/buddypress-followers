@@ -962,7 +962,7 @@ function bp_follow_prime_mentions_results() {
 		return;
 	}
 
-	$following = bp_follow_get_following( array( 'user_id' => bp_loggedin_user_id() );
+	$following = bp_follow_get_following( array( 'user_id' => bp_loggedin_user_id() ) );
 	if ( empty( $following ) ) {
 		return;
 	}
