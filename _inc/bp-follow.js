@@ -4,8 +4,8 @@ if ( typeof jq == "undefined" ) {
 
 jq( function() {
 	var profileHeader   = jq("#item-buttons");
-	var memberLoop      = jq("#members-list");
-	var groupMemberLoop = jq("#member-list"); // groan!
+	var memberLoop      = jq("#members-list").parent();
+	var groupMemberLoop = jq("#member-list").parent();
 
 	profileHeader.on("click", ".follow-button a", function() {
 		bp_follow_button_action( jq(this), 'profile' );
