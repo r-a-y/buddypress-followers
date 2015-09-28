@@ -26,7 +26,7 @@ class BP_Follow_Following_Widget extends WP_Widget {
 		);
 
 		// Set up the widget
-		parent::WP_Widget(
+		parent::__construct(
 			false,
 			__( "(BP Follow) Users I'm Following", 'bp-follow' ),
 			$widget_ops
