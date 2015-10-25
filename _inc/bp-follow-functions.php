@@ -10,14 +10,16 @@
 if ( !defined( 'ABSPATH' ) ) exit;
 
 /**
- * Start following a user's activity.
+ * Start following an item.
  *
  * @since 1.0.0
  *
  * @param array $args {
  *     Array of arguments.
- *     @type int $leader_id The user ID of the person we want to follow.
- *     @type int $follower_id The user ID initiating the follow request.
+ *     @type int    $leader_id     The object ID we want to follow. Defaults to the displayed user ID.
+ *     @type int    $follower_id   The object ID creating the request. Defaults to the logged-in user ID.
+ *     @type string $follow_type   The follow type. Leave blank to follow users. Default: ''
+ *     @type string $date_recorded The date that this relationship is to be recorded.
  * }
  * @return bool
  */
@@ -57,14 +59,15 @@ function bp_follow_start_following( $args = '' ) {
 }
 
 /**
- * Stop following a user's activity.
+ * Stop following an item.
  *
  * @since 1.0.0
  *
  * @param array $args {
  *     Array of arguments.
- *     @type int $leader_id The user ID of the person we want to stop following.
- *     @type int $follower_id The user ID initiating the unfollow request.
+ *     @type int    $leader_id     The object ID we want to stop following. Defaults to the displayed user ID.
+ *     @type int    $follower_id   The object ID stopping the request. Defaults to the logged-in user ID.
+ *     @type string $follow_type   The follow type. Leave blank for users. Default: ''
  * }
  * @return bool
  */
@@ -92,14 +95,15 @@ function bp_follow_stop_following( $args = '' ) {
 }
 
 /**
- * Check if a user is already following another user.
+ * Check if an item is already following an item.
  *
  * @since 1.0.0
  *
  * @param array $args {
  *     Array of arguments.
- *     @type int $leader_id The user ID of the person we want to check.
- *     @type int $follower_id The user ID initiating the follow request.
+ *     @type int    $leader_id   The object ID of the item we want to check. Defaults to the displayed user ID.
+ *     @type int    $follower_id The object ID creating the request. Defaults to the logged-in user ID.
+ *     @type string $follow_type The follow type. Leave blank for users. Default: ''
  * }
  * @return bool
  */
