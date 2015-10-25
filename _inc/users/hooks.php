@@ -517,7 +517,7 @@ add_action( 'bp_follow_before_remove_data', 'bp_follow_clear_cache_on_user_delet
  */
 function bp_follow_add_activity_tab() {
 
-	$count = bp_follow_get_the_following_count( array( 'user_id' => bp_loggedin_user_id() ) );
+	$count = bp_follow_get_the_following_count();
 
 	if ( empty( $count ) ) {
 		return;
@@ -544,7 +544,7 @@ function bp_follow_add_following_tab() {
 		return;
 	}
 
-	$count = bp_follow_get_the_following_count( array( 'user_id' => bp_loggedin_user_id() ) );
+	$count = bp_follow_get_the_following_count();
 
 	if ( empty( $count ) ) {
 		return;
