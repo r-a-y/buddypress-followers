@@ -430,8 +430,8 @@ function bp_follow_users_setup_global_cachegroups() {
 	global $bp;
 
 	// user counts
-	$bp->follow->global_cachegroups[] = 'bp_follow_followers_count';
-	$bp->follow->global_cachegroups[] = 'bp_follow_following_count';
+	$bp->follow->global_cachegroups[] = 'bp_follow_user_followers_count';
+	$bp->follow->global_cachegroups[] = 'bp_follow_user_following_count';
 
 	// user data query
 	$bp->follow->global_cachegroups[] = 'bp_follow_followers';
@@ -466,10 +466,10 @@ add_action( 'make_spam_user',	'bp_follow_remove_data' );
  */
 function bp_follow_clear_cache_on_follow( BP_Follow $follow ) {
 	// clear follow cache
-	wp_cache_delete( $follow->leader_id,   'bp_follow_followers_count' );
-	wp_cache_delete( $follow->follower_id, 'bp_follow_following_count' );
-	wp_cache_delete( $follow->leader_id,   'bp_follow_followers' );
-	wp_cache_delete( $follow->follower_id, 'bp_follow_following' );
+	wp_cache_delete( $follow->leader_id,   'bp_follow_user_followers_count' );
+	wp_cache_delete( $follow->follower_id, 'bp_follow_user_following_count' );
+	wp_cache_delete( $follow->leader_id,   'bp_follow_user_followers_query' );
+	wp_cache_delete( $follow->follower_id, 'bp_follow_user_following_query' );
 
 	// clear follow relationship
 	wp_cache_delete( "{$follow->leader_id}:{$follow->follower_id}:", 'bp_follow_data' );
@@ -486,16 +486,16 @@ add_action( 'bp_follow_stop_following',  'bp_follow_clear_cache_on_follow' );
  */
 function bp_follow_clear_cache_on_user_delete( $user_id ) {
 	// delete follow cache
-	wp_cache_delete( $user_id, 'bp_follow_following_count' );
-	wp_cache_delete( $user_id, 'bp_follow_followers_count' );
-	wp_cache_delete( $user_id, 'bp_follow_following' );
-	wp_cache_delete( $user_id, 'bp_follow_followers' );
+	wp_cache_delete( $user_id, 'bp_follow_user_following_count' );
+	wp_cache_delete( $user_id, 'bp_follow_user_followers_count' );
+	wp_cache_delete( $user_id, 'bp_follow_user_following_query' );
+	wp_cache_delete( $user_id, 'bp_follow_user_followers_query' );
 
 	// delete each user's followers count that the user was following
 	$users = BP_Follow::get_following( $user_id );
 	if ( ! empty( $users ) ) {
 		foreach ( $users as $user ) {
-			wp_cache_delete( $user, 'bp_follow_followers_count' );
+			wp_cache_delete( $user, 'bp_follow_user_followers_count' );
 
 			// clear follow relationship
 			wp_cache_delete( "{$user_id}:{$user}:", 'bp_follow_data' );

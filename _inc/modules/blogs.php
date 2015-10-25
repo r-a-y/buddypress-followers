@@ -97,12 +97,12 @@ class BP_Follow_Blogs {
 		$bp = buddypress();
 
 		// blog counts
-		$bp->follow->global_cachegroups[] = 'bp_follow_followers_blogs_count';
-		$bp->follow->global_cachegroups[] = 'bp_follow_following_blogs_count';
+		$bp->follow->global_cachegroups[] = 'bp_follow_user_blogs_following_count';
+		$bp->follow->global_cachegroups[] = 'bp_follow_blogs_followers_count';
 
 		// blog data query
-		$bp->follow->global_cachegroups[] = 'bp_follow_followers_blogs';
-		$bp->follow->global_cachegroups[] = 'bp_follow_following_blogs';
+		$bp->follow->global_cachegroups[] = 'bp_follow_user_blogs_following_query';
+		$bp->follow->global_cachegroups[] = 'bp_follow_blogs_followers_query';
 	}
 
 	/**
@@ -732,14 +732,14 @@ class BP_Follow_Blogs {
 	 */
 	public function clear_cache_on_follow( BP_Follow $follow ) {
 		// clear followers count for blog
-		wp_cache_delete( $follow->leader_id,   'bp_follow_followers_blogs_count' );
+		wp_cache_delete( $follow->leader_id,   'bp_follow_blogs_followers_count' );
 
 		// clear following blogs count for user
-		wp_cache_delete( $follow->follower_id, 'bp_follow_following_blogs_count' );
+		wp_cache_delete( $follow->follower_id, 'bp_follow_user_blogs_following_count' );
 
 		// clear queried followers / following
-		wp_cache_delete( $follow->leader_id,   'bp_follow_followers_blogs' );
-		wp_cache_delete( $follow->follower_id, 'bp_follow_following_blogs' );
+		wp_cache_delete( $follow->leader_id,   'bp_follow_blogs_followers_query' );
+		wp_cache_delete( $follow->follower_id, 'bp_follow_user_blogs_following_query' );
 
 		// clear follow relationship
 		wp_cache_delete( "{$follow->leader_id}:{$follow->follower_id}:blogs", 'bp_follow_data' );
@@ -752,16 +752,16 @@ class BP_Follow_Blogs {
 	 */
 	public function clear_cache_on_user_delete( $user_id = 0 ) {
 		// delete user's blog follow count
-		wp_cache_delete( $user_id, 'bp_follow_following_blogs_count' );
+		wp_cache_delete( $user_id, 'bp_follow_user_blogs_following_count' );
 
 		// delete queried blogs that user was following
-		wp_cache_delete( $user_id, 'bp_follow_following_blogs' );
+		wp_cache_delete( $user_id, 'bp_follow_user_blogs_following_query' );
 
 		// delete each blog's followers count that the user was following
 		$blogs = BP_Follow::get_following( $user_id, 'blogs' );
 		if ( ! empty( $blogs ) ) {
 			foreach ( $blogs as $blog_id ) {
-				wp_cache_delete( $blog_id, 'bp_follow_followers_blogs_count' );
+				wp_cache_delete( $blog_id, 'bp_follow_blogs_followers_count' );
 
 				// clear follow relationship
 				wp_cache_delete( "{$blog_id}:{$user_id}:blogs", 'bp_follow_data' );
@@ -776,16 +776,16 @@ class BP_Follow_Blogs {
 	 */
 	public function clear_cache_on_blog_delete( $blog_id ) {
 		// clear followers count for blog
-		wp_cache_delete( $blog_id, 'bp_follow_followers_blogs_count' );
+		wp_cache_delete( $blog_id, 'bp_follow_blogs_followers_count' );
 
 		// clear queried followers for blog
-		wp_cache_delete( $blog_id, 'bp_follow_followers_blogs' );
+		wp_cache_delete( $blog_id, 'bp_follow_blogs_followers_query' );
 
 		// delete each user's blog following count for those that followed the blog
 		$users = BP_Follow::get_followers( $blog_id, 'blogs' );
 		if ( ! empty( $users ) ) {
 			foreach ( $users as $user ) {
-				wp_cache_delete( $user, 'bp_follow_following_blogs_count' );
+				wp_cache_delete( $user, 'bp_follow_user_blogs_following_count' );
 
 				// clear follow relationship
 				wp_cache_delete( "{$blog_id}:{$user}:blogs", 'bp_follow_data' );

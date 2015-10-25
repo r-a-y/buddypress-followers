@@ -127,7 +127,7 @@ function bp_follow_is_following( $args = '' ) {
 }
 
 /**
- * Fetch the IDs of all the followers of a particular item.
+ * Fetch the IDs for the followers of a particular item.
  *
  * @since 1.0.0
  *
@@ -142,27 +142,23 @@ function bp_follow_is_following( $args = '' ) {
  */
 function bp_follow_get_followers( $args = '' ) {
 
-	$r = wp_parse_args( $args, array(
-		'user_id'     => bp_displayed_user_id(),
-		'follow_type' => '',
-		'query_args'  => array()
-	) );
+	$r = bp_follow_get_common_args( wp_parse_args( $args, array(
+		'user_id' => bp_displayed_user_id(),
+	) ) );
 
 	$retval   = array();
 	$do_query = true;
 
-	// setup some variables based on the follow type
+	// Set up filter name
 	if ( ! empty( $r['follow_type'] ) ) {
-		$filter = 'bp_follow_get_followers_' .  $r['follow_type'];
-		$cachegroup = 'bp_follow_followers_' .  $r['follow_type'];
+		$filter = 'bp_follow_get_followers_' .  $r['object'];
 	} else {
 		$filter = 'bp_follow_get_followers';
-		$cachegroup = 'bp_follow_followers';
 	}
 
 	// check for cache if 'query_args' is empty
 	if ( empty( $r['query_args'] ) ) {
-		$retval = wp_cache_get( $r['user_id'], $cachegroup );
+		$retval = wp_cache_get( $r['object_id'], "bp_follow_{$r['object']}_followers_query" );
 
 		if ( false !== $retval ) {
 			$do_query = false;
@@ -171,19 +167,33 @@ function bp_follow_get_followers( $args = '' ) {
 
 	// query if necessary
 	if ( true === $do_query ) {
-		$retval = BP_Follow::get_followers( $r['user_id'], $r['follow_type'], $r['query_args'] );
+		$retval = BP_Follow::get_followers( $r['object_id'], $r['follow_type'], $r['query_args'] );
 
 		// cache if no extra query args - we only cache default args for now
 		if ( empty( $r['query_args'] ) ) {
-			wp_cache_set( $r['user_id'], $retval, $cachegroup );
+			wp_cache_set( $r['object_id'], $retval, "bp_follow_{$r['object']}_followers_query" );
+
+			// cache count while we're at it
+			wp_cache_set( $r['object_id'], $GLOBALS['wpdb']->num_rows, "bp_follow_{$r['object']}_followers_count" );
 		}
 	}
 
+	/**
+	 * Dynamic filter for followers query.
+	 *
+	 * By default, the filter name is 'bp_follow_get_followers', which filters
+	 * the displayed user's followers.
+	 *
+	 * @since 1.0.0
+	 * @since 1.3.0 Filter is now dynamic.
+	 *
+	 * @param array $retval Array of follower IDs.
+	 */
 	return apply_filters( $filter, $retval );
 }
 
 /**
- * Fetch all IDs that a particular user is following.
+ * Fetch the IDs that a particular item is following.
  *
  * @since 1.0.0
  *
@@ -198,27 +208,23 @@ function bp_follow_get_followers( $args = '' ) {
  */
 function bp_follow_get_following( $args = '' ) {
 
-	$r = wp_parse_args( $args, array(
-		'user_id'     => bp_displayed_user_id(),
-		'follow_type' => '',
-		'query_args'  => array()
-	) );
+	$r = bp_follow_get_common_args( wp_parse_args( $args, array(
+		'user_id' => bp_displayed_user_id(),
+	) ) );
 
 	$retval   = array();
 	$do_query = true;
 
 	// setup some variables based on the follow type
 	if ( ! empty( $r['follow_type'] ) ) {
-		$filter = 'bp_follow_get_following_' .  $r['follow_type'];
-		$cachegroup = 'bp_follow_following_' .  $r['follow_type'];
+		$filter = 'bp_follow_get_following_' .  $r['object'];
 	} else {
 		$filter = 'bp_follow_get_following';
-		$cachegroup = 'bp_follow_following';
 	}
 
 	// check for cache if 'query_args' is empty
 	if ( empty( $r['query_args'] ) ) {
-		$retval = wp_cache_get( $r['user_id'], $cachegroup );
+		$retval = wp_cache_get( $r['object_id'], "bp_follow_{$r['object']}_following_query" );
 
 		if ( false !== $retval ) {
 			$do_query = false;
@@ -227,14 +233,28 @@ function bp_follow_get_following( $args = '' ) {
 
 	// query if necessary
 	if ( true === $do_query ) {
-		$retval = BP_Follow::get_following( $r['user_id'], $r['follow_type'], $r['query_args'] );
+		$retval = BP_Follow::get_following( $r['object_id'], $r['follow_type'], $r['query_args'] );
 
 		// cache if no extra query args - we only cache default args for now
 		if ( empty( $r['query_args'] ) ) {
-			wp_cache_set( $r['user_id'], $retval, $cachegroup );
+			wp_cache_set( $r['object_id'], $retval, "bp_follow_{$r['object']}_following_query" );
+
+			// cache count while we're at it
+			wp_cache_set( $r['object_id'], $GLOBALS['wpdb']->num_rows, "bp_follow_{$r['object']}_following_count" );
 		}
 	}
 
+	/**
+	 * Dynamic filter for following query.
+	 *
+	 * By default, the filter name is 'bp_follow_get_following', which filters
+	 * the displayed user's following.
+	 *
+	 * @since 1.0.0
+	 * @since 1.3.0 Filter is now dynamic.
+	 *
+	 * @param array $retval Array of follower IDs.
+	 */
 	return apply_filters( $filter, $retval );
 }
 
