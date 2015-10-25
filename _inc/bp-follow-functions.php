@@ -339,6 +339,59 @@ function bp_follow_total_follow_counts( $args = '' ) {
 }
 
 /**
+ * Utility function to parse common arguments.
+ *
+ * Used quite a bit internally.
+ *
+ * @since 1.3.0
+ *
+ * @param array $args {
+ *     Array of arguments.
+ *     @type int    $user_id     The user ID. Defaults to logged-in user ID.
+ *     @type int    $object_id   The object ID. If filled in, this takes precedence over the $user_id
+ *                               parameter. Handy when using a different $follow_type. Default: ''.
+ *     @type string $follow_type The follow type. Leave blank to query for users. Default: ''.
+ *     @type array  $query_args  Query arguments. Only used when querying.
+ * }
+ * @return array
+ */
+function bp_follow_get_common_args( $args = array() ) {
+	$r = wp_parse_args( $args, array(
+		'user_id'     => bp_loggedin_user_id(),
+		'follow_type' => '',
+		'object_id'   => '',
+		'query_args'  => array()
+	) );
+
+	// Set up our object. $object is used for cache keys and filter names.
+	if ( ! empty( $r['follow_type'] ) ) {
+		// Append 'user' to the $object if a user ID is passed.
+		if ( ! empty( $r['user_id'] ) && empty( $r['object_id'] ) ) {
+			$object = "user_{$r['follow_type']}";
+		} else {
+			$object = $r['follow_type'];
+		}
+
+	// Defaults to 'user'
+	} else {
+		$object = 'user';
+	}
+
+	if ( ! empty( $r['object_id'] ) ) {
+		$object_id = (int) $r['object_id'];
+	} else {
+		$object_id = (int) $r['user_id'];
+	}
+
+	return array(
+		'object'      => $object,
+		'object_id'   => $object_id,
+		'follow_type' => $r['follow_type'],
+		'query_args'  => $r['query_args']
+	);
+}
+
+/**
  * Is an AJAX request currently taking place?
  *
  * Since BP Follow still supports BP 1.5, we can't simply use the DOING_AJAX
