@@ -339,6 +339,76 @@ function bp_follow_total_follow_counts( $args = '' ) {
 }
 
 /**
+ * Get the following count for a particular item.
+ *
+ * Defaults to the number of users the logged-in user is following.
+ *
+ * @since 1.3.0
+ *
+ * @param  array $args See bp_follow_get_common_args()
+ * @return int
+ */
+function bp_follow_get_the_following_count( $args = array() ) {
+	$r = bp_follow_get_common_args( $args );
+
+	// fetch cache
+	$retval = wp_cache_get( $r['object_id'], "bp_follow_{$r['object']}_following_count" );
+
+	// query if necessary
+	if ( false === $retval ) {
+		$retval = BP_Follow::get_following_count( $r['object_id'], $r['follow_type'] );
+		wp_cache_set( $r['object_id'], $retval, "bp_follow_{$r['object']}_following_count" );
+	}
+
+	/**
+	 * Dynamic filter for the following count.
+	 *
+	 * Defaults to 'bp_follow_get_user_following_count'.
+	 *
+	 * @since 1.3.0
+	 *
+	 * @param int $retval    The following count.
+	 * @param int $object_id The object ID.  Defaults to logged-in user ID.
+	 */
+	return apply_filters( "bp_follow_get_{$r['object']}_following_count", $retval, $r['object_id'] );
+}
+
+/**
+ * Get the followers count for a particular item.
+ *
+ * Defaults to the number of users following the logged-in user.
+ *
+ * @since 1.3.0
+ *
+ * @param  array $args See bp_follow_get_common_args()
+ * @return int
+ */
+function bp_follow_get_the_followers_count( $args = array() ) {
+	$r = bp_follow_get_common_args( $args );
+
+	// fetch cache
+	$retval = wp_cache_get( $r['object_id'], "bp_follow_{$r['object']}_followers_count" );
+
+	// query if necessary
+	if ( false === $retval ) {
+		$retval = BP_Follow::get_followers_count( $r['object_id'], $r['follow_type'] );
+		wp_cache_set( $r['object_id'], $retval, "bp_follow_{$r['object']}_followers_count" );
+	}
+
+	/**
+	 * Dynamic filter for the followers count.
+	 *
+	 * Defaults to 'bp_follow_get_user_followers_count'.
+	 *
+	 * @since 1.3.0
+	 *
+	 * @param int $retval    The followers count.
+	 * @param int $object_id The object ID.  Defaults to logged-in user ID.
+	 */
+	return apply_filters( "bp_follow_get_{$r['object']}_followers_count", $retval, $r['object_id'] );
+}
+
+/**
  * Utility function to parse common arguments.
  *
  * Used quite a bit internally.

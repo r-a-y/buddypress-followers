@@ -33,7 +33,6 @@ function bp_follow_user_setup_nav( $main_nav = array(), $sub_nav = array() ) {
 
 	// Need to change the user ID, so if we're not on a member page, $counts variable is still calculated
 	$user_id = bp_is_user() ? bp_displayed_user_id() : bp_loggedin_user_id();
-	$counts  = bp_follow_total_follow_counts( array( 'user_id' => $user_id ) );
 
 	// BuddyBar compatibility
 	$domain = bp_displayed_user_domain() ? bp_displayed_user_domain() : bp_loggedin_user_domain();
@@ -41,7 +40,7 @@ function bp_follow_user_setup_nav( $main_nav = array(), $sub_nav = array() ) {
 	/** FOLLOWERS NAV ************************************************/
 
 	bp_core_new_nav_item( array(
-		'name'                => sprintf( __( 'Following <span>%d</span>', 'bp-follow' ), $counts['following'] ),
+		'name'                => sprintf( __( 'Following <span>%d</span>', 'bp-follow' ), bp_follow_get_the_following_count( array( 'user_id' => $user_id ) ) ),
 		'slug'                => $bp->follow->following->slug,
 		'position'            => $bp->follow->params['adminbar_myaccount_order'],
 		'screen_function'     => 'bp_follow_screen_following',
@@ -52,7 +51,7 @@ function bp_follow_user_setup_nav( $main_nav = array(), $sub_nav = array() ) {
 	/** FOLLOWING NAV ************************************************/
 
 	bp_core_new_nav_item( array(
-		'name'                => sprintf( __( 'Followers <span>%d</span>', 'bp-follow' ), $counts['followers'] ),
+		'name'                => sprintf( __( 'Followers <span>%d</span>', 'bp-follow' ), bp_follow_get_the_followers_count( array( 'user_id' => $user_id ) ) ),
 		'slug'                => $bp->follow->followers->slug,
 		'position'            => apply_filters( 'bp_follow_followers_nav_position', 62 ),
 		'screen_function'     => 'bp_follow_screen_followers',
@@ -518,14 +517,14 @@ add_action( 'bp_follow_before_remove_data', 'bp_follow_clear_cache_on_user_delet
  */
 function bp_follow_add_activity_tab() {
 
-	$counts = bp_follow_total_follow_counts( array( 'user_id' => bp_loggedin_user_id() ) );
+	$count = bp_follow_get_the_following_count( array( 'user_id' => bp_loggedin_user_id() ) );
 
-	if ( empty( $counts['following'] ) ) {
+	if ( empty( $count ) ) {
 		return;
 	}
 ?>
 
-	<li id="activity-following"><a href="<?php echo bp_loggedin_user_domain() . BP_ACTIVITY_SLUG . '/' . BP_FOLLOWING_SLUG . '/' ?>" title="<?php _e( 'The public activity for everyone you are following on this site.', 'bp-follow' ) ?>"><?php printf( __( 'Following <span>%d</span>', 'bp-follow' ), (int)$counts['following'] ) ?></a></li>
+	<li id="activity-following"><a href="<?php echo bp_loggedin_user_domain() . BP_ACTIVITY_SLUG . '/' . BP_FOLLOWING_SLUG . '/' ?>" title="<?php _e( 'The public activity for everyone you are following on this site.', 'bp-follow' ) ?>"><?php printf( __( 'Following <span>%d</span>', 'bp-follow' ), $count ) ?></a></li>
 
 <?php
 }
@@ -545,14 +544,14 @@ function bp_follow_add_following_tab() {
 		return;
 	}
 
-	$counts = bp_follow_total_follow_counts( array( 'user_id' => bp_loggedin_user_id() ) );
+	$count = bp_follow_get_the_following_count( array( 'user_id' => bp_loggedin_user_id() ) );
 
-	if ( empty( $counts['following'] ) ) {
-		return false;
+	if ( empty( $count ) ) {
+		return;
 	}
 ?>
 
-	<li id="members-following"><a href="<?php echo bp_loggedin_user_domain() . BP_FOLLOWING_SLUG ?>"><?php printf( __( 'Following <span>%d</span>', 'bp-follow' ), $counts['following'] ) ?></a></li>
+	<li id="members-following"><a href="<?php echo bp_loggedin_user_domain() . BP_FOLLOWING_SLUG ?>"><?php printf( __( 'Following <span>%d</span>', 'bp-follow' ), $count ) ?></a></li>
 
 <?php
 }
