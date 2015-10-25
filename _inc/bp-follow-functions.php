@@ -311,28 +311,71 @@ function bp_following_ids( $args = '' ) {
 /**
  * Get the total followers and total following counts for a user.
  *
+ * You shouldn't really use this function any more.
+ *
+ * @see bp_follow_get_the_following_count() To grab the following count.
+ * @see bp_follow_get_the_followers_count() To grab the followers count.
+ *
  * @since 1.0.0
  *
  * @param array $args {
  *     Array of arguments.
- *     @type int $user_id The user ID to grab follow counts for.
- *     @type string $follow_type The follow type
+ *     @type int    $user_id     The user ID to grab follow counts for.
+ *     @type string $follow_type The follow type. Default to '', which will query follow counts for users.
+ *                               Passing a follow type such as 'blogs' will only return a 'following'
+ *                               key and integer zero for the 'followers' key since a user can only follow
+ *                               blogs.
  * }
  * @return array [ followers => int, following => int ]
  */
 function bp_follow_total_follow_counts( $args = '' ) {
-
 	$r = wp_parse_args( $args, array(
 		'user_id'     => bp_loggedin_user_id(),
 		'follow_type' => '',
 	) );
 
-	$counts = BP_Follow::get_counts( $r['user_id'], $r['follow_type'] );
+	$retval = array();
+
+	$retval['following'] = bp_follow_get_the_following_count( array(
+		'user_id'     => $r['user_id'],
+		'follow_type' => $r['follow_type']
+	) );
+
+	/**
+	 * Passing a follow type such as 'blogs' will only return a 'following'
+	 * key and integer zero for the 'followers' key since a user can only follow
+	 * blogs.
+	 */
+	if ( ! empty( $r['follow_type'] ) ) {
+		$retval['followers'] = 0;
+	} else {
+		$retval['followers'] = bp_follow_get_the_followers_count( array(
+			'user_id'     => $r['user_id'],
+			'follow_type' => $r['follow_type']
+		) );
+	}
 
 	if ( empty( $r['follow_type'] ) ) {
-		$retval = apply_filters( 'bp_follow_total_follow_counts', $counts, $r['user_id'] );
+		/**
+		 * Filter the total follow counts for a user.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param array $retval  Array consisting of 'following' and 'followers' counts.
+		 * @param int   $user_id The user ID. Defaults to logged-in user ID.
+		 */
+		$retval = apply_filters( 'bp_follow_total_follow_counts', $retval, $r['user_id'] );
 	} else {
-		$retval = apply_filters( 'bp_follow_total_follow_' . $r['follow_type'] . '_counts', $counts, $r['user_id'] );
+		/**
+		 * Filter the total follow counts for a user given a specific follow type.
+		 *
+		 * @since 1.3.0
+		 *
+		 * @param array $retval  Array consisting of 'following' and 'followers' counts. Note: 'followers'
+		 *                       is always going to be 0, since a user can only follow a given follow type.
+		 * @param int   $user_id The user ID. Defaults to logged-in user ID.
+		 */
+		$retval = apply_filters( 'bp_follow_total_follow_' . $r['follow_type'] . '_counts', $retval, $r['user_id'] );
 	}
 
 	return $retval;
