@@ -178,6 +178,12 @@ class BP_Follow {
 			$this->id = $wpdb->insert_id;
 		}
 
+		// Save cache
+		$data = new stdClass;
+		$data->id = $this->id;
+		$data->date_recorded = $this->date_recorded;
+		wp_cache_set( "{$this->leader_id}:{$this->follower_id}:{$this->follow_type}", $data, 'bp_follow_data' );
+
 		do_action_ref_array( 'bp_follow_after_save', array( &$this ) );
 
 		return $result;
@@ -196,6 +202,9 @@ class BP_Follow {
 		$sql .= self::get_where_sql( array(
 			'id' => $this->id,
 		) );
+
+		// Delete cache
+		wp_cache_delete( "{$this->leader_id}:{$this->follower_id}:{$this->follow_type}", 'bp_follow_data' );
 
 		return $wpdb->query( $sql );
 	}
