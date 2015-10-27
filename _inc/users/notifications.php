@@ -227,35 +227,21 @@ add_filter( 'bp_after_has_notifications_parse_args', 'bp_follow_filter_unread_no
  *
  * @global $bp The global BuddyPress settings variable created in bp_core_setup_globals()
  */
-function bp_follow_screen_notification_settings() {
+function bp_follow_user_screen_notification_settings() {
 	if ( !$notify = bp_get_user_meta( bp_displayed_user_id(), 'notification_starts_following', true ) )
 		$notify = 'yes';
 ?>
 
-	<table class="notification-settings" id="follow-notification-settings">
-		<thead>
-			<tr>
-				<th class="icon"></th>
-				<th class="title"><?php _e( 'Follow', 'bp-follow' ) ?></th>
-				<th class="yes"><?php _e( 'Yes', 'bp-follow' ) ?></th>
-				<th class="no"><?php _e( 'No', 'bp-follow' )?></th>
-			</tr>
-		</thead>
+	<tr>
+		<td></td>
+		<td><?php _e( 'A member starts following your activity', 'bp-follow' ) ?></td>
+		<td class="yes"><input type="radio" name="notifications[notification_starts_following]" value="yes" <?php checked( $notify, 'yes', true ) ?>/></td>
+		<td class="no"><input type="radio" name="notifications[notification_starts_following]" value="no" <?php checked( $notify, 'no', true ) ?>/></td>
+	</tr>
 
-		<tbody>
-			<tr>
-				<td></td>
-				<td><?php _e( 'A member starts following your activity', 'bp-follow' ) ?></td>
-				<td class="yes"><input type="radio" name="notifications[notification_starts_following]" value="yes" <?php checked( $notify, 'yes', true ) ?>/></td>
-				<td class="no"><input type="radio" name="notifications[notification_starts_following]" value="no" <?php checked( $notify, 'no', true ) ?>/></td>
-			</tr>
-		</tbody>
-
-		<?php do_action( 'bp_follow_screen_notification_settings' ); ?>
-	</table>
 <?php
 }
-add_action( 'bp_notification_settings', 'bp_follow_screen_notification_settings' );
+add_action( 'bp_follow_screen_notification_settings', 'bp_follow_user_screen_notification_settings' );
 
 /** EMAIL ***************************************************************/
 

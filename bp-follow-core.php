@@ -146,6 +146,9 @@ class BP_Follow_Component extends BP_Component {
 		// register global cachegroups
 		add_action( 'bp_init', array( $this, 'register_global_cachegroups' ), 5 );
 
+		// register notification settings
+		add_action( 'bp_init', array( $this, 'register_notification_settings' ) );
+
 		// javascript hook
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ), 11 );
 	}
@@ -163,6 +166,19 @@ class BP_Follow_Component extends BP_Component {
 	 */
 	public function register_global_cachegroups() {
 		wp_cache_add_global_groups( (array) $this->global_cachegroups );
+	}
+
+	/**
+	 * Registers notification settings block.
+	 *
+	 * Only shows if there are follow modules with notification settings enabled.
+	 *
+	 * @since 1.3.0
+	 */
+	public function register_notification_settings() {
+		if ( has_action( 'bp_follow_screen_notification_settings' ) ) {
+			add_action( 'bp_notification_settings', 'bp_follow_notification_settings_content' );
+		}
 	}
 
 	/**

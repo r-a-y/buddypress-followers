@@ -545,6 +545,33 @@ function bp_follow_is_doing_ajax() {
 /** NOTIFICATIONS *******************************************************/
 
 /**
+ * Show a 'Follow' block on a user's "Settings > Email" page.
+ *
+ * Used internally only.
+ *
+ * @since 1.3.0
+ */
+function bp_follow_notification_settings_content() {
+?>
+
+	<table class="notification-settings" id="follow-notification-settings">
+		<thead>
+			<tr>
+				<th class="icon"></th>
+				<th class="title"><?php _e( 'Follow', 'bp-follow' ) ?></th>
+				<th class="yes"><?php _e( 'Yes', 'bp-follow' ) ?></th>
+				<th class="no"><?php _e( 'No', 'bp-follow' )?></th>
+			</tr>
+		</thead>
+
+		<tbody>
+			<?php do_action( 'bp_follow_screen_notification_settings' ); ?>
+		</tbody>
+	</table>
+<?php
+}
+
+/**
  * Format on screen notifications into something readable by users.
  *
  * @global $bp The global BuddyPress settings variable created in bp_core_setup_globals()
