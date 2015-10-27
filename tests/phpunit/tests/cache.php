@@ -25,8 +25,8 @@ class BP_Follow_Test_Cache extends BP_UnitTestCase {
 		) );
 
 		// make sure cache is invalidated
-		$this->assertEmpty( wp_cache_get( $u1, 'bp_follow_followers_count' ) );
-		$this->assertEmpty( wp_cache_get( $u2, 'bp_follow_following_count' ) );
+		$this->assertEmpty( wp_cache_get( $u1, 'bp_follow_user_followers_count' ) );
+		$this->assertEmpty( wp_cache_get( $u2, 'bp_follow_user_following_count' ) );
 
 		// get counts and assert
 		$u1_counts = bp_follow_total_follow_counts( array(
@@ -97,7 +97,7 @@ class BP_Follow_Test_Cache extends BP_UnitTestCase {
 		bp_follow_get_following( array( 'user_id' => $u1 ) );
 
 		// assert
-		$this->assertEqualSets( array( $u2, $u3, $u4 ), wp_cache_get( $u1, 'bp_follow_following' ) );
+		$this->assertEqualSets( array( $u2, $u3, $u4 ), wp_cache_get( $u1, 'bp_follow_user_following_query' ) );
 
 		// stop following one user
 		bp_follow_stop_following( array(
@@ -106,7 +106,7 @@ class BP_Follow_Test_Cache extends BP_UnitTestCase {
 		) );
 
 		// make sure cache is invalidated
-		$this->assertEmpty( wp_cache_get( $u1, 'bp_follow_following' ) );
+		$this->assertEmpty( wp_cache_get( $u1, 'bp_follow_user_following_query' ) );
 	}
 
 	/**
@@ -144,7 +144,7 @@ class BP_Follow_Test_Cache extends BP_UnitTestCase {
 		) );
 
 		// we do not cache following calls with query args at the moment
-		$this->assertEmpty( wp_cache_get( $u1, 'bp_follow_following' ) );
+		$this->assertEmpty( wp_cache_get( $u1, 'bp_follow_user_following_query' ) );
 	}
 
 	/**
@@ -174,7 +174,7 @@ class BP_Follow_Test_Cache extends BP_UnitTestCase {
 		bp_follow_get_followers( array( 'user_id' => $u1 ) );
 
 		// assert
-		$this->assertEqualSets( array( $u2, $u3, $u4 ), wp_cache_get( $u1, 'bp_follow_followers' ) );
+		$this->assertEqualSets( array( $u2, $u3, $u4 ), wp_cache_get( $u1, 'bp_follow_user_followers_query' ) );
 
 		// one user stops following user 1
 		bp_follow_stop_following( array(
@@ -183,6 +183,6 @@ class BP_Follow_Test_Cache extends BP_UnitTestCase {
 		) );
 
 		// make sure cache is invalidated
-		$this->assertEmpty( wp_cache_get( $u1, 'bp_follow_followers' ) );
+		$this->assertEmpty( wp_cache_get( $u1, 'bp_follow_user_followers_query' ) );
 	}
 }

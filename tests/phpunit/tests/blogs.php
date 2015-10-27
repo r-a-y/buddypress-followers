@@ -30,20 +30,24 @@ class BP_Follow_Test_Blogs extends BP_UnitTestCase {
 		// assert that follow relationship worked
 		$this->assertTrue( $f );
 
+		// prime cache
+		new BP_Follow( $b, $u, 'blogs' );
+		bp_follow_get_the_following_count( array(
+			'user_id' => $u,
+			'follow_type' => 'blogs',
+		) );
+		bp_follow_get_the_followers_count( array(
+			'object_id'   => $b,
+			'follow_type' => 'blogs'
+		) );
+
 		// now delete blog
 		wpmu_delete_blog( $b );
 
 		// check if cache was deleted
-		$this->assertEmpty( wp_cache_get( $u, 'bp_follow_following_blogs_count' ) );
-		$this->assertEmpty( wp_cache_get( $b, 'bp_follow_followers_blogs_count' ) );
-
-		// check if follow relationship was deleted
-		$is_following = bp_follow_is_following( array(
-			'leader_id'   => $b,
-			'follower_id' => $u,
-			'follow_type' => 'blogs',
-		) );
-		$this->assertSame( 0, $is_following );
+		$this->assertEmpty( wp_cache_get( "{$b}:{$u}:blogs", 'bp_follow_data' ) );
+		$this->assertEmpty( wp_cache_get( $u, 'bp_follow_user_blogs_following_count' ) );
+		$this->assertEmpty( wp_cache_get( $b, 'bp_follow_blogs_followers_count' ) );
 	}
 
 	/**
