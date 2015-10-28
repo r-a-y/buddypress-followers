@@ -93,6 +93,11 @@ class BP_Follow_Component extends BP_Component {
 			require( $this->path . '/modules/blogs.php' );
 		}
 
+		// activity module - BP 2.2+ only
+		if ( class_exists( 'BP_Activity_Query' ) && bp_is_active( 'activity' ) ) {
+			require( $this->path . '/modules/activity.php' );
+		}
+
 		// updater
 		if ( defined( 'WP_NETWORK_ADMIN' ) ) {
 			require( $this->path . '/bp-follow-updater.php' );
