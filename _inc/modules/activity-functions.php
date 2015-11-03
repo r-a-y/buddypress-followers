@@ -141,7 +141,7 @@ function bp_follow_activity_get_type( $activity_id = 0 ) {
 function bp_follow_activity_button( $args = array() ) {
 	global $activities_template;
 
-	$r = wp_parse_args( $args, array(
+	$r = bp_parse_args( $args, array(
 		'leader_id'     => ! empty( $activities_template->in_the_loop ) ? bp_get_activity_id() : 0,
 		'follower_id'   => bp_loggedin_user_id(),
 		'link_text'     => '',
@@ -152,7 +152,7 @@ function bp_follow_activity_button( $args = array() ) {
 
 		// follow-related args
 		'show_follower_count' => false
-	) );
+	), 'follow_activity_button' );
 
 	if ( ! $r['leader_id'] || ! $r['follower_id'] ) {
 		return;
