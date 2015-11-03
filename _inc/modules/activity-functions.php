@@ -134,8 +134,10 @@ function bp_follow_activity_get_type( $activity_id = 0 ) {
  * Output a 'Follow' activity button.
  *
  * @param $args {
- *      Array of arguments.
- *      @type int $leader_id Activity ID to follow.
+ *      Array of arguments.  Also see other args via {@link BP_Button} class.
+ *      @type int  $leader_id           Activity ID to follow.
+ *      @type int  $follower_id         User ID initiating the follow request.
+ *      @type bool $show_follower_count Should we show the follower count for this item? Default: false.
  * }
  */
 function bp_follow_activity_button( $args = array() ) {
