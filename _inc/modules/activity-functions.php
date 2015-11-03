@@ -148,7 +148,10 @@ function bp_follow_activity_button( $args = array() ) {
 		'link_title'    => '',
 		'wrapper_class' => '',
 		'link_class'    => 'button bp-primary-action',
-		'wrapper'       => false
+		'wrapper'       => false,
+
+		// follow-related args
+		'show_follower_count' => false
 	) );
 
 	if ( ! $r['leader_id'] || ! $r['follower_id'] ) {
@@ -196,10 +199,14 @@ function bp_follow_activity_button( $args = array() ) {
 	} else {
 		$id     = 'not-following';
 		$action = 'follow';
-		$count  = bp_follow_get_the_followers_count( array(
-			'object_id'   => $r['leader_id'],
-			'follow_type' => $follow_type
-		) );
+
+		$count = 0;
+		if ( true === $r['show_follower_count'] ) {
+			$count  = bp_follow_get_the_followers_count( array(
+				'object_id'   => $r['leader_id'],
+				'follow_type' => $follow_type
+			) );
+		}
 
 		if ( empty( $count ) ) {
 			$link_text = _x( 'Follow', 'Follow activity button', 'bp-follow' );
