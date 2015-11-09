@@ -68,5 +68,20 @@ class BP_Follow_Functions extends BP_UnitTestCase {
 
 		$this->assertTrue( $f2 );
 	}
+
+	/**
+	 * Check stop following function when follow ID doesn't exist.
+	 *
+	 * @group bp_follow_stop_following
+	 */
+	public function test_stop_following_when_follow_id_does_not_exist() {
+		$f1 = bp_follow_stop_following( array(
+			'leader_id'   => get_current_user_id(),
+			'follower_id' => 9999,
+		) );
+
+
+		$this->assertFalse( $f1 );
+	}
 }
 
