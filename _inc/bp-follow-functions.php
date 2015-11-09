@@ -66,7 +66,7 @@ function bp_follow_stop_following( $args = '' ) {
 
 	$follow = new BP_Follow( $r['leader_id'], $r['follower_id'] );
 
-	if ( ! $follow->delete() ) {
+	if ( empty( $follow->id ) || ! $follow->delete() ) {
 		return false;
 	}
 
