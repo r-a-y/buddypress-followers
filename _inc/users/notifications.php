@@ -256,22 +256,27 @@ add_action( 'bp_follow_screen_notification_settings', 'bp_follow_user_screen_not
  */
 function bp_follow_new_follow_email_notification( $args = '' ) {
 
-	$defaults = array(
+	$r = wp_parse_args( $args, array(
 		'leader_id'   => bp_displayed_user_id(),
 		'follower_id' => bp_loggedin_user_id()
-	);
+	) );
 
-	$r = wp_parse_args( $args, $defaults );
-
-	if ( 'no' == bp_get_user_meta( (int) $r['leader_id'], 'notification_starts_following', true ) )
+	// Don't send email for yourself!
+	if ( $r['follower_id'] === $r['leader_id'] ) {
 		return false;
+	}
+
+	if ( 'no' == bp_get_user_meta( (int) $r['leader_id'], 'notification_starts_following', true ) ) {
+		return false;
+	}
 
 	// Check to see if this leader has already been notified of this follower before
 	$has_notified = bp_get_user_meta( $r['follower_id'], 'bp_follow_has_notified', true );
 
 	// Already notified so don't send another email
-	if ( in_array( $r['leader_id'], (array) $has_notified ) )
+	if ( in_array( $r['leader_id'], (array) $has_notified ) ) {
 		return false;
+	}
 
 	// Not been notified before, update usermeta and continue to mail
 	$has_notified[] = $r['leader_id'];
