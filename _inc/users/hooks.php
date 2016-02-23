@@ -928,6 +928,11 @@ function bp_follow_user_follow_suggestions( $user_query ) {
 
 		// limit suggestions to followers
 		$user_query['include'] = bp_follow_get_followers( array( 'user_id' => bp_loggedin_user_id() ) );
+
+		// No followers, so don't return any suggestions.
+		if ( empty( $user_query['include'] ) && false === is_super_admin( bp_loggedin_user_id() ) ) {
+			$user_query['include'] = (array) 0;
+		}
 	}
 
 	return $user_query;
