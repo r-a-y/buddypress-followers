@@ -284,12 +284,15 @@ add_action( 'bp_notification_settings', 'bp_follow_screen_notification_settings'
  */
 function bp_follow_new_follow_email_notification( $args = '' ) {
 
-	$defaults = array(
+	$r = wp_parse_args( $args, array(
 		'leader_id'   => bp_displayed_user_id(),
 		'follower_id' => bp_loggedin_user_id()
-	);
+	) );
 
-	$r = wp_parse_args( $args, $defaults );
+	// Don't send email for yourself!
+	if ( $r['follower_id'] === $r['leader_id'] ) {
+		return false;
+	}
 
 	if ( 'no' == bp_get_user_meta( (int) $r['leader_id'], 'notification_starts_following', true ) )
 		return false;
