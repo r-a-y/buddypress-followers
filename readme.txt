@@ -2,7 +2,7 @@
 Contributors: apeatling, r-a-y
 Tags: buddypress, following, followers, connections
 Requires at least: WP 3.2 / BP 1.5
-Tested up to: WP 3.9.x / BP 2.0.x
+Tested up to: WP 4.4.x / BP 2.5.x
 Stable tag: 1.2.1
 
 == Description ==
@@ -39,6 +39,18 @@ For bug reports or to add patches or translation files, visit the [BP Follow Git
 Check out the [BP Follow wiki](https://github.com/r-a-y/buddypress-followers/wiki).
 
 == Changelog ==
+
+= 1.2.2 =
+* Fix deprecated notice in widget for those using WordPress 4.3+.
+* Fix member filtering when custom follow slugs are in use.
+* Increase selector scope in javascript so AJAX button works with pagination in member loops.
+* Fix issue with bp_follow_stop_following() when relationship doesn't exist.
+* Fix issue with member loop existence and follow user button defaults.
+* Only show "Following" tab if user is logged in on member directory.
+* Do not query for follow button if a user is on their own profile.
+* Decode special characters in email subject and content.
+* Do not an email notification to yourself.
+* Allow plugins to bail out of saving a follow relationship into the database.
 
 = 1.2.1 =
 * Add "Mark as read" support for the Notifications component (only available on BP 1.9+)
