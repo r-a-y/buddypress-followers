@@ -42,6 +42,19 @@ Check out the [BP Follow wiki](https://github.com/r-a-y/buddypress-followers/wik
 
 == Changelog ==
 
+= 1.3.0 =
+* Add object caching support.
+* Add ability to follow sites in WordPress multisite (only available in BuddyPress 2.0+)
+* Add support for BP's Suggestions API (only available in BuddyPress 2.1+)
+* Allow plugin to work in symlinked environments
+* Fix marking notifications as read for bp-default themes
+* Add Spanish translation (props saik003)
+* Developer: Add 'following' scope to activity loop (only available in BuddyPress 2.2+)
+* Developer: Add new `'follow_type'` and `'date_recorded'` database columns
+* Developer: Add ability to sort following and followers query by DB column
+* Developer: Add ability to query following and followers by WP's date query
+* Developer: Add ability to disable follow users module
+
 = 1.2.2 =
 * Fix deprecated notice in widget for those using WordPress 4.3+.
 * Fix member filtering when custom follow slugs are in use.
