@@ -32,8 +32,8 @@ class BP_Follow_Posts {
 		add_action( 'bp_activity_admin_nav',   array( $this, 'activity_admin_nav' ) );
 
 		// screen hooks
-		add_action( 'bp_after_member_posts_content', 'BP_Follow_Posts_Screens::user_posts_inline_js' );
-		add_action( 'bp_actions',                    'BP_Follow_Posts_Screens::action_handler' );
+		// add_action( 'bp_after_member_posts_content', 'BP_Follow_Posts_Screens::user_posts_inline_js' );
+		add_action( 'bp_actions',                    'BP_Follow_Posts_Screens::action_handler' ); // To do: Change to ajax!
 		add_action( 'bp_actions',                    'BP_Follow_Posts_Screens::rss_handler' );
 
 		// directory tabs
@@ -41,30 +41,30 @@ class BP_Follow_Posts {
 
 		// loop filtering
 		// add_filter( 'bp_activity_set_followblogs_scope_args', array( $this, 'filter_activity_scope' ), 10, 2 );
-		add_filter( 'bp_ajax_querystring', array( $this, 'add_posts_scope_filter' ),    20, 2 );
-		add_filter( 'bp_has_blogs',        array( $this, 'bulk_inject_post_follow_status' ) );
+		// add_filter( 'bp_ajax_querystring', array( $this, 'add_posts_scope_filter' ),    20, 2 );
 
 		// button injection
 		add_action( 'the_content', array( $this, 'add_follow_button_to_post' ),   20 );
-		add_action( 'the_excerpt', array( $this, 'add_follow_button_to_post' ),   20 );
 		add_action( 'wp_footer',   array( $this, 'add_follow_button_to_footer' ), 999 );
 
-		// blog deletion
-		// add_action( 'bp_blogs_remove_blog', array( $this, 'on_blog_delete' ) );
+		// post deletion
+		add_action( 'before_delete_post', array( $this, 'on_post_delete' ) );
 
 		// cache invalidation
-		// add_action( 'bp_follow_start_following_blogs', array( $this, 'clear_cache_on_follow' ) );
-		// add_action( 'bp_follow_stop_following_blogs',  array( $this, 'clear_cache_on_follow' ) );
-		// add_action( 'bp_follow_before_remove_data',    array( $this, 'clear_cache_on_user_delete' ) );
+		add_action( 'bp_follow_start_following_posts', array( $this, 'clear_cache_on_follow' ) );
+		add_action( 'bp_follow_stop_following_posts',  array( $this, 'clear_cache_on_follow' ) );
+		add_action( 'bp_follow_before_remove_data',    array( $this, 'clear_cache_on_user_delete' ) );
 
 		// rss feed link
-		// add_filter( 'bp_get_sitewide_activity_feed_link', array( $this, 'activity_feed_url' ) );
-		// add_filter( 'bp_dtheme_activity_feed_url',        array( $this, 'activity_feed_url' ) );
-		// add_filter( 'bp_legacy_theme_activity_feed_url',  array( $this, 'activity_feed_url' ) );
+		add_filter( 'bp_get_sitewide_activity_feed_link', array( $this, 'activity_feed_url' ) );
+		add_filter( 'bp_dtheme_activity_feed_url',        array( $this, 'activity_feed_url' ) );
+		add_filter( 'bp_legacy_theme_activity_feed_url',  array( $this, 'activity_feed_url' ) );
 	}
 
 	/**
 	 * Constants.
+	 *
+	 * @since 1.3.0
 	 */
 	public function constants() {
 		// /members/admin/posts/[FOLLOWING]
@@ -76,10 +76,17 @@ class BP_Follow_Posts {
 		if ( ! defined( 'BP_FOLLOW_POSTS_USER_ACTIVITY_SLUG' ) ) {
 			define( 'BP_FOLLOW_POSTS_USER_ACTIVITY_SLUG', 'followposts' );
 		}
+
+		// Adds the follow button in the end of the post
+		if ( ! defined( 'BP_FOLLOW_POSTS_BUTTON_POSITION' ) ) {
+			define( 'BP_FOLLOW_POSTS_BUTTON_POSITION', 'bottom' );
+		}
 	}
 
 	/**
 	 * Set up global cachegroups.
+	 * 
+	 * @since 1.3.0
 	 */
 	public function setup_global_cachegroups() {
 		$bp = buddypress();
@@ -95,6 +102,8 @@ class BP_Follow_Posts {
 
 	/**
 	 * Setup profile nav.
+	 *
+	 * @since 1.3.0
 	 */
 	public function setup_nav() {
 		global $bp;
@@ -135,6 +144,8 @@ class BP_Follow_Posts {
 	/**
 	 * Inject "Followed Posts" nav item to WP adminbar's "Activity" main nav.
 	 *
+	 * @since 1.3.0
+	 *
 	 * @param array $retval
 	 * @return array
 	 */
@@ -161,7 +172,6 @@ class BP_Follow_Posts {
 				array_slice( $retval, $offset, NULL, true )
 			);
 		}
-
 		return $retval;
 	}
 
@@ -364,82 +374,49 @@ class BP_Follow_Posts {
 		return $qs;
 	}
 
-	/**
-	 * Bulk-check the follow status of all posts in a loop.
-	 *
-	 * This is so we don't have query each follow post status individually.
-	 */
-	public function bulk_inject_post_follow_status( $has_posts ) {
-		global $wp_query;
-
-		if ( empty( $has_posts ) ) {
-			return $has_posts;
-		}
-
-		if ( ! is_user_logged_in() ) {
-			return $has_posts;
-		}
-
-		$posts_ids = array();
-
-		if ( $wp_query->in_the_loop ) {
-
-			// add post ID to array
-			$post_ids[] = $wp_query->post->ID;
-
-			// set default follow status to false
-			$is_following = false;
-		}
-
-		if ( empty( $post_ids ) ) {
-			return $has_posts;
-		}
-
-		$following = BP_Follow::bulk_check_follow_status( $post_ids, bp_loggedin_user_id(), 'posts' );
-
-		if ( empty( $following ) ) {
-			return $has_posts;
-		}
-
-		foreach( (array) $following as $f ) {
-			// set follow status to true if the logged-in user is following
-			if ( $f->leader_id == $wp_query->post->ID ) {
-				$is_following = $wp_query->post->is_following;
-			}
-		}
-
-		return $has_posts;
-	}
-
 	/** BUTTON ********************************************************/
 
 	/**
-	 * Add a follow button to the of the post
+	 * Add a follow button to the post
+	 *
+	 * @since 1.3.0
+	 *
+	 * @return string The post content with the button before or after it.
 	 */
 	public function add_follow_button_to_post( $content ) {
 		if ( ! is_user_logged_in() ) {
-			return;
+			return $content;
 		}
 
-		if ( is_page() || 'posts' == get_post_type() && ! single() ) {
+		if ( is_page() || ! is_single() ) {
 			return $content;
 		}
 
 		$btn = self::get_button();
+		$pos = constant( 'BP_FOLLOW_POSTS_BUTTON_POSITION' );
 
-		return $content . $btn;
+		if ( $pos == 'top' ) {
+			$out = $btn . $content;
+		}
+
+		if ( $pos == 'bottom' ) {
+			$out = $content . $btn;
+		}
+
+		return $out;
 	}
 
 	/**
 	 * Whether to show the post footer buttons.
 	 *
-	 * @return bool Defaults to true. False when on BP root blog and not on a blog
-	 *         page deemed by BuddyPress.
+	 * @since 1.3.0
+	 *
+	 * @return bool Defaults to true. False when on home, page or not on single post.
 	 */
 	public static function show_footer_button() {
 		$retval = true;
 
-		if ( is_home() || is_page() || 'posts' == get_post_type() && ! single() ) {
+		if ( is_home() || is_page() || ! is_single() ) {
 			$retval = false;
 		}
 
@@ -470,7 +447,7 @@ class BP_Follow_Posts {
 		<style type="text/css">
 			#bpf-posts-ftr{
 				position:fixed;
-				bottom:5px;
+				bottom: 5px;
 				left: 5px;
 				z-index:9999;
 				text-align:left;
@@ -535,14 +512,13 @@ class BP_Follow_Posts {
 
 	/**
 	 * Static method to generate a follow posts button.
+	 *
+	 * @since 1.3.0
 	 */
 	public static function get_button( $args = '' ) {
-		global $wp_query;
-
-		// var_dump($wp_query);
 
 		$r = wp_parse_args( $args, array(
-			'leader_id'     => ! empty( $wp_query->in_the_loop ) ? get_the_ID() : get_the_ID(),
+			'leader_id'     => get_the_ID(),
 			'follower_id'   => bp_loggedin_user_id(),
 			'link_text'     => '',
 			'link_title'    => '',
@@ -555,49 +531,30 @@ class BP_Follow_Posts {
 			return false;
 		}
 
-		// if we're checking during a post loop, then follow status is already
-		// queried via bulk_inject_follow_post_status()
-		if ( ! empty( $wp_query->in_the_loop ) 
-			&& $r['follower_id'] == bp_loggedin_user_id() 
-			&& $r['leader_id'] == get_the_ID() ) {
-			$is_following = $wp_query->post->is_following;
-
-		// else we manually query the follow status
-		} else {
-			$is_following = bp_follow_is_following( array(
-				'leader_id'   => $r['leader_id'],
-				'follower_id' => $r['follower_id'],
-				'follow_type' => 'posts',
-			) );
-		}
+		$is_following = bp_follow_is_following( array(
+			'leader_id'   => $r['leader_id'],
+			'follower_id' => $r['follower_id'],
+			'follow_type' => 'posts',
+		) );
 
 		// setup some variables
 		if ( $is_following ) {
 			$id        = 'following';
 			$action    = 'unfollow';
-			$link_text = _x( 'Unfollow', 'Button', 'bp-follow' );
-
-			if ( empty( $wp_query->in_the_loop ) ) {
-				$link_text = _x( 'Unfollow Post', 'Button', 'bp-follow' );
-			}
+			$link_text = _x( 'Unfollow Post', 'Button', 'bp-follow' );
 
 			if ( empty( $r['link_text'] ) ) {
 				$r['link_text'] = $link_text;
 			}
-
-		} else {
+		} 
+		else {
 			$id        = 'not-following';
 			$action    = 'follow';
-			$link_text = _x( 'Follow', 'Button', 'bp-follow' );
-
-			if ( empty( $wp_query->in_the_loop ) ) {
-				$link_text = _x( 'Follow Post', 'Button', 'bp-follow' );
-			}
+			$link_text = _x( 'Follow Post', 'Button', 'bp-follow' );
 
 			if ( empty( $r['link_text'] ) ) {
 				$r['link_text'] = $link_text;
 			}
-
 		}
 
 		$wrapper_class = 'follow-button ' . $id;
@@ -639,84 +596,98 @@ class BP_Follow_Posts {
 	/** DELETION ***********************************************************/
 
 	/**
-	 * Do stuff when a blog is deleted.
+	 * Do stuff when a post is deleted.
 	 *
-	 * @param int $blog_id The ID of the blog being deleted.
+	 * @since 1.3.0
+	 *
+	 * @param int $post_id The ID of the post being deleted.
 	 */
-	public function on_blog_delete( $blog_id ) {
-		global $bp, $wpdb;
+	public function on_post_delete( $post_id ) {
+		global $bp, $wpdb, $post_type;
+    	
+    	// Right now, only the post is being checked, later, 
+    	// it'll be needed to check for the allowed/added post types
+    	if ( $post_type != 'post' ) {
+    		return;
+    	}
 
-		$this->clear_cache_on_blog_delete( $blog_id );
+		$this->clear_cache_on_post_delete( $post_id );
 
-		$wpdb->query( $wpdb->prepare( "DELETE FROM {$bp->follow->table_name} WHERE leader_id = %d AND follow_type = 'blogs'", $blog_id ) );
+		$wpdb->query( $wpdb->prepare( "DELETE FROM {$bp->follow->table_name} WHERE leader_id = %d AND follow_type = 'posts'", $post_id ) );
 	}
 
 	/** CACHE **************************************************************/
 
 	/**
-	 * Clear count cache when a user follows / unfolows a blog.
+	 * Clear count cache when a user follows / unfolows a post.
+	 *
+	 * @since 1.3.0
 	 *
 	 * @param BP_Follow $follow
 	 */
 	public function clear_cache_on_follow( BP_Follow $follow ) {
-		// clear followers count for blog
-		wp_cache_delete( $follow->leader_id,   'bp_follow_blogs_followers_count' );
+		// clear followers count for post
+		wp_cache_delete( $follow->leader_id,   'bp_follow_posts_followers_count' );
 
-		// clear following blogs count for user
-		wp_cache_delete( $follow->follower_id, 'bp_follow_user_blogs_following_count' );
+		// clear following posts count for user
+		wp_cache_delete( $follow->follower_id, 'bp_follow_user_posts_following_count' );
 
 		// clear queried followers / following
-		wp_cache_delete( $follow->leader_id,   'bp_follow_blogs_followers_query' );
-		wp_cache_delete( $follow->follower_id, 'bp_follow_user_blogs_following_query' );
+		wp_cache_delete( $follow->leader_id,   'bp_follow_posts_followers_query' );
+		wp_cache_delete( $follow->follower_id, 'bp_follow_user_posts_following_query' );
 
 		// clear follow relationship
-		wp_cache_delete( "{$follow->leader_id}:{$follow->follower_id}:blogs", 'bp_follow_data' );
+		wp_cache_delete( "{$follow->leader_id}:{$follow->follower_id}:posts", 'bp_follow_data' );
 	}
 
 	/**
-	 * Clear blog count cache when a user is deleted.
+	 * Clear post count cache when a user is deleted.
+	 *
+	 * @since 1.3.0
 	 *
 	 * @param int $user_id The user ID being deleted
 	 */
 	public function clear_cache_on_user_delete( $user_id = 0 ) {
-		// delete user's blog follow count
-		wp_cache_delete( $user_id, 'bp_follow_user_blogs_following_count' );
+		// delete user's post follow count
+		wp_cache_delete( $user_id, 'bp_follow_user_posts_following_count' );
 
-		// delete queried blogs that user was following
-		wp_cache_delete( $user_id, 'bp_follow_user_blogs_following_query' );
+		// delete queried posts that user was following
+		wp_cache_delete( $user_id, 'bp_follow_user_posts_following_query' );
 
-		// delete each blog's followers count that the user was following
-		$blogs = BP_Follow::get_following( $user_id, 'blogs' );
-		if ( ! empty( $blogs ) ) {
-			foreach ( $blogs as $blog_id ) {
-				wp_cache_delete( $blog_id, 'bp_follow_blogs_followers_count' );
+		// delete each post's followers count that the user was following
+		$posts = BP_Follow::get_following( $user_id, 'posts' );
+		if ( ! empty( $posts ) ) {
+			foreach ( $posts as $post_id ) {
+				wp_cache_delete( $post_id, 'bp_follow_posts_followers_count' );
 
 				// clear follow relationship
-				wp_cache_delete( "{$blog_id}:{$user_id}:blogs", 'bp_follow_data' );
+				wp_cache_delete( "{$post_id}:{$user_id}:posts", 'bp_follow_data' );
 			}
 		}
 	}
 
 	/**
-	 * Clear blog count cache when a blog is deleted.
+	 * Clear post count cache when a post is deleted.
 	 *
-	 * @param int $blog_id The ID of the blog being deleted
+	 * @since 1.3.0
+	 *
+	 * @param int $post_id The ID of the post being deleted
 	 */
-	public function clear_cache_on_blog_delete( $blog_id ) {
-		// clear followers count for blog
-		wp_cache_delete( $blog_id, 'bp_follow_blogs_followers_count' );
+	public function clear_cache_on_post_delete( $post_id ) {
+		// clear followers count for post
+		wp_cache_delete( $post_id, 'bp_follow_posts_followers_count' );
 
-		// clear queried followers for blog
-		wp_cache_delete( $blog_id, 'bp_follow_blogs_followers_query' );
+		// clear queried followers for post
+		wp_cache_delete( $post_id, 'bp_follow_posts_followers_query' );
 
-		// delete each user's blog following count for those that followed the blog
-		$users = BP_Follow::get_followers( $blog_id, 'blogs' );
+		// delete each user's post following count for those that followed the post
+		$users = BP_Follow::get_followers( $post_id, 'posts' );
 		if ( ! empty( $users ) ) {
 			foreach ( $users as $user ) {
-				wp_cache_delete( $user, 'bp_follow_user_blogs_following_count' );
+				wp_cache_delete( $user, 'bp_follow_user_posts_following_count' );
 
 				// clear follow relationship
-				wp_cache_delete( "{$blog_id}:{$user}:blogs", 'bp_follow_data' );
+				wp_cache_delete( "{$post_id}:{$user}:posts", 'bp_follow_data' );
 			}
 		}
 	}
@@ -726,10 +697,12 @@ class BP_Follow_Posts {
 	/**
 	 * Sets the "RSS" feed URL for the tab on the Sitewide Activity page.
 	 *
-	 * This occurs when the "Followed Sites" tab is clicked on the Sitewide
-	 * Activity page or when the activity scope is already set to "followblogs".
+	 * This occurs when the "Followed Posts" tab is clicked on the Sitewide
+	 * Activity page or when the activity scope is already set to "followposts".
 	 *
 	 * Only do this for BuddyPress 1.8+.
+	 *
+	 * @since 1.3.0
 	 *
 	 * @param string $retval The feed URL.
 	 * @return string The feed URL.
@@ -749,8 +722,8 @@ class BP_Follow_Posts {
 		// get the activity scope
 		$scope = ! empty( $_COOKIE['bp-activity-scope'] ) ? $_COOKIE['bp-activity-scope'] : false;
 
-		if ( $scope == 'followblogs' && bp_loggedin_user_id() ) {
-			$retval = bp_loggedin_user_domain() . bp_get_activity_slug() . '/' . constant( 'BP_FOLLOW_BLOGS_USER_ACTIVITY_SLUG' ) . '/feed/';
+		if ( $scope == 'followposts' && bp_loggedin_user_id() ) {
+			$retval = bp_loggedin_user_domain() . bp_get_activity_slug() . '/' . constant( 'BP_FOLLOW_POSTS_USER_ACTIVITY_SLUG' ) . '/feed/';
 		}
 
 		return $retval;
@@ -773,7 +746,7 @@ class BP_Follow_Posts_Screens {
 		add_action( 'bp_template_content', array( __CLASS__, 'user_posts_screen_content' ) );
 
 		// this is for bp-default themes
-		bp_core_load_template( 'members/single/home' );
+		bp_core_load_template( 'members/single/plugins' );
 	}
 
 	/**
@@ -783,9 +756,8 @@ class BP_Follow_Posts_Screens {
 		do_action( 'bp_before_member_posts_content' );
 	?>
 
-		<div class="posts follow-post" role="main">
-			<p>Apenas testando!</p>
-			<?php // bp_get_template_part( 'post/post-loop' ) ?>
+		<div class="posts follow-posts" role="main">
+			<?php bp_get_template_part( 'posts/post-loop' ) ?>
 		</div><!-- .posts.follow-posts -->
 
 	<?php
@@ -796,11 +768,11 @@ class BP_Follow_Posts_Screens {
 	 * Inline JS when on a user blogs page.
 	 *
 	 * We need to:
-	 *  - Disable AJAX when clicking on a blogs subnav item (this is a BP bug)
+	 *  - Disable AJAX when clicking on a posts subnav item (this is a BP bug)
 	 *  - Add a following scope when AJAX is submitted
 	 */
 	public static function user_posts_inline_js() {
-		//jQuery("#blogs-personal-li").attr('id','blogs-following-personal-li');
+		//jQuery("#posts-personal-li").attr('id','posts-following-personal-li');
 	?>
 
 		<script type="text/javascript">
@@ -829,8 +801,8 @@ class BP_Follow_Posts_Screens {
 	/**
 	 * RSS handler for a user's followed sites.
 	 *
-	 * When a user lands on /members/USERNAME/activity/followblogs/feed/, this
-	 * method generates the RSS feed for their followed sites.
+	 * When a user lands on /members/USERNAME/activity/followposts/feed/, this
+	 * method generates the RSS feed for their followed posts.
 	 */
 	public static function rss_handler() {
 		// only available in BP 1.8+
@@ -842,12 +814,12 @@ class BP_Follow_Posts_Screens {
 			return;
 		}
 
-		// get blog IDs that the user is following
+		// get post IDs that the user is following
 		$following_ids = bp_get_following_ids( array(
 			'follow_type' => 'posts',
 		) );
 
-		// if $following_ids is empty, pass a negative number so no blogs can be found
+		// if $following_ids is empty, pass a negative number so no posts can be found
 		$following_ids = empty( $following_ids ) ? -1 : $following_ids;
 
 		$args = array(
@@ -860,11 +832,11 @@ class BP_Follow_Posts_Screens {
 		buddypress()->activity->feed = new BP_Activity_Feed( array(
 			'id'            => 'followedposts',
 
-			/* translators: User's following activity RSS title - "[Site Name] | [User Display Name] | Followed Site Activity" */
-			'title'         => sprintf( __( '%1$s | %2$s | Followed Post Activity', 'bp-follow' ), bp_get_site_name(), bp_get_displayed_user_fullname() ),
+			/* translators: User's following activity RSS title - "[Post Name] | [User Display Name] | Followed Post Activity" */
+			'title'         => sprintf( __( '%1$s | %2$s | Followed Post Activity', 'bp-follow' ), get_the_title( $following_ids ), bp_get_displayed_user_fullname() ),
 
-			'link'          => trailingslashit( bp_displayed_user_domain() . bp_get_activity_slug() . '/' . constant( 'BP_FOLLOW_BLOGS_USER_ACTIVITY_SLUG' ) ),
-			'description'   => sprintf( __( "Activity feed for sites that %s is following.", 'buddypress' ), bp_get_displayed_user_fullname() ),
+			'link'          => trailingslashit( bp_displayed_user_domain() . bp_get_activity_slug() . '/' . constant( 'BP_FOLLOW_POSTS_USER_ACTIVITY_SLUG' ) ),
+			'description'   => sprintf( __( "Activity feed for posts that %s is following.", 'buddypress' ), bp_get_displayed_user_fullname() ),
 			'activity_args' => $args,
 		) );
 	}
@@ -909,8 +881,9 @@ class BP_Follow_Posts_Screens {
 			bp_core_add_message( $message, 'error' );
 
 		// success on follow action
-		} else {
-			$post_id    = $_GET['post_id'];
+		} 
+		else {
+			$post_id    = intval( $_GET['post_id'] );
 			$post_title = get_the_title( $post_id );
 
 			if ( 'follow' == $action ) {
