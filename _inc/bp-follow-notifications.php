@@ -299,10 +299,12 @@ function bp_follow_new_follow_email_notification( $args = '' ) {
 
 	// Check to see if this leader has already been notified of this follower before
 	$has_notified = bp_get_user_meta( $r['follower_id'], 'bp_follow_has_notified', true );
+	$has_notified = empty( $has_notified ) ? array() : $has_notified;
 
 	// Already notified so don't send another email
-	if ( in_array( $r['leader_id'], (array) $has_notified ) )
+	if ( in_array( $r['leader_id'], $has_notified ) ) {
 		return false;
+	}
 
 	// Not been notified before, update usermeta and continue to mail
 	$has_notified[] = $r['leader_id'];
