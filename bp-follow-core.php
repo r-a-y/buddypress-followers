@@ -98,6 +98,11 @@ class BP_Follow_Component extends BP_Component {
 			require( $this->path . '/modules/activity.php' );
 		}
 
+		// posts module
+		if ( true === (bool) apply_filters( 'bp_follow_enable_posts', true ) ) {
+			require( $this->path . '/modules/posts.php' );
+		}
+
 		// updater
 		if ( defined( 'WP_NETWORK_ADMIN' ) ) {
 			require( $this->path . '/bp-follow-updater.php' );
