@@ -86,7 +86,7 @@ function bp_follow_add_follow_button( $args = '' ) {
 			$id        = 'following';
 			$action    = 'stop';
 			$class     = 'unfollow';
-			$link_text = sprintf( _x( 'Unfollow', 'Button', 'bp-follow' ), apply_filters( 'bp_follow_leader_name', bp_get_user_firstname( $leader_fullname ), $r['leader_id'] ) );
+			$link_text = sprintf( _x( 'Unfollow', 'Button', 'buddypress-followers' ), apply_filters( 'bp_follow_leader_name', bp_get_user_firstname( $leader_fullname ), $r['leader_id'] ) );
 
 			if ( empty( $r['link_text'] ) ) {
 				$r['link_text'] = $link_text;
@@ -96,7 +96,7 @@ function bp_follow_add_follow_button( $args = '' ) {
 			$id        = 'not-following';
 			$action    = 'start';
 			$class     = 'follow';
-			$link_text = sprintf( _x( 'Follow', 'Button', 'bp-follow' ), apply_filters( 'bp_follow_leader_name', bp_get_user_firstname( $leader_fullname ), $r['leader_id'] ) );
+			$link_text = sprintf( _x( 'Follow', 'Button', 'buddypress-followers' ), apply_filters( 'bp_follow_leader_name', bp_get_user_firstname( $leader_fullname ), $r['leader_id'] ) );
 
 			if ( empty( $r['link_text'] ) ) {
 				$r['link_text'] = $link_text;

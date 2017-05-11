@@ -82,7 +82,7 @@ class BP_Follow_Activity_Module {
 		// Add activity sub nav item
 		if ( bp_is_active( 'activity' ) && apply_filters( 'bp_follow_activity_show_activity_subnav', true ) ) {
 			bp_core_new_subnav_item( array(
-				'name'            => _x( 'Followed Activity', 'Activity subnav tab', 'bp-follow' ),
+				'name'            => _x( 'Followed Activity', 'Activity subnav tab', 'buddypress-followers' ),
 				'slug'            => constant( 'BP_FOLLOW_ACTIVITY_USER_ACTIVITY_SLUG' ),
 				'parent_url'      => trailingslashit( $user_domain . bp_get_activity_slug() ),
 				'parent_slug'     => bp_get_activity_slug(),
@@ -108,7 +108,7 @@ class BP_Follow_Activity_Module {
 			$new_item = array(
 				'parent' => 'my-account-activity',
 				'id'     => 'my-account-activity-followactivity',
-				'title'  => _x( 'Followed Activity', 'Adminbar activity subnav', 'bp-follow' ),
+				'title'  => _x( 'Followed Activity', 'Adminbar activity subnav', 'buddypress-followers' ),
 				'href'   => bp_loggedin_user_domain() . bp_get_activity_slug() . '/' . constant( 'BP_FOLLOW_ACTIVITY_USER_ACTIVITY_SLUG' ) . '/',
 			);
 
@@ -150,7 +150,7 @@ class BP_Follow_Activity_Module {
 		// Adding a count is confusing when you can follow comments of activity items...
 		$count = 0;
 		?>
-		<li id="activity-follow"><a href="<?php echo esc_url( bp_loggedin_user_domain() . bp_get_activity_slug() . '/' . constant( 'BP_FOLLOW_ACTIVITY_USER_ACTIVITY_SLUG' ). '/' ); ?>"><?php printf( __( 'My Followed Activity', 'bp-follow' ), (int) $count ) ?></a></li><?php
+		<li id="activity-follow"><a href="<?php echo esc_url( bp_loggedin_user_domain() . bp_get_activity_slug() . '/' . constant( 'BP_FOLLOW_ACTIVITY_USER_ACTIVITY_SLUG' ). '/' ); ?>"><?php printf( __( 'My Followed Activity', 'buddypress-followers' ), (int) $count ) ?></a></li><?php
 	}
 
 	public function bulk_inject_follow_status( $retval ) {
@@ -435,7 +435,7 @@ class BP_Follow_Activity_Module {
 			'id'            => 'followedactivity',
 
 			/* translators: User's following activity RSS title - "[Site Name] | [User Display Name] | Followed Activity" */
-			'title'         => sprintf( __( '%1$s | %2$s | Followed Activity', 'bp-follow' ), bp_get_site_name(), bp_get_displayed_user_fullname() ),
+			'title'         => sprintf( __( '%1$s | %2$s | Followed Activity', 'buddypress-followers' ), bp_get_site_name(), bp_get_displayed_user_fullname() ),
 
 			'link'          => esc_url( trailingslashit( bp_displayed_user_domain() . bp_get_activity_slug() . '/' . constant( 'BP_FOLLOW_ACTIVITY_USER_ACTIVITY_SLUG' ) ) ),
 			'description'   => sprintf( __( "Feed for activity that %s is following.", 'buddypress' ), bp_get_displayed_user_fullname() ),
