@@ -80,12 +80,43 @@ class BP_Follow_Component extends BP_Component {
 
 		// users module
 		if ( true === (bool) apply_filters( 'bp_follow_enable_users', true ) ) {
-			require( $this->path . '/users/screens.php' );
-			require( $this->path . '/users/actions.php' );
 			require( $this->path . '/users/hooks.php' );
 			require( $this->path . '/users/template.php' );
 			require( $this->path . '/users/notifications.php' );
 			require( $this->path . '/users/widgets.php' );
+
+			// Load AJAX code when an AJAX request is requested.
+			add_action( 'admin_init', function() {
+				if ( defined( 'DOING_AJAX' ) && true === DOING_AJAX && false !== strpos( $_POST['action'], 'follow' ) ) {
+					require $this->path . '/users/ajax.php';
+				}
+			} );
+
+			/**
+			 * Conditional includes.
+			 *
+			 * bp_setup_canonical_stack() is a BP 2.1 function and we still support v1.5.
+			 */
+			if ( function_exists( 'bp_setup_canonical_stack' ) ) {
+				$load_hook = 'bp_setup_canonical_stack';
+				$priority  = 20;
+			} else {
+				$load_hook = 'bp_init';
+				$priority  = 5;
+			}
+			add_action( $load_hook, function() {
+				// Actions
+				if ( bp_is_current_component( $this->followers->slug ) || bp_is_action_variable( 'feed', 0 ) ) {
+					require $this->path . '/users/actions.php';
+				}
+
+				// Screens
+				if ( bp_is_current_component( $this->following->slug ) || bp_is_current_component( $this->followers->slug ) ||
+					( bp_is_current_component( 'activity' ) && bp_is_current_action( $this->following->slug ) )
+				) {
+					require $this->path . '/users/screens.php';
+				}
+			}, $priority );
 		}
 
 		// blogs module - on multisite and BP 2.0+ only
