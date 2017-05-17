@@ -121,7 +121,7 @@ class BP_Follow_Blogs {
 		}
 
 		bp_core_new_subnav_item( array(
-			'name'            => _x( 'Followed Sites', 'Sites subnav tab', 'bp-follow' ),
+			'name'            => _x( 'Followed Sites', 'Sites subnav tab', 'buddypress-followers' ),
 			'slug'            => constant( 'BP_FOLLOW_BLOGS_USER_FOLLOWING_SLUG' ),
 			'parent_url'      => trailingslashit( $user_domain . bp_get_blogs_slug() ),
 			'parent_slug'     => bp_get_blogs_slug(),
@@ -133,7 +133,7 @@ class BP_Follow_Blogs {
 		// Add activity sub nav item
 		if ( bp_is_active( 'activity' ) && apply_filters( 'bp_follow_blogs_show_activity_subnav', true ) ) {
 			bp_core_new_subnav_item( array(
-				'name'            => _x( 'Followed Sites', 'Activity subnav tab', 'bp-follow' ),
+				'name'            => _x( 'Followed Sites', 'Activity subnav tab', 'buddypress-followers' ),
 				'slug'            => constant( 'BP_FOLLOW_BLOGS_USER_ACTIVITY_SLUG' ),
 				'parent_url'      => trailingslashit( $user_domain . bp_get_activity_slug() ),
 				'parent_slug'     => bp_get_activity_slug(),
@@ -159,7 +159,7 @@ class BP_Follow_Blogs {
 			$new_item = array(
 				'parent' => 'my-account-activity',
 				'id'     => 'my-account-activity-followblogs',
-				'title'  => _x( 'Followed Sites', 'Adminbar activity subnav', 'bp-follow' ),
+				'title'  => _x( 'Followed Sites', 'Adminbar activity subnav', 'buddypress-followers' ),
 				'href'   => bp_loggedin_user_domain() . bp_get_activity_slug() . '/' . constant( 'BP_FOLLOW_BLOGS_USER_ACTIVITY_SLUG' ) . '/',
 			);
 
@@ -191,7 +191,7 @@ class BP_Follow_Blogs {
 		$new_item = array(
 			'parent' => 'my-account-blogs',
 			'id'     => 'my-account-blogs-following',
-			'title'  => _x( 'Followed Sites', 'Adminbar blogs subnav', 'bp-follow' ),
+			'title'  => _x( 'Followed Sites', 'Adminbar blogs subnav', 'buddypress-followers' ),
 			'href'   => bp_loggedin_user_domain() . bp_get_blogs_slug() . '/' . constant( 'BP_FOLLOW_BLOGS_USER_FOLLOWING_SLUG' ). '/',
 		);
 
@@ -236,7 +236,7 @@ class BP_Follow_Blogs {
 		}
 		*/
 		?>
-		<li id="activity-followblogs"><a href="<?php echo esc_url( bp_loggedin_user_domain() . bp_get_blogs_slug() . '/' . constant( 'BP_FOLLOW_BLOGS_USER_FOLLOWING_SLUG' ). '/' ); ?>"><?php printf( __( 'Followed Sites <span>%d</span>', 'bp-follow' ), (int) $counts['following'] ) ?></a></li><?php
+		<li id="activity-followblogs"><a href="<?php echo esc_url( bp_loggedin_user_domain() . bp_get_blogs_slug() . '/' . constant( 'BP_FOLLOW_BLOGS_USER_FOLLOWING_SLUG' ). '/' ); ?>"><?php printf( __( 'Followed Sites <span>%d</span>', 'buddypress-followers' ), (int) $counts['following'] ) ?></a></li><?php
 	}
 
 
@@ -260,7 +260,7 @@ class BP_Follow_Blogs {
 			return false;
 		}
 		?>
-		<li id="blogs-following"><a href="<?php echo esc_url( bp_loggedin_user_domain() . bp_get_blogs_slug() . '/' . constant( 'BP_FOLLOW_BLOGS_USER_FOLLOWING_SLUG' ). '/' ); ?>"><?php printf( __( 'Following <span>%d</span>', 'bp-follow' ), (int) $counts['following'] ) ?></a></li><?php
+		<li id="blogs-following"><a href="<?php echo esc_url( bp_loggedin_user_domain() . bp_get_blogs_slug() . '/' . constant( 'BP_FOLLOW_BLOGS_USER_FOLLOWING_SLUG' ). '/' ); ?>"><?php printf( __( 'Following <span>%d</span>', 'buddypress-followers' ), (int) $counts['following'] ) ?></a></li><?php
 	}
 
 	/** LOOP-FILTERING ************************************************/
@@ -595,7 +595,7 @@ class BP_Follow_Blogs {
  				$btn_args = apply_filters( 'bp_follow_blogs_get_sites_button_args', array(
  					'class' => 'home',
  					'link' => bp_loggedin_user_domain() . bp_get_blogs_slug() . '/' . constant( 'BP_FOLLOW_BLOGS_USER_FOLLOWING_SLUG' ). '/',
- 					'text' => _x( 'Followed Sites', 'Footer button', 'bp-follow' ),
+ 					'text' => _x( 'Followed Sites', 'Footer button', 'buddypress-followers' ),
  				) );
 
 				if ( ! empty( $btn_args ) && is_array( $btn_args ) ) {
@@ -647,10 +647,10 @@ class BP_Follow_Blogs {
 		if ( $is_following ) {
 			$id        = 'following';
 			$action    = 'unfollow';
-			$link_text = _x( 'Unfollow', 'Button', 'bp-follow' );
+			$link_text = _x( 'Unfollow', 'Button', 'buddypress-followers' );
 
 			if ( empty( $blogs_template->in_the_loop ) ) {
-				$link_text = _x( 'Unfollow Site', 'Button', 'bp-follow' );
+				$link_text = _x( 'Unfollow Site', 'Button', 'buddypress-followers' );
 			}
 
 			if ( empty( $r['link_text'] ) ) {
@@ -660,10 +660,10 @@ class BP_Follow_Blogs {
 		} else {
 			$id        = 'not-following';
 			$action    = 'follow';
-			$link_text = _x( 'Follow', 'Button', 'bp-follow' );
+			$link_text = _x( 'Follow', 'Button', 'buddypress-followers' );
 
 			if ( empty( $blogs_template->in_the_loop ) ) {
-				$link_text = _x( 'Follow Site', 'Button', 'bp-follow' );
+				$link_text = _x( 'Follow Site', 'Button', 'buddypress-followers' );
 			}
 
 			if ( empty( $r['link_text'] ) ) {
@@ -932,7 +932,7 @@ class BP_Follow_Blogs_Screens {
 			'id'            => 'followedsites',
 
 			/* translators: User's following activity RSS title - "[Site Name] | [User Display Name] | Followed Site Activity" */
-			'title'         => sprintf( __( '%1$s | %2$s | Followed Site Activity', 'bp-follow' ), bp_get_site_name(), bp_get_displayed_user_fullname() ),
+			'title'         => sprintf( __( '%1$s | %2$s | Followed Site Activity', 'buddypress-followers' ), bp_get_site_name(), bp_get_displayed_user_fullname() ),
 
 			'link'          => trailingslashit( bp_displayed_user_domain() . bp_get_activity_slug() . '/' . constant( 'BP_FOLLOW_BLOGS_USER_ACTIVITY_SLUG' ) ),
 			'description'   => sprintf( __( "Activity feed for sites that %s is following.", 'buddypress' ), bp_get_displayed_user_fullname() ),
@@ -972,9 +972,9 @@ class BP_Follow_Blogs_Screens {
 			'follow_type' => 'blogs'
 		) ) ) {
 			if ( 'follow' == $action ) {
-				$message = __( 'You are already following that blog.', 'bp-follow' );
+				$message = __( 'You are already following that blog.', 'buddypress-followers' );
 			} else {
-				$message = __( 'You are not following that blog.', 'bp-follow' );
+				$message = __( 'You are not following that blog.', 'buddypress-followers' );
 			}
 
 			bp_core_add_message( $message, 'error' );
@@ -1005,15 +1005,15 @@ class BP_Follow_Blogs_Screens {
 
 			if ( 'follow' == $action ) {
 				if ( ! empty( $blog_name ) ) {
-					$message = sprintf( __( 'You are now following the site, %s.', 'bp-follow' ), $blog_name );
+					$message = sprintf( __( 'You are now following the site, %s.', 'buddypress-followers' ), $blog_name );
 				} else {
-					$message = __( 'You are now following that site.', 'bp-follow' );
+					$message = __( 'You are now following that site.', 'buddypress-followers' );
 				}
 			} else {
 				if ( ! empty( $blog_name ) ) {
-					$message = sprintf( __( 'You are no longer following the site, %s.', 'bp-follow' ), $blog_name );
+					$message = sprintf( __( 'You are no longer following the site, %s.', 'buddypress-followers' ), $blog_name );
 				} else {
-					$message = __( 'You are no longer following that site.', 'bp-follow' );
+					$message = __( 'You are no longer following that site.', 'buddypress-followers' );
 				}
 			}
 

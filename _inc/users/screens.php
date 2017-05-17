@@ -193,17 +193,17 @@ function bp_follow_add_members_dropdown_filter() {
 	<li id="members-order-select" class="last filter">
 
 		<?php // the ID for this is important as AJAX relies on it! ?>
-		<label for="members-<?php echo bp_current_action(); ?>-orderby"><?php _e( 'Order By:', 'bp-follow' ); ?></label>
+		<label for="members-<?php echo bp_current_action(); ?>-orderby"><?php _e( 'Order By:', 'buddypress-followers' ); ?></label>
 		<select id="members-<?php echo bp_current_action(); ?>-orderby">
 			<?php if ( class_exists( 'BP_User_Query' ) ) : ?>
-				<option value="newest-follows"><?php _e( 'Newest Follows', 'bp-follow' ); ?></option>
-				<option value="oldest-follows"><?php _e( 'Oldest Follows', 'bp-follow' ); ?></option>
+				<option value="newest-follows"><?php _e( 'Newest Follows', 'buddypress-followers' ); ?></option>
+				<option value="oldest-follows"><?php _e( 'Oldest Follows', 'buddypress-followers' ); ?></option>
 			<?php endif; ?>
-			<option value="active"><?php _e( 'Last Active', 'bp-follow' ); ?></option>
-			<option value="newest"><?php _e( 'Newest Registered', 'bp-follow' ); ?></option>
+			<option value="active"><?php _e( 'Last Active', 'buddypress-followers' ); ?></option>
+			<option value="newest"><?php _e( 'Newest Registered', 'buddypress-followers' ); ?></option>
 
 			<?php if ( bp_is_active( 'xprofile' ) ) : ?>
-				<option value="alphabetical"><?php _e( 'Alphabetical', 'bp-follow' ); ?></option>
+				<option value="alphabetical"><?php _e( 'Alphabetical', 'buddypress-followers' ); ?></option>
 			<?php endif; ?>
 
 			<?php do_action( 'bp_members_directory_order_options' ); ?>
