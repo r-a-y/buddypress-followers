@@ -1,0 +1,318 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: bp-follow\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-02-05 15:40-0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: bp-follow-core.php:45 bp-follow-core.php:45
+#: _inc/users/notifications.php:239
+msgid "Follow"
+msgstr ""
+
+#: loader.php:38 loader.php:38
+#, php-format
+msgid ""
+"Hey! BP Follow v1.2 requires BuddyPress 1.5 or higher.  If you are still "
+"using BuddyPress 1.2 and you don't plan on upgrading, use <a href='%s'>BP "
+"Follow v1.1.1 instead</a>."
+msgstr ""
+
+#: _inc/bp-follow-functions.php:372 _inc/users/notifications.php:302
+#, php-format
+msgid "%s is now following you"
+msgstr ""
+
+#: _inc/bp-follow-functions.php:376
+#, php-format
+msgid "%d more users are now following you"
+msgstr ""
+
+#: _inc/modules/blogs.php:99
+msgctxt "Sites subnav tab"
+msgid "Followed Sites"
+msgstr ""
+
+#: _inc/modules/blogs.php:111
+msgctxt "Activity subnav tab"
+msgid "Followed Sites"
+msgstr ""
+
+#: _inc/modules/blogs.php:137
+msgctxt "Adminbar activity subnav"
+msgid "Followed Sites"
+msgstr ""
+
+#: _inc/modules/blogs.php:169
+msgctxt "Adminbar blogs subnav"
+msgid "Followed Sites"
+msgstr ""
+
+#: _inc/modules/blogs.php:214
+#, php-format
+msgid "Followed Sites <span>%d</span>"
+msgstr ""
+
+#: _inc/modules/blogs.php:238 _inc/users/hooks.php:44 _inc/users/hooks.php:494
+#: _inc/users/hooks.php:517
+#, php-format
+msgid "Following <span>%d</span>"
+msgstr ""
+
+#: _inc/modules/blogs.php:575
+msgctxt "Footer button"
+msgid "Followed Sites"
+msgstr ""
+
+#: _inc/modules/blogs.php:627 _inc/users/template.php:89
+msgctxt "Button"
+msgid "Unfollow"
+msgstr ""
+
+#: _inc/modules/blogs.php:630
+msgctxt "Button"
+msgid "Unfollow Site"
+msgstr ""
+
+#: _inc/modules/blogs.php:640 _inc/users/template.php:99
+msgctxt "Button"
+msgid "Follow"
+msgstr ""
+
+#: _inc/modules/blogs.php:643
+msgctxt "Button"
+msgid "Follow Site"
+msgstr ""
+
+#: _inc/modules/blogs.php:912
+#, php-format
+msgid "%1$s | %2$s | Followed Site Activity"
+msgstr ""
+
+#: _inc/modules/blogs.php:915
+#, php-format
+msgid "Activity feed for sites that %s is following."
+msgstr ""
+
+#: _inc/modules/blogs.php:952
+msgid "You are already following that blog."
+msgstr ""
+
+#: _inc/modules/blogs.php:954
+msgid "You are not following that blog."
+msgstr ""
+
+#: _inc/modules/blogs.php:985
+#, php-format
+msgid "You are now following the site, %s."
+msgstr ""
+
+#: _inc/modules/blogs.php:987
+msgid "You are now following that site."
+msgstr ""
+
+#: _inc/modules/blogs.php:991
+#, php-format
+msgid "You are no longer following the site, %s."
+msgstr ""
+
+#: _inc/modules/blogs.php:993
+msgid "You are no longer following that site."
+msgstr ""
+
+#: _inc/users/actions.php:35
+#, php-format
+msgid "You are already following %s."
+msgstr ""
+
+#: _inc/users/actions.php:39
+#, php-format
+msgid "There was a problem when trying to follow %s, please try again."
+msgstr ""
+
+#: _inc/users/actions.php:41
+#, php-format
+msgid "You are now following %s."
+msgstr ""
+
+#: _inc/users/actions.php:74
+#, php-format
+msgid "You are not following %s."
+msgstr ""
+
+#: _inc/users/actions.php:78
+#, php-format
+msgid "There was a problem when trying to stop following %s, please try again."
+msgstr ""
+
+#: _inc/users/actions.php:80
+#, php-format
+msgid "You are no longer following %s."
+msgstr ""
+
+#: _inc/users/actions.php:117
+#, php-format
+msgid "%1$s | %2$s | Following Activity"
+msgstr ""
+
+#: _inc/users/actions.php:120
+#, php-format
+msgid "Activity feed for people that %s is following."
+msgstr ""
+
+#: _inc/users/actions.php:167
+msgid "Already following"
+msgstr ""
+
+#: _inc/users/actions.php:172
+msgid "Error following user"
+msgstr ""
+
+#: _inc/users/actions.php:220
+msgid "Not following"
+msgstr ""
+
+#: _inc/users/actions.php:226
+msgid "Error unfollowing user"
+msgstr ""
+
+#: _inc/users/hooks.php:55
+#, php-format
+msgid "Followers <span>%d</span>"
+msgstr ""
+
+#: _inc/users/hooks.php:69
+msgctxt "Activity subnav tab"
+msgid "Following"
+msgstr ""
+
+#: _inc/users/hooks.php:103 _inc/users/hooks.php:209
+msgctxt "Adminbar main nav"
+msgid "Follow"
+msgstr ""
+
+#: _inc/users/hooks.php:111 _inc/users/hooks.php:220
+msgctxt "Adminbar follow subnav"
+msgid "Following"
+msgstr ""
+
+#: _inc/users/hooks.php:119 _inc/users/hooks.php:231
+msgctxt "Adminbar follow subnav"
+msgid "Followers"
+msgstr ""
+
+#: _inc/users/hooks.php:148
+msgctxt "Adminbar activity subnav"
+msgid "Following"
+msgstr ""
+
+#: _inc/users/hooks.php:494
+msgid "The public activity for everyone you are following on this site."
+msgstr ""
+
+#: _inc/users/hooks.php:852
+msgid "You are following some users, but they haven't posted yet."
+msgstr ""
+
+#: _inc/users/hooks.php:854
+msgid "You are not following anyone yet."
+msgstr ""
+
+#: _inc/users/hooks.php:862
+msgid "This user is following some users, but they haven't posted yet."
+msgstr ""
+
+#: _inc/users/hooks.php:864
+msgid "This user isn't following anyone yet."
+msgstr ""
+
+#: _inc/users/notifications.php:240
+msgid "Yes"
+msgstr ""
+
+#: _inc/users/notifications.php:241
+msgid "No"
+msgstr ""
+
+#: _inc/users/notifications.php:248
+msgid "A member starts following your activity"
+msgstr ""
+
+#: _inc/users/notifications.php:305
+#, php-format
+msgid ""
+"%s is now following your activity.\n"
+"\n"
+"To view %s's profile: %s"
+msgstr ""
+
+#: _inc/users/notifications.php:312
+#, php-format
+msgid ""
+"\n"
+"\n"
+"---------------------\n"
+"To disable these notifications please log in and go to:\n"
+"%s"
+msgstr ""
+
+#: _inc/users/screens.php:196
+msgid "Order By:"
+msgstr ""
+
+#: _inc/users/screens.php:199
+msgid "Newest Follows"
+msgstr ""
+
+#: _inc/users/screens.php:200
+msgid "Oldest Follows"
+msgstr ""
+
+#: _inc/users/screens.php:202
+msgid "Last Active"
+msgstr ""
+
+#: _inc/users/screens.php:203
+msgid "Newest Registered"
+msgstr ""
+
+#: _inc/users/screens.php:206
+msgid "Alphabetical"
+msgstr ""
+
+#: _inc/users/widgets.php:25
+msgid "Show a list of member avatars that the logged-in user is following."
+msgstr ""
+
+#: _inc/users/widgets.php:31
+msgid "(BP Follow) Users I'm Following"
+msgstr ""
+
+#: _inc/users/widgets.php:99
+msgid "Users I'm Following"
+msgstr ""
+
+#: _inc/users/widgets.php:104
+msgid "Title:"
+msgstr ""
+
+#: _inc/users/widgets.php:107
+msgid "Max members to show:"
+msgstr ""
+
+#: _inc/users/widgets.php:108
+msgid ""
+"Note: This widget is only displayed if a member is logged in and if the "
+"logged-in user is following some users."
+msgstr ""

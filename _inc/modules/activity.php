@@ -135,9 +135,9 @@ class BP_Follow_Activity_Core {
 			$message_type = 'error';
 
 			if ( 'follow' === $action ) {
-				$message = __( 'You are already following that item.', 'bp-follow' );
+				$message = __( 'You are already following that item.', 'buddypress-followers' );
 			} else {
-				$message = __( 'You were not following that item.', 'bp-follow' );
+				$message = __( 'You were not following that item.', 'buddypress-followers' );
 			}
 
 		// Success!
@@ -145,9 +145,9 @@ class BP_Follow_Activity_Core {
 			$message_type = 'success';
 
 			if ( 'follow' === $action ) {
-				$message = __( 'You are now following that item.', 'bp-follow' );
+				$message = __( 'You are now following that item.', 'buddypress-followers' );
 			} else {
-				$message = __( 'You are no longer following that item.', 'bp-follow' );
+				$message = __( 'You are no longer following that item.', 'buddypress-followers' );
 			}
 		}
 

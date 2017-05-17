@@ -42,7 +42,7 @@ class BP_Follow_Component extends BP_Component {
 		// let's start the show!
 		parent::start(
 			'follow',
-			__( 'Follow', 'bp-follow' ),
+			__( 'Follow', 'buddypress-followers' ),
 			constant( 'BP_FOLLOW_DIR' ) . '/_inc',
 			$this->params
 		);

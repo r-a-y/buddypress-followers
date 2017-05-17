@@ -22,13 +22,13 @@ class BP_Follow_Following_Widget extends WP_Widget {
 		// Set up optional widget args
 		$widget_ops = array(
 			'classname'   => 'widget_bp_follow_following_widget widget buddypress',
-			'description' => __( "Show a list of member avatars that the logged-in user is following.", 'bp-follow' )
+			'description' => __( "Show a list of member avatars that the logged-in user is following.", 'buddypress-followers' )
 		);
 
 		// Set up the widget
 		parent::__construct(
 			false,
-			__( "(BP Follow) Users I'm Following", 'bp-follow' ),
+			__( "(BP Follow) Users I'm Following", 'buddypress-followers' ),
 			$widget_ops
 		);
 	}
@@ -96,7 +96,7 @@ class BP_Follow_Following_Widget extends WP_Widget {
 	 */
 	function form( $instance ) {
 		$instance = wp_parse_args( (array) $instance, array(
-			'title'     => __( "Users I'm Following", 'bp-follow' ),
+			'title'     => __( "Users I'm Following", 'buddypress-followers' ),
 			'max_users' => 16
 		) );
 	?>
@@ -104,8 +104,8 @@ class BP_Follow_Following_Widget extends WP_Widget {
 		<p><label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:'); ?></label>
 		<input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo esc_attr( $instance['title'] ); ?>" /></p>
 
-		<p><label for="bp-follow-widget-users-max"><?php _e('Max members to show:', 'bp-follow'); ?> <input class="widefat" id="<?php echo $this->get_field_id( 'max_users' ); ?>" name="<?php echo $this->get_field_name( 'max_users' ); ?>" type="text" value="<?php echo esc_attr( (int) $instance['max_users'] ); ?>" style="width: 30%" /></label></p>
-		<p><small><?php _e( 'Note: This widget is only displayed if a member is logged in and if the logged-in user is following some users.', 'bp-follow' ); ?></small></p>
+		<p><label for="bp-follow-widget-users-max"><?php _e('Max members to show:', 'buddypress-followers'); ?> <input class="widefat" id="<?php echo $this->get_field_id( 'max_users' ); ?>" name="<?php echo $this->get_field_name( 'max_users' ); ?>" type="text" value="<?php echo esc_attr( (int) $instance['max_users'] ); ?>" style="width: 30%" /></label></p>
+		<p><small><?php _e( 'Note: This widget is only displayed if a member is logged in and if the logged-in user is following some users.', 'buddypress-followers' ); ?></small></p>
 
 	<?php
 	}

@@ -558,9 +558,9 @@ function bp_follow_notification_settings_content() {
 		<thead>
 			<tr>
 				<th class="icon"></th>
-				<th class="title"><?php _e( 'Follow', 'bp-follow' ) ?></th>
-				<th class="yes"><?php _e( 'Yes', 'bp-follow' ) ?></th>
-				<th class="no"><?php _e( 'No', 'bp-follow' )?></th>
+				<th class="title"><?php _e( 'Follow', 'buddypress-followers' ) ?></th>
+				<th class="yes"><?php _e( 'Yes', 'buddypress-followers' ) ?></th>
+				<th class="no"><?php _e( 'No', 'buddypress-followers' )?></th>
 			</tr>
 		</thead>
 
@@ -586,11 +586,11 @@ function bp_follow_format_notifications( $action, $item_id, $secondary_item_id, 
 			$link = $text = false;
 
 			if ( 1 == $total_items ) {
-				$text = sprintf( __( '%s is now following you', 'bp-follow' ), bp_core_get_user_displayname( $item_id ) );
+				$text = sprintf( __( '%s is now following you', 'buddypress-followers' ), bp_core_get_user_displayname( $item_id ) );
 				$link = bp_core_get_user_domain( $item_id  ) . '?bpf_read';
 
 			} else {
-				$text = sprintf( __( '%d more users are now following you', 'bp-follow' ), $total_items );
+				$text = sprintf( __( '%d more users are now following you', 'buddypress-followers' ), $total_items );
 
 				if ( bp_is_active( 'notifications' ) ) {
 					$link = bp_get_notifications_permalink();

@@ -32,13 +32,13 @@ function bp_follow_action_start() {
 	check_admin_referer( 'start_following' );
 
 	if ( bp_follow_is_following( array( 'leader_id' => bp_displayed_user_id(), 'follower_id' => bp_loggedin_user_id() ) ) ) {
-		bp_core_add_message( sprintf( __( 'You are already following %s.', 'bp-follow' ), bp_get_displayed_user_fullname() ), 'error' );
+		bp_core_add_message( sprintf( __( 'You are already following %s.', 'buddypress-followers' ), bp_get_displayed_user_fullname() ), 'error' );
 
 	} else {
 		if ( ! bp_follow_start_following( array( 'leader_id' => bp_displayed_user_id(), 'follower_id' => bp_loggedin_user_id() ) ) ) {
-			bp_core_add_message( sprintf( __( 'There was a problem when trying to follow %s, please try again.', 'bp-follow' ), bp_get_displayed_user_fullname() ), 'error' );
+			bp_core_add_message( sprintf( __( 'There was a problem when trying to follow %s, please try again.', 'buddypress-followers' ), bp_get_displayed_user_fullname() ), 'error' );
 		} else {
-			bp_core_add_message( sprintf( __( 'You are now following %s.', 'bp-follow' ), bp_get_displayed_user_fullname() ) );
+			bp_core_add_message( sprintf( __( 'You are now following %s.', 'buddypress-followers' ), bp_get_displayed_user_fullname() ) );
 		}
 	}
 
@@ -71,13 +71,13 @@ function bp_follow_action_stop() {
 	check_admin_referer( 'stop_following' );
 
 	if ( ! bp_follow_is_following( array( 'leader_id' => bp_displayed_user_id(), 'follower_id' => bp_loggedin_user_id() ) ) ) {
-		bp_core_add_message( sprintf( __( 'You are not following %s.', 'bp-follow' ), bp_get_displayed_user_fullname() ), 'error' );
+		bp_core_add_message( sprintf( __( 'You are not following %s.', 'buddypress-followers' ), bp_get_displayed_user_fullname() ), 'error' );
 
 	} else {
 		if ( ! bp_follow_stop_following( array( 'leader_id' => bp_displayed_user_id(), 'follower_id' => bp_loggedin_user_id() ) ) ) {
-			bp_core_add_message( sprintf( __( 'There was a problem when trying to stop following %s, please try again.', 'bp-follow' ), bp_get_displayed_user_fullname() ), 'error' );
+			bp_core_add_message( sprintf( __( 'There was a problem when trying to stop following %s, please try again.', 'buddypress-followers' ), bp_get_displayed_user_fullname() ), 'error' );
 		} else {
-			bp_core_add_message( sprintf( __( 'You are no longer following %s.', 'bp-follow' ), bp_get_displayed_user_fullname() ) );
+			bp_core_add_message( sprintf( __( 'You are no longer following %s.', 'buddypress-followers' ), bp_get_displayed_user_fullname() ) );
 		}
 	}
 
@@ -114,7 +114,7 @@ function bp_follow_my_following_feed() {
 		'id'            => 'myfollowing',
 
 		/* translators: User's following activity RSS title - "[Site Name] | [User Display Name] | Following Activity" */
-		'title'         => sprintf( __( '%1$s | %2$s | Following Activity', 'bp-follow' ), bp_get_site_name(), bp_get_displayed_user_fullname() ),
+		'title'         => sprintf( __( '%1$s | %2$s | Following Activity', 'buddypress-followers' ), bp_get_site_name(), bp_get_displayed_user_fullname() ),
 
 		'link'          => trailingslashit( bp_displayed_user_domain() . bp_get_activity_slug() . '/' . constant( 'BP_FOLLOWING_SLUG' ) ),
 		'description'   => sprintf( __( "Activity feed for people that %s is following.", 'buddypress' ), bp_get_displayed_user_fullname() ),
@@ -164,12 +164,12 @@ function bp_follow_ajax_action_start() {
 
 		if ( bp_follow_is_following( array( 'leader_id' => $_POST['uid'], 'follower_id' => bp_loggedin_user_id() ) ) ) {
 			$output = bp_get_button( array_merge(
-				array( 'link_text' => __( 'Already following', 'bp-follow' ) ),
+				array( 'link_text' => __( 'Already following', 'buddypress-followers' ) ),
 				$args
 			) );
 		} else {
 			$output = bp_get_button( array_merge(
-				array( 'link_text' => __( 'Error following user', 'bp-follow' ) ),
+				array( 'link_text' => __( 'Error following user', 'buddypress-followers' ) ),
 				$args
 			) );
 		}
@@ -217,13 +217,13 @@ function bp_follow_ajax_action_stop() {
 
 		if ( ! bp_follow_is_following( array( 'leader_id' => $_POST['uid'], 'follower_id' => bp_loggedin_user_id() ) ) ) {
 			$output = bp_get_button( array_merge(
-				array( 'link_text' => __( 'Not following', 'bp-follow' ) ),
+				array( 'link_text' => __( 'Not following', 'buddypress-followers' ) ),
 				$args
 			) );
 
 		} else {
 			$output = bp_get_button( array_merge(
-				array( 'link_text' => __( 'Error unfollowing user', 'bp-follow' ) ),
+				array( 'link_text' => __( 'Error unfollowing user', 'buddypress-followers' ) ),
 				$args
 			) );
 

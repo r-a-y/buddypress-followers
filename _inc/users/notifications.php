@@ -234,7 +234,7 @@ function bp_follow_user_screen_notification_settings() {
 
 	<tr>
 		<td></td>
-		<td><?php _e( 'A member starts following your activity', 'bp-follow' ) ?></td>
+		<td><?php _e( 'A member starts following your activity', 'buddypress-followers' ) ?></td>
 		<td class="yes"><input type="radio" name="notifications[notification_starts_following]" value="yes" <?php checked( $notify, 'yes', true ) ?>/></td>
 		<td class="no"><input type="radio" name="notifications[notification_starts_following]" value="no" <?php checked( $notify, 'no', true ) ?>/></td>
 	</tr>
@@ -272,9 +272,10 @@ function bp_follow_new_follow_email_notification( $args = '' ) {
 
 	// Check to see if this leader has already been notified of this follower before
 	$has_notified = bp_get_user_meta( $r['follower_id'], 'bp_follow_has_notified', true );
+	$has_notified = empty( $has_notified ) ? array() : $has_notified;
 
 	// Already notified so don't send another email
-	if ( in_array( $r['leader_id'], (array) $has_notified ) ) {
+	if ( in_array( $r['leader_id'], $has_notified ) ) {
 		return false;
 	}
 
@@ -290,12 +291,12 @@ function bp_follow_new_follow_email_notification( $args = '' ) {
 	// Set up and send the message
 	$to = $leader_ud->user_email;
 
-	$subject = '[' . wp_specialchars_decode( bp_get_option( 'blogname' ), ENT_QUOTES ) . '] ' . sprintf( __( '%s is now following you', 'bp-follow' ), $follower_name );
+	$subject = '[' . wp_specialchars_decode( bp_get_option( 'blogname' ), ENT_QUOTES ) . '] ' . sprintf( __( '%s is now following you', 'buddypress-followers' ), $follower_name );
 
 	$message = sprintf( __(
 '%s is now following your activity.
 
-To view %s\'s profile: %s', 'bp-follow' ), $follower_name, $follower_name, $follower_link );
+To view %s\'s profile: %s', 'buddypress-followers' ), $follower_name, $follower_name, $follower_link );
 
 	// Add notifications link if settings component is enabled
 	if ( bp_is_active( 'settings' ) ) {
@@ -304,7 +305,7 @@ To view %s\'s profile: %s', 'bp-follow' ), $follower_name, $follower_name, $foll
 
 ---------------------
 To disable these notifications please log in and go to:
-%s', 'bp-follow' ), $settings_link );
+%s', 'buddypress-followers' ), $settings_link );
 	}
 
 	// Send the message
