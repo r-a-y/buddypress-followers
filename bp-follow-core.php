@@ -87,7 +87,7 @@ class BP_Follow_Component extends BP_Component {
 
 			// Load AJAX code when an AJAX request is requested.
 			add_action( 'admin_init', function() {
-				if ( defined( 'DOING_AJAX' ) && true === DOING_AJAX && false !== strpos( $_POST['action'], 'follow' ) ) {
+				if ( defined( 'DOING_AJAX' ) && true === DOING_AJAX && isset( $_POST['action'] ) && false !== strpos( $_POST['action'], 'follow' ) ) {
 					require $this->path . '/users/ajax.php';
 				}
 			} );
