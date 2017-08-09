@@ -24,10 +24,10 @@ jq( function() {
 } );
 
 function bp_follow_button_action( scope, context ) {
-	var link   = scope;
-	var uid    = link.attr('id');
-	var nonce  = link.attr('href');
-	var action = '';
+	var link = scope,
+		uid = link.attr('id'),
+		nonce  = link.attr('href'),
+		action = '';
 
 	uid    = uid.split('-');
 	action = uid[0];
