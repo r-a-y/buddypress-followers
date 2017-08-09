@@ -37,10 +37,12 @@ function bp_follow_button_action( scope, context ) {
 	nonce = nonce[1].split('&');
 	nonce = nonce[0];
 
+	link.addClass( 'loading' );
+
 	jq.post( ajaxurl, {
 		action: 'bp_' + action,
 		'uid': uid,
-		'link_class': link.attr( 'class' ),
+		'link_class': link.attr( 'class' ).replace( 'loading', '' ),
 		'_wpnonce': nonce
 	},
 	function(response) {
