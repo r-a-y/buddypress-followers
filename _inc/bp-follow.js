@@ -82,6 +82,11 @@ function bp_follow_button_action( scope, context ) {
 			}
 
 			jq(this).fadeIn(200);
+
+			jq(this).trigger( 'bpFollow:complete', {
+				action: action,
+				context: context
+			} );
 		});
 	});
 }
