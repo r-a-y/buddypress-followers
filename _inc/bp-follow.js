@@ -39,6 +39,11 @@ function bp_follow_button_action( scope, context ) {
 
 	link.addClass( 'loading' );
 
+	link.trigger( 'bpFollow:beforeAjax', {
+		action: action,
+		context: context
+	} );
+
 	jq.post( ajaxurl, {
 		action: 'bp_' + action,
 		'uid': uid,
