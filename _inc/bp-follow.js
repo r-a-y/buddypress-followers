@@ -55,7 +55,7 @@ function bp_follow_button_action( scope, context ) {
 			}
 
 			// add ajax response
-			link.parent().html( response );
+			link.parent().html( response.data.button );
 
 			// increase / decrease counts
 			var count_wrapper = false;
@@ -85,7 +85,8 @@ function bp_follow_button_action( scope, context ) {
 
 			jq(this).trigger( 'bpFollow:complete', {
 				action: action,
-				context: context
+				context: context,
+				response: response.data
 			} );
 		});
 	});

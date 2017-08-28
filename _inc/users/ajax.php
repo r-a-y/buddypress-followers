@@ -53,9 +53,21 @@ function bp_follow_ajax_action_start() {
 		}
 	}
 
-	echo $output;
+	/**
+	 * Filter the JSON response for the AJAX start action.
+	 *
+	 * @since 1.3.0
+	 *
+	 * @param array $response {
+	 *     An array of parameters. You can use this filter to add custom parameters as
+	 *     array keys.
+	 *     @type string $button The AJAX button to render after unfollowing a user.
+	 * }
+	 * @param int $leader_id The user ID of the person being followed.
+	 */
+	$output = apply_filters( 'bp_follow_ajax_action_start_response', array( 'button' => $output ), $_POST['uid'] );
 
-	exit();
+	wp_send_json_success( $output );
 }
 add_action( 'wp_ajax_bp_follow', 'bp_follow_ajax_action_start' );
 
@@ -108,8 +120,20 @@ function bp_follow_ajax_action_stop() {
 		}
 	}
 
-	echo $output;
+	/**
+	 * Filter the JSON response for the AJAX stop action.
+	 *
+	 * @since 1.3.0
+	 *
+	 * @param array $response {
+	 *     An array of parameters. You can use this filter to add custom parameters as
+	 *     array keys.
+	 *     @type string $button The AJAX button to render after unfollowing a user.
+	 * }
+	 * @param int $leader_id The user ID of the person being unfollowed.
+	 */
+	$output = apply_filters( 'bp_follow_ajax_action_stop_response', array( 'button' => $output ), $_POST['uid'] );
 
-	exit();
+	wp_send_json_success( $output );
 }
 add_action( 'wp_ajax_bp_unfollow', 'bp_follow_ajax_action_stop' );
