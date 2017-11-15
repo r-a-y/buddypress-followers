@@ -18,10 +18,10 @@ Domain Path: /languages
  * @subpackage Loader
  */
 
-// Exit if accessed directly
-if ( !defined( 'ABSPATH' ) ) exit;
+// Exit if accessed directly.
+defined( 'ABSPATH' ) || exit;
 
-// some pertinent defines
+// some pertinent defines.
 define( 'BP_FOLLOW_DIR', dirname( __FILE__ ) );
 define( 'BP_FOLLOW_URL', plugins_url( basename( BP_FOLLOW_DIR ) ) . '/' );
 

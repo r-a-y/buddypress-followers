@@ -1,13 +1,13 @@
 <?php
 /**
- * BP Follow Classes
+ * BP Follow Class
  *
  * @package BP-Follow
- * @subpackage Classes
+ * @subpackage Class
  */
 
-// Exit if accessed directly
-if ( !defined( 'ABSPATH' ) ) exit;
+// Exit if accessed directly.
+defined( 'ABSPATH' ) || exit;
 
 /**
  * BuddyPress Follow class.
@@ -62,9 +62,9 @@ class BP_Follow {
 	/**
 	 * Constructor.
 	 *
-	 * @param int $leader_id The ID of the item wewant to follow.
-	 * @param int $follower_id The ID initiating the follow request.
-	 * @param string $follow_type The type of follow connection.
+	 * @param int    $leader_id    The ID of the item wewant to follow.
+	 * @param int    $follower_id  The ID initiating the follow request.
+	 * @param string $follow_type  The type of follow connection.
 	 */
 	public function __construct( $leader_id = 0, $follower_id = 0, $follow_type = '' ) {
 		if ( ! empty( $leader_id ) && ! empty( $follower_id ) ) {
@@ -86,42 +86,42 @@ class BP_Follow {
 	protected function populate() {
 		global $wpdb;
 
-		// we always require a leader ID
+		// we always require a leader ID.
 		if ( empty( $this->leader_id ) ) {
 			return;
 		}
 
-		// check cache first
+		// check cache first.
 		$key = "{$this->leader_id}:{$this->follower_id}:{$this->follow_type}";
 		$data = wp_cache_get( $key, 'bp_follow_data' );
 
-		// Run query if no cache
+		// Run query if no cache.
 		if ( false === $data ) {
-			// SQL statement
-			$sql =  self::get_select_sql( 'id, date_recorded' );
+			// SQL statement.
+			$sql = self::get_select_sql( 'id, date_recorded' );
 			$sql .= self::get_where_sql( array(
 				'leader_id'   => $this->leader_id,
 				'follower_id' => $this->follower_id,
 				'follow_type' => $this->follow_type,
 			) );
 
-			// Run the query
+			// Run the query.
 			$data = $wpdb->get_results( $sql );
 
-			// Got a match; grab the results
+			// Got a match; grab the results.
 			if ( ! empty( $data ) ) {
 				$data = $data[0];
 
-			// No match; set cache to zero to prevent further hits to database
+			// No match. Set cache to zero to prevent further hits to database.
 			} else {
 				$data = 0;
 			}
 
-			// Set the cache
+			// Set the cache.
 			wp_cache_set( $key, $data, 'bp_follow_data' );
 		}
 
-		// Populate some other properties
+		// Populate some other properties.
 		if ( ! empty( $data ) ) {
 			$this->id = $data->id;
 			$this->date_recorded = $data->date_recorded;
@@ -137,7 +137,7 @@ class BP_Follow {
 		global $wpdb, $bp;
 
 		// do not use these filters
-		// use the 'bp_follow_before_save' hook instead
+		// use the 'bp_follow_before_save' hook instead.
 		$this->leader_id   = apply_filters( 'bp_follow_leader_id_before_save',   $this->leader_id,   $this->id );
 		$this->follower_id = apply_filters( 'bp_follow_follower_id_before_save', $this->follower_id, $this->id );
 
@@ -145,43 +145,43 @@ class BP_Follow {
 
 		// leader ID is required
 		// this allows plugins to bail out of saving a follow relationship
-		// use hooks above to redeclare 'leader_id' so it is empty if you need to bail
+		// use hooks above to redeclare 'leader_id' so it is empty if you need to bail.
 		if ( empty( $this->leader_id ) ) {
 			return false;
 		}
 
-		// make sure a date is added for those directly using the save() method
+		// make sure a date is added for those directly using the save() method.
 		if ( empty( $this->date_recorded ) ) {
 			$this->date_recorded = bp_core_current_time();
 		}
 
-		// update existing entry
+		// update existing entry.
 		if ( $this->id ) {
 			$result = $wpdb->query( $wpdb->prepare(
-				"UPDATE {$bp->follow->table_name} SET leader_id = %d, follower_id = %d, follow_type = %s, date_recorded = %s WHERE id = %d",
-					$this->leader_id,
-					$this->follower_id,
-					$this->follow_type,
-					$this->date_recorded,
-					$this->id
+				$this->leader_id,
+				$this->follower_id,
+				$this->follow_type,
+				$this->date_recorded,
+				$this->id
 			) );
 
 		// add new entry
 		} else {
 			$result = $wpdb->query( $wpdb->prepare(
 				"INSERT INTO {$bp->follow->table_name} ( leader_id, follower_id, follow_type, date_recorded ) VALUES ( %d, %d, %s, %s )",
-					$this->leader_id,
-					$this->follower_id,
-					$this->follow_type,
-					$this->date_recorded
+				$this->leader_id,
+				$this->follower_id,
+				$this->follow_type,
+				$this->date_recorded
 			) );
 			$this->id = $wpdb->insert_id;
 		}
 
-		// Save cache
-		$data = new stdClass;
+		// Save cache.
+		$data = new stdClass();
 		$data->id = $this->id;
 		$data->date_recorded = $this->date_recorded;
+
 		wp_cache_set( "{$this->leader_id}:{$this->follower_id}:{$this->follow_type}", $data, 'bp_follow_data' );
 
 		do_action_ref_array( 'bp_follow_after_save', array( &$this ) );
@@ -197,13 +197,13 @@ class BP_Follow {
 	public function delete() {
 		global $wpdb, $bp;
 
-		// SQL statement
+		// SQL statement.
 		$sql  = "DELETE FROM {$bp->follow->table_name} ";
 		$sql .= self::get_where_sql( array(
 			'id' => $this->id,
 		) );
 
-		// Delete cache
+		// Delete cache.
 		wp_cache_delete( "{$this->leader_id}:{$this->follower_id}:{$this->follow_type}", 'bp_follow_data' );
 
 		return $wpdb->query( $sql );
@@ -216,23 +216,21 @@ class BP_Follow {
 	 *
 	 * @since 1.3.0
 	 *
-	 * @param string $column
+	 * @param string $column Column.
 	 * @return string
 	 */
 	protected static function get_select_sql( $column = '' ) {
-		global $bp;
-
-		return sprintf( "SELECT %s FROM %s ", esc_sql( $column ), esc_sql( $bp->follow->table_name ) );
+		return sprintf( 'SELECT %s FROM %s ', esc_sql( $column ), esc_sql( buddypress()->follow->table_name ) );
 	}
 
 	/**
 	 * Generate the WHERE SQL statement used to query follow relationships.
 	 *
-	 * @since 1.3.0
-	 *
 	 * @todo Add support for date ranges with 'date_recorded' column
 	 *
-	 * @param array $params
+	 * @since 1.3.0
+	 *
+	 * @param array $params Where params.
 	 * @return string
 	 */
 	protected static function get_where_sql( $params = array() ) {
@@ -256,11 +254,10 @@ class BP_Follow {
 		}
 
 		if ( isset( $params['follow_type'] ) ) {
-			$where_conditions['follow_type'] = $wpdb->prepare( "follow_type = %s", $params['follow_type'] );
+			$where_conditions['follow_type'] = $wpdb->prepare( 'follow_type = %s', $params['follow_type'] );
 		}
 
 		return 'WHERE ' . join( ' AND ', $where_conditions );
-
 	}
 
 	/**
@@ -281,28 +278,28 @@ class BP_Follow {
 			'order'   => 'DESC',
 		) );
 
-		// sanitize 'orderby' DB oclumn lookup
+		// sanitize 'orderby' DB oclumn lookup.
 		switch ( $r['orderby'] ) {
-			// columns available for lookup
-			case 'id' :
-			case 'leader_id' :
-			case 'follower_id' :
-			case 'follow_type' :
-			case 'date_recorded' :
+			// columns available for lookup.
+			case 'id':
+			case 'leader_id':
+			case 'follower_id':
+			case 'follow_type':
+			case 'date_recorded':
 				break;
 
-			// fallback to 'id' column on anything else
-			default :
+			// fallback to 'id' column on anything else.
+			default:
 				$r['orderby'] = 'id';
 				break;
 		}
 
-		// only allow ASC or DESC for order
+		// only allow ASC or DESC for order.
 		if ( 'ASC' !== $r['order'] || 'DESC' !== $r['order'] ) {
 			$r['order'] = 'DESC';
 		}
 
-		return sprintf( " ORDER BY %s %s", $r['orderby'], $r['order'] );
+		return sprintf( ' ORDER BY %s %s', $r['orderby'], $r['order'] );
 	}
 
 	/**
@@ -310,9 +307,9 @@ class BP_Follow {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param int $leader_id The leader ID.
+	 * @param int    $leader_id The leader ID.
 	 * @param string $follow_type The follow type.  Leave blank to query users.
-	 * @param array $query_args {
+	 * @param array  $query_args {
 	 *     Various query arguments
 	 *     @type array $date_query See {@link WP_Date_Query}.
 	 *     @type string $orderby The DB column to order results by. Default: 'id'.
@@ -323,14 +320,14 @@ class BP_Follow {
 	public static function get_followers( $leader_id = 0, $follow_type = '', $query_args = array() ) {
 		global $wpdb;
 
-		// SQL statement
+		// SQL statement.
 		$sql  = self::get_select_sql( 'follower_id' );
 		$sql .= self::get_where_sql( array(
 			'leader_id'   => $leader_id,
 			'follow_type' => $follow_type,
 		) );
 
-		// Setup date query
+		// Setup date query.
 		if ( ! empty( $query_args['date_query'] ) && class_exists( 'WP_Date_Query' ) ) {
 			add_filter( 'date_query_valid_columns', array( __CLASS__, 'register_date_column' ) );
 			$date_query = new WP_Date_Query( $query_args['date_query'], 'date_recorded' );
@@ -338,7 +335,7 @@ class BP_Follow {
 			remove_filter( 'date_query_valid_columns', array( __CLASS__, 'register_date_column' ) );
 		}
 
-		// Setup orderby query
+		// Setup orderby query.
 		$orderby = array();
 		if ( ! empty( $query_args['orderby'] ) ) {
 			$orderby = $query_args['orderby'];
@@ -348,7 +345,7 @@ class BP_Follow {
 		}
 		$sql .= self::get_orderby_sql( $orderby );
 
-		// do the query
+		// do the query.
 		return $wpdb->get_col( $sql );
 	}
 
@@ -370,14 +367,14 @@ class BP_Follow {
 	public static function get_following( $user_id = 0, $follow_type = '', $query_args = array() ) {
 		global $wpdb;
 
-		// SQL statement
+		// SQL statement.
 		$sql  = self::get_select_sql( 'leader_id' );
 		$sql .= self::get_where_sql( array(
 			'follower_id' => $user_id,
 			'follow_type' => $follow_type,
 		) );
 
-		// Setup date query
+		// Setup date query.
 		if ( ! empty( $query_args['date_query'] ) && class_exists( 'WP_Date_Query' ) ) {
 			add_filter( 'date_query_valid_columns', array( __CLASS__, 'register_date_column' ) );
 			$date_query = new WP_Date_Query( $query_args['date_query'], 'date_recorded' );
@@ -385,7 +382,7 @@ class BP_Follow {
 			remove_filter( 'date_query_valid_columns', array( __CLASS__, 'register_date_column' ) );
 		}
 
-		// Setup orderby query
+		// Setup orderby query.
 		$orderby = array();
 		if ( ! empty( $query_args['orderby'] ) ) {
 			$orderby = $query_args['orderby'];
@@ -395,7 +392,7 @@ class BP_Follow {
 		}
 		$sql .= self::get_orderby_sql( $orderby );
 
-		// do the query
+		// do the query.
 		return $wpdb->get_col( $sql );
 	}
 
@@ -405,7 +402,7 @@ class BP_Follow {
 	 * @since 1.3.0
 	 *
 	 * @param int    $leader_id   The leader ID to grab the followers count for.
-	 * @param string $follow_type The follow type. Leave blank to query for users.  Default: ''
+	 * @param string $follow_type The follow type. Leave blank to query for users.
 	 * @return int
 	 */
 	public static function get_followers_count( $leader_id = 0, $follow_type = '' ) {
@@ -426,7 +423,7 @@ class BP_Follow {
 	 * @since 1.3.0
 	 *
 	 * @param int    $id          The object ID to grab the following count for.
-	 * @param string $follow_type The follow type. Leave blank to query for users. Default: ''
+	 * @param string $follow_type The follow type. Leave blank to query for users.
 	 * @return int
 	 */
 	public static function get_following_count( $id = 0, $follow_type = '' ) {
@@ -454,7 +451,10 @@ class BP_Follow {
 		$following = self::get_following_count( $id, $follow_type );
 		$followers = self::get_followers_count( $id, $follow_type );
 
-		return array( 'followers' => $followers, 'following' => $following );
+		return array(
+			'followers' => $followers,
+			'following' => $following,
+		);
 	}
 
 	/**
@@ -462,8 +462,8 @@ class BP_Follow {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param array $leader_ids The user IDs to check the follow status for.
-	 * @param int $user_id The user ID to check against the list of leader IDs.
+	 * @param array  $leader_ids The user IDs to check the follow status for.
+	 * @param int    $user_id The user ID to check against the list of leader IDs.
 	 * @param string $follow_type The type of follow connection.
 	 * @return array
 	 */
@@ -478,7 +478,7 @@ class BP_Follow {
 			return false;
 		}
 
-		// SQL statement
+		// SQL statement.
 		$sql  = self::get_select_sql( 'leader_id, id' );
 		$sql .= self::get_where_sql( array(
 			'follower_id' => $user_id,
@@ -494,7 +494,7 @@ class BP_Follow {
 	 *
 	 * @since 1.1.0
 	 *
-	 * @param int $user_id The user ID
+	 * @param int $user_id The user ID.
 	 */
 	public static function delete_all_for_user( $user_id = 0 ) {
 		global $bp, $wpdb;
@@ -507,11 +507,12 @@ class BP_Follow {
 	 *
 	 * @since 1.3.0
 	 *
-	 * @param array $retval Current DB columns
+	 * @param array $retval Current DB columns.
 	 * @return array
 	 */
 	public static function register_date_column( $retval ) {
 		$retval[] = 'date_recorded';
+
 		return $retval;
 	}
 }

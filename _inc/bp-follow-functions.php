@@ -6,8 +6,8 @@
  * @subpackage Functions
  */
 
-// Exit if accessed directly
-if ( !defined( 'ABSPATH' ) ) exit;
+// Exit if accessed directly.
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Start following an item.
@@ -24,7 +24,6 @@ if ( !defined( 'ABSPATH' ) ) exit;
  * @return bool
  */
 function bp_follow_start_following( $args = '' ) {
-	global $bp;
 
 	$r = wp_parse_args( $args, array(
 		'leader_id'     => bp_displayed_user_id(),
@@ -35,12 +34,12 @@ function bp_follow_start_following( $args = '' ) {
 
 	$follow = new BP_Follow( $r['leader_id'], $r['follower_id'], $r['follow_type'] );
 
-	// existing follow already exists
+	// existing follow already exists.
 	if ( ! empty( $follow->id ) ) {
 		return false;
 	}
 
-	// add other properties before save
+	// add other properties before save.
 	$follow->date_recorded = $r['date_recorded'];
 
 	// save!
@@ -149,14 +148,14 @@ function bp_follow_get_followers( $args = '' ) {
 	$retval   = array();
 	$do_query = true;
 
-	// Set up filter name
+	// Set up filter name.
 	if ( ! empty( $r['follow_type'] ) ) {
-		$filter = 'bp_follow_get_followers_' .  $r['object'];
+		$filter = 'bp_follow_get_followers_' . $r['object'];
 	} else {
 		$filter = 'bp_follow_get_followers';
 	}
 
-	// check for cache if 'query_args' is empty
+	// check for cache if 'query_args' is empty.
 	if ( empty( $r['query_args'] ) ) {
 		$retval = wp_cache_get( $r['object_id'], "bp_follow_{$r['object']}_followers_query" );
 
@@ -165,15 +164,15 @@ function bp_follow_get_followers( $args = '' ) {
 		}
 	}
 
-	// query if necessary
+	// query if necessary.
 	if ( true === $do_query ) {
 		$retval = BP_Follow::get_followers( $r['object_id'], $r['follow_type'], $r['query_args'] );
 
-		// cache if no extra query args - we only cache default args for now
+		// cache if no extra query args - we only cache default args for now.
 		if ( empty( $r['query_args'] ) ) {
 			wp_cache_set( $r['object_id'], $retval, "bp_follow_{$r['object']}_followers_query" );
 
-			// cache count while we're at it
+			// cache count while we're at it.
 			wp_cache_set( $r['object_id'], $GLOBALS['wpdb']->num_rows, "bp_follow_{$r['object']}_followers_count" );
 		}
 	}
@@ -215,14 +214,14 @@ function bp_follow_get_following( $args = '' ) {
 	$retval   = array();
 	$do_query = true;
 
-	// setup some variables based on the follow type
+	// setup some variables based on the follow type.
 	if ( ! empty( $r['follow_type'] ) ) {
-		$filter = 'bp_follow_get_following_' .  $r['object'];
+		$filter = 'bp_follow_get_following_' . $r['object'];
 	} else {
 		$filter = 'bp_follow_get_following';
 	}
 
-	// check for cache if 'query_args' is empty
+	// check for cache if 'query_args' is empty.
 	if ( empty( $r['query_args'] ) ) {
 		$retval = wp_cache_get( $r['object_id'], "bp_follow_{$r['object']}_following_query" );
 
@@ -231,15 +230,15 @@ function bp_follow_get_following( $args = '' ) {
 		}
 	}
 
-	// query if necessary
+	// query if necessary.
 	if ( true === $do_query ) {
 		$retval = BP_Follow::get_following( $r['object_id'], $r['follow_type'], $r['query_args'] );
 
-		// cache if no extra query args - we only cache default args for now
+		// cache if no extra query args - we only cache default args for now.
 		if ( empty( $r['query_args'] ) ) {
 			wp_cache_set( $r['object_id'], $retval, "bp_follow_{$r['object']}_following_query" );
 
-			// cache count while we're at it
+			// cache count while we're at it.
 			wp_cache_set( $r['object_id'], $GLOBALS['wpdb']->num_rows, "bp_follow_{$r['object']}_following_count" );
 		}
 	}
@@ -281,10 +280,12 @@ function bp_follower_ids( $args = '' ) {
 	function bp_get_follower_ids( $args = '' ) {
 
 		$r = wp_parse_args( $args, array(
-			'user_id' => bp_displayed_user_id()
+			'user_id' => bp_displayed_user_id(),
 		) );
 
-		$ids = implode( ',', (array) bp_follow_get_followers( array( 'user_id' => $r['user_id'] ) ) );
+		$ids = implode( ',', (array) bp_follow_get_followers( array(
+			'user_id' => $r['user_id'],
+		) ) );
 
 		$ids = empty( $ids ) ? 0 : $ids;
 
@@ -358,7 +359,7 @@ function bp_follow_total_follow_counts( $args = '' ) {
 
 	$retval['following'] = bp_follow_get_the_following_count( array(
 		'user_id'     => $r['user_id'],
-		'follow_type' => $r['follow_type']
+		'follow_type' => $r['follow_type'],
 	) );
 
 	/**
@@ -371,7 +372,7 @@ function bp_follow_total_follow_counts( $args = '' ) {
 	} else {
 		$retval['followers'] = bp_follow_get_the_followers_count( array(
 			'user_id'     => $r['user_id'],
-			'follow_type' => $r['follow_type']
+			'follow_type' => $r['follow_type'],
 		) );
 	}
 
@@ -408,16 +409,16 @@ function bp_follow_total_follow_counts( $args = '' ) {
  *
  * @since 1.3.0
  *
- * @param  array $args See bp_follow_get_common_args()
+ * @param  array $args See bp_follow_get_common_args().
  * @return int
  */
 function bp_follow_get_the_following_count( $args = array() ) {
 	$r = bp_follow_get_common_args( $args );
 
-	// fetch cache
+	// fetch cache.
 	$retval = wp_cache_get( $r['object_id'], "bp_follow_{$r['object']}_following_count" );
 
-	// query if necessary
+	// query if necessary.
 	if ( false === $retval ) {
 		$retval = BP_Follow::get_following_count( $r['object_id'], $r['follow_type'] );
 		wp_cache_set( $r['object_id'], $retval, "bp_follow_{$r['object']}_following_count" );
@@ -443,16 +444,16 @@ function bp_follow_get_the_following_count( $args = array() ) {
  *
  * @since 1.3.0
  *
- * @param  array $args See bp_follow_get_common_args()
+ * @param  array $args See bp_follow_get_common_args().
  * @return int
  */
 function bp_follow_get_the_followers_count( $args = array() ) {
 	$r = bp_follow_get_common_args( $args );
 
-	// fetch cache
+	// fetch cache.
 	$retval = wp_cache_get( $r['object_id'], "bp_follow_{$r['object']}_followers_count" );
 
-	// query if necessary
+	// query if necessary.
 	if ( false === $retval ) {
 		$retval = BP_Follow::get_followers_count( $r['object_id'], $r['follow_type'] );
 		wp_cache_set( $r['object_id'], $retval, "bp_follow_{$r['object']}_followers_count" );
@@ -493,7 +494,7 @@ function bp_follow_get_common_args( $args = array() ) {
 		'user_id'     => bp_loggedin_user_id(),
 		'follow_type' => '',
 		'object_id'   => '',
-		'query_args'  => array()
+		'query_args'  => array(),
 	) );
 
 	// Set up our object. $object is used for cache keys and filter names.
@@ -505,7 +506,7 @@ function bp_follow_get_common_args( $args = array() ) {
 			$object = $r['follow_type'];
 		}
 
-	// Defaults to 'user'
+	// Defaults to 'user'.
 	} else {
 		$object = 'user';
 	}
@@ -520,7 +521,7 @@ function bp_follow_get_common_args( $args = array() ) {
 		'object'      => $object,
 		'object_id'   => $object_id,
 		'follow_type' => $r['follow_type'],
-		'query_args'  => $r['query_args']
+		'query_args'  => $r['query_args'],
 	);
 }
 
@@ -553,14 +554,13 @@ function bp_follow_is_doing_ajax() {
  */
 function bp_follow_notification_settings_content() {
 ?>
-
 	<table class="notification-settings" id="follow-notification-settings">
 		<thead>
 			<tr>
 				<th class="icon"></th>
-				<th class="title"><?php _e( 'Follow', 'buddypress-followers' ) ?></th>
-				<th class="yes"><?php _e( 'Yes', 'buddypress-followers' ) ?></th>
-				<th class="no"><?php _e( 'No', 'buddypress-followers' )?></th>
+				<th class="title"><?php esc_html_e( 'Follow', 'buddypress-followers' ); ?></th>
+				<th class="yes"><?php esc_html_e( 'Yes', 'buddypress-followers' ); ?></th>
+				<th class="no"><?php esc_html_e( 'No', 'buddypress-followers' ); ?></th>
 			</tr>
 		</thead>
 
@@ -577,17 +577,17 @@ function bp_follow_notification_settings_content() {
  * @global $bp The global BuddyPress settings variable created in bp_core_setup_globals()
  */
 function bp_follow_format_notifications( $action, $item_id, $secondary_item_id, $total_items, $format = 'string' ) {
-	global $bp;
 
 	do_action( 'bp_follow_format_notifications', $action, $item_id, $secondary_item_id, $total_items, $format );
 
 	switch ( $action ) {
 		case 'new_follow':
-			$link = $text = false;
+			$text = false;
+			$link = $text;
 
-			if ( 1 == $total_items ) {
+			if ( 1 === $total_items ) {
 				$text = sprintf( __( '%s is now following you', 'buddypress-followers' ), bp_core_get_user_displayname( $item_id ) );
-				$link = bp_core_get_user_domain( $item_id  ) . '?bpf_read';
+				$link = bp_core_get_user_domain( $item_id ) . '?bpf_read';
 
 			} else {
 				$text = sprintf( __( '%d more users are now following you', 'buddypress-followers' ), $total_items );
@@ -595,34 +595,34 @@ function bp_follow_format_notifications( $action, $item_id, $secondary_item_id, 
 				if ( bp_is_active( 'notifications' ) ) {
 					$link = bp_get_notifications_permalink();
 
-					// filter notifications by 'new_follow' action
+					// filter notifications by 'new_follow' action.
 					if ( version_compare( BP_VERSION, '2.0.9' ) >= 0 ) {
 						$link .= '?action=' . $action;
 					}
 				} else {
-					$link = bp_loggedin_user_domain() . $bp->follow->followers->slug . '/?new';
+					$link = bp_loggedin_user_domain() . buddypress()->follow->followers->slug . '/?new';
 				}
 			}
 
-		break;
+			break;
 
-		default :
+		default:
 			$link = apply_filters( 'bp_follow_extend_notification_link', false, $action, $item_id, $secondary_item_id, $total_items );
 			$text = apply_filters( 'bp_follow_extend_notification_text', false, $action, $item_id, $secondary_item_id, $total_items );
-		break;
+			break;
 	}
 
 	if ( ! $link || ! $text ) {
 		return false;
 	}
 
-	if ( 'string' == $format ) {
+	if ( 'string' === $format ) {
 		return apply_filters( 'bp_follow_new_followers_notification', '<a href="' . $link . '">' . $text . '</a>', $total_items, $link, $text, $item_id, $secondary_item_id );
 
 	} else {
 		$array = array(
 			'text' => $text,
-			'link' => $link
+			'link' => $link,
 		);
 
 		return apply_filters( 'bp_follow_new_followers_return_notification', $array, $item_id, $secondary_item_id, $total_items );
