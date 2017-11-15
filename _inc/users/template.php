@@ -60,11 +60,9 @@ function bp_follow_add_follow_button( $args = '' ) {
 			return false;
 		}
 
-		$logged_user_id = bp_loggedin_user_id();
-
 		// if we're checking during a members loop, then follow status is already
-		// queried via bp_follow_inject_member_follow_status()
-		if ( ! empty( $members_template->in_the_loop ) && $r['follower_id'] === $logged_user_id && $r['leader_id'] === $logged_user_id ) {
+		// queried via bp_follow_inject_member_follow_status().
+		if ( ! empty( $members_template->in_the_loop ) && $r['follower_id'] === bp_loggedin_user_id() && $r['leader_id'] === bp_get_member_user_id() ) {
 			$is_following = $members_template->member->is_following;
 
 		// else we manually query the follow status
@@ -75,12 +73,14 @@ function bp_follow_add_follow_button( $args = '' ) {
 			) );
 		}
 
+		$logged_user_id = bp_loggedin_user_id();
+
 		// if the logged-in user is the leader, use already-queried variables.
 		if ( $logged_user_id && $logged_user_id === $r['leader_id'] ) {
 			$leader_domain   = bp_loggedin_user_domain();
 			$leader_fullname = bp_get_loggedin_user_fullname();
 
-		// else we do a lookup for the user domain and display name of the leader
+		// else we do a lookup for the user domain and display name of the leader.
 		} else {
 			$leader_domain   = bp_core_get_user_domain( $r['leader_id'] );
 			$leader_fullname = bp_core_get_user_displayname( $r['leader_id'] );
