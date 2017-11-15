@@ -5,6 +5,9 @@
  * @since 1.3.0
  */
 
+// Exit if accessed directly.
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Check if the current activity item in the activity loop can be followed.
  *

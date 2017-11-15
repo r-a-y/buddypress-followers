@@ -5,6 +5,9 @@
  * @since 1.3.0
  */
 
+// Exit if accessed directly.
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Follow Activity module class.
  *

@@ -6,8 +6,8 @@
  * @subpackage Template
  */
 
-// Exit if accessed directly
-if ( !defined( 'ABSPATH' ) ) exit;
+// Exit if accessed directly.
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Output a follow / unfollow button for a given user depending on the follower status.

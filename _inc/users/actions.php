@@ -6,8 +6,8 @@
  * @subpackage Actions
  */
 
-// Exit if accessed directly
-if ( !defined( 'ABSPATH' ) ) exit;
+// Exit if accessed directly.
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Catches clicks on a "Follow" button and tries to make that happen.

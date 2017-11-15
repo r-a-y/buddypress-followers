@@ -6,8 +6,8 @@
  * @subpackage Widgets
  */
 
-// Exit if accessed directly
-if ( !defined( 'ABSPATH' ) ) exit;
+// Exit if accessed directly.
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Add a "Users I'm following" widget for the logged-in user

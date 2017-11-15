@@ -12,8 +12,8 @@
  * @subpackage Backpat
  */
 
-// Exit if accessed directly
-if ( !defined( 'ABSPATH' ) ) exit;
+// Exit if accessed directly.
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Set activity scope on a user's "Activity > Followed Sites" page

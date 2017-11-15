@@ -13,8 +13,8 @@
  * @subpackage Backpat
  */
 
-// Exit if accessed directly
-if ( !defined( 'ABSPATH' ) ) exit;
+// Exit if accessed directly.
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Filter the activity loop when we're on a "Following" page

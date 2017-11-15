@@ -7,8 +7,8 @@
  * @subpackage Backpat
  */
 
-// Exit if accessed directly
-if ( !defined( 'ABSPATH' ) ) exit;
+// Exit if accessed directly.
+defined( 'ABSPATH' ) || exit;
 
 /** 1.7 compat *****************************************************/
 

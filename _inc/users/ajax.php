@@ -6,6 +6,9 @@
  * @subpackage AJAX
  */
 
+// Exit if accessed directly.
+defined( 'ABSPATH' ) || exit;
+
 /**
  * AJAX callback when clicking on the "Follow" button to follow a user.
  *
