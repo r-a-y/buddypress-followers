@@ -19,13 +19,15 @@ defined( 'ABSPATH' ) || exit;
  * @param int $user_id The user ID.
  */
 function bp_follow_remove_notifications_for_user( $user_id = 0 ) {
+	$bp = $GLOBALS['bp'];
+
 	// BP 1.9+
 	if ( bp_is_active( 'notifications' ) ) {
-		bp_notifications_delete_all_notifications_by_type( $user_id, buddypress()->follow->id, 'new_follow' );
+		bp_notifications_delete_all_notifications_by_type( $user_id, $bp->follow->id, 'new_follow' );
 
-	// BP < 1.9 - delete notifications the old way
+	// BP < 1.9 - delete notifications the old way.
 	} elseif ( ! class_exists( 'BP_Core_Login_Widget' ) ) {
-		bp_core_delete_notifications_from_user( $user_id, buddypress()->follow->id, 'new_follow' );
+		bp_core_delete_notifications_from_user( $user_id, $bp->follow->id, 'new_follow' );
 	}
 }
 add_action( 'bp_follow_remove_data', 'bp_follow_remove_notifications_for_user' );
@@ -38,7 +40,7 @@ add_action( 'bp_follow_remove_data', 'bp_follow_remove_notifications_for_user' )
  * @param object $follow The BP_Follow object.
  */
 function bp_follow_notifications_add_on_follow( BP_Follow $follow ) {
-	$bp = buddypress();
+	$bp = $GLOBALS['bp'];
 
 	// this only applies to users.
 	if ( ! empty( $follow->follow_type ) ) {
@@ -82,7 +84,7 @@ add_action( 'bp_follow_start_following', 'bp_follow_notifications_add_on_follow'
  * @param object $follow The BP_Follow object.
  */
 function bp_follow_notifications_remove_on_unfollow( BP_Follow $follow ) {
-	$bp = buddypress();
+	$bp = $GLOBALS['bp'];
 
 	// BP 1.9+
 	if ( bp_is_active( 'notifications' ) ) {
@@ -107,7 +109,7 @@ function bp_follow_notifications_mark_follower_profile_as_read() {
 		return;
 	}
 
-	$bp = buddypress();
+	$bp = $GLOBALS['bp'];
 
 	// mark notification as read.
 	if ( bp_is_active( 'notifications' ) ) {
@@ -147,7 +149,7 @@ function bp_follow_notifications_delete_on_followers_page() {
 		return;
 	}
 
-	$bp = buddypress();
+	$bp = $GLOBALS['bp'];
 
 	// BP 1.9+
 	if ( bp_is_active( 'notifications' ) ) {

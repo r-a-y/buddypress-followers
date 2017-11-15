@@ -9,8 +9,9 @@ defined( 'ABSPATH' ) || exit;
  * @since 1.3.0
  */
 function bp_follow_blogs_init() {
+	$bp = $GLOBALS['bp'];
 
-	buddypress()->follow->blogs = new BP_Follow_Blogs();
+	$bp->follow->blogs = new BP_Follow_Blogs();
 
 	do_action( 'bp_follow_blogs_loaded' );
 }
@@ -72,8 +73,10 @@ class BP_Follow_Blogs {
 	 * Includes.
 	 */
 	protected function includes() {
+		$bp = $GLOBALS['bp'];
+
 		if ( ! class_exists( 'BP_Activity_Query' ) ) {
-			require( buddypress()->follow->path . '/modules/blogs-backpat.php' );
+			require( $bp->follow->path . '/modules/blogs-backpat.php' );
 		}
 	}
 
@@ -96,7 +99,7 @@ class BP_Follow_Blogs {
 	 * Set up global cachegroups.
 	 */
 	public function setup_global_cachegroups() {
-		$bp = buddypress();
+		$bp = $GLOBALS['bp'];
 
 		// blog counts.
 		$bp->follow->global_cachegroups[] = 'bp_follow_user_blogs_following_count';
@@ -281,6 +284,8 @@ class BP_Follow_Blogs {
 	 * @return array
 	 */
 	function filter_activity_scope( $retval = array(), $filter = array() ) {
+		$bp = $GLOBALS['bp'];
+
 		// Determine the user_id.
 		if ( ! empty( $filter['user_id'] ) ) {
 			$user_id = $filter['user_id'];
@@ -312,7 +317,7 @@ class BP_Follow_Blogs {
 		if ( function_exists( 'bp_groupblog_init' ) && array( 0 ) !== $following_ids ) {
 			global $wpdb;
 
-			$bp = buddypress();
+			$bp = $GLOBALS['bp'];
 
 			// comma-delimit the blog IDs.
 			$delimited_ids = implode( ',', $following_ids );
@@ -326,7 +331,7 @@ class BP_Follow_Blogs {
 					'relation' => 'AND',
 					array(
 						'column' => 'component',
-						'value'  => buddypress()->blogs->id,
+						'value'  => $bp->blogs->id,
 					),
 					array(
 						'column'  => 'item_id',
@@ -340,7 +345,7 @@ class BP_Follow_Blogs {
 					'relation' => 'AND',
 					array(
 						'column' => 'component',
-						'value'  => buddypress()->groups->id,
+						'value'  => $bp->groups->id,
 					),
 					array(
 						'column'  => 'item_id',
@@ -360,7 +365,7 @@ class BP_Follow_Blogs {
 				'relation' => 'AND',
 				array(
 					'column' => 'component',
-					'value'  => buddypress()->blogs->id,
+					'value'  => $bp->blogs->id,
 				),
 				array(
 					'column'  => 'item_id',
@@ -720,7 +725,7 @@ class BP_Follow_Blogs {
 	public function on_blog_delete( $blog_id ) {
 		global $wpdb;
 
-		$bp = buddypress();
+		$bp = $GLOBALS['bp'];
 
 		$this->clear_cache_on_blog_delete( $blog_id );
 
@@ -917,6 +922,8 @@ class BP_Follow_Blogs_Screens {
 			return;
 		}
 
+		$bp = $GLOBALS['bp'];
+
 		// get blog IDs that the user is following.
 		$following_ids = bp_get_following_ids( array(
 			'follow_type' => 'blogs',
@@ -932,7 +939,7 @@ class BP_Follow_Blogs_Screens {
 		);
 
 		// setup the feed.
-		buddypress()->activity->feed = new BP_Activity_Feed( array(
+		$bp->activity->feed = new BP_Activity_Feed( array(
 			'id'            => 'followedsites',
 
 			/* translators: User's following activity RSS title - "[Site Name] | [User Display Name] | Followed Site Activity" */

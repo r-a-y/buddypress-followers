@@ -19,8 +19,9 @@ defined( 'ABSPATH' ) || exit;
  * @uses bp_core_redirect() Safe redirects the user to a particular URL.
  */
 function bp_follow_action_start() {
+	$bp = $GLOBALS['bp'];
 
-	if ( ! bp_is_current_component( buddypress()->follow->followers->slug ) || ! bp_is_current_action( 'start' ) ) {
+	if ( ! bp_is_current_component( $bp->follow->followers->slug ) || ! bp_is_current_action( 'start' ) ) {
 		return;
 	}
 
@@ -57,8 +58,9 @@ add_action( 'bp_actions', 'bp_follow_action_start' );
  * @uses bp_core_redirect() Safe redirects the user to a particular URL.
  */
 function bp_follow_action_stop() {
+	$bp = $GLOBALS['bp'];
 
-	if ( ! bp_is_current_component( buddypress()->follow->followers->slug ) || ! bp_is_current_action( 'stop' ) ) {
+	if ( ! bp_is_current_component( $bp->follow->followers->slug ) || ! bp_is_current_action( 'stop' ) ) {
 		return;
 	}
 
@@ -105,8 +107,10 @@ function bp_follow_my_following_feed() {
 		return false;
 	}
 
+	$bp = $GLOBALS['bp'];
+
 	// setup the feed.
-	buddypress()->activity->feed = new BP_Activity_Feed( array(
+	$bp->activity->feed = new BP_Activity_Feed( array(
 		'id'            => 'myfollowing',
 
 		/* translators: User's following activity RSS title - "[Site Name] | [User Display Name] | Following Activity" */

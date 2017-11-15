@@ -67,11 +67,13 @@ class BP_Follow_Updater {
 	protected function install() {
 		global $wpdb;
 
+		$bp = $GLOBALS['bp'];
+
 		$charset_collate = ! empty( $wpdb->charset )
 			? "DEFAULT CHARACTER SET $wpdb->charset"
 			: '';
 
-		$table_prefix = buddypress()->table_prefix;
+		$table_prefix = $bp->table_prefix;
 		if ( ! $table_prefix ) {
 			$table_prefix = apply_filters( 'bp_core_get_table_prefix', $wpdb->base_prefix );
 		}
@@ -99,11 +101,13 @@ class BP_Follow_Updater {
 	 * @return int The current revision date (eg. 2014-01-01 01:00 UTC).
 	 */
 	public static function get_current_revision_date() {
+		$bp = $GLOBALS['bp'];
+
 		if ( false === self::is_loaded() ) {
 			return false;
 		}
 
-		return buddypress()->follow->revision_date;
+		return $bp->follow->revision_date;
 	}
 
 	/**
@@ -136,7 +140,9 @@ class BP_Follow_Updater {
 	 * @return bool
 	 */
 	public static function is_loaded() {
-		if ( empty( buddypress()->follow ) ) {
+		$bp = $GLOBALS['bp'];
+
+		if ( empty( $bp->follow ) ) {
 			return false;
 		}
 

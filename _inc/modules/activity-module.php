@@ -64,13 +64,15 @@ class BP_Follow_Activity_Module {
 	 * Set up global cachegroups.
 	 */
 	public function setup_global_cachegroups() {
+		$bp = $GLOBALS['bp'];
+
 		// Counts.
-		buddypress()->follow->global_cachegroups[] = 'bp_follow_user_activity_following_count';
-		buddypress()->follow->global_cachegroups[] = 'bp_follow_activity_followers_count';
+		$bp->follow->global_cachegroups[] = 'bp_follow_user_activity_following_count';
+		$bp->follow->global_cachegroups[] = 'bp_follow_activity_followers_count';
 
 		// Query.
-		buddypress()->follow->global_cachegroups[] = 'bp_follow_user_activity_following_query';
-		buddypress()->follow->global_cachegroups[] = 'bp_follow_activity_followers_query';
+		$bp->follow->global_cachegroups[] = 'bp_follow_user_activity_following_query';
+		$bp->follow->global_cachegroups[] = 'bp_follow_activity_followers_query';
 	}
 
 	/**
@@ -343,13 +345,17 @@ class BP_Follow_Activity_Module {
 
 	/**
 	 * Clear cache when activity item is deleted.
+	 *
+	 * @param array $activities An array of activities objects.
 	 */
 	public function on_activity_delete( $activities ) {
+		$bp = $GLOBALS['bp'];
+
 		// Pluck the activity IDs out of the $activities array.
 		$activity_ids = wp_parse_id_list( wp_list_pluck( $activities, 'id' ) );
 
 		// See if any of the deleted activity IDs were being followed.
-		$sql  = 'SELECT leader_id, follower_id FROM ' . esc_sql( buddypress()->follow->table_name ) . ' ';
+		$sql  = 'SELECT leader_id, follower_id FROM ' . esc_sql( $bp->follow->table_name ) . ' ';
 		$sql .= 'WHERE leader_id IN (' . implode( ',', wp_parse_id_list( $activity_ids ) ) . ') ';
 		$sql .= "AND follow_type = 'activity'";
 
@@ -434,13 +440,15 @@ class BP_Follow_Activity_Module {
 			return;
 		}
 
+		$bp = $GLOBALS['bp'];
+
 		$args = array(
 			'user_id' => bp_displayed_user_id(),
 			'scope'   => 'follow',
 		);
 
 		// setup the feed.
-		buddypress()->activity->feed = new BP_Activity_Feed( array(
+		$bp->activity->feed = new BP_Activity_Feed( array(
 			'id'            => 'followedactivity',
 
 			/* translators: User's following activity RSS title - "[Site Name] | [User Display Name] | Followed Activity" */

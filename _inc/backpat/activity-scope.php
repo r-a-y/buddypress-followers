@@ -31,6 +31,8 @@ defined( 'ABSPATH' ) || exit;
  */
 function bp_follow_add_activity_scope_filter( $qs, $object ) {
 
+	$bp = $GLOBALS['bp'];
+
 	// not on the activity object? stop now!
 	if ( $object != 'activity' ) {
 		return $qs;
@@ -39,14 +41,14 @@ function bp_follow_add_activity_scope_filter( $qs, $object ) {
 	$set = false;
 
 	// activity directory
-	// can't use bp_is_activity_directory() yet since that's a BP 2.0 function
+	// can't use bp_is_activity_directory() yet since that's a BP 2.0 function.
 	if ( ! bp_displayed_user_id() && bp_is_activity_component() && ! bp_current_action() ) {
 		// check if activity scope is following before manipulating
 		if ( isset( $_COOKIE['bp-activity-scope'] ) && 'following' === $_COOKIE['bp-activity-scope'] ) {
 			$set = true;
 		}
 
-	// user's activity following page
+	// user's activity following page.
 	} elseif ( bp_is_user_activity() && bp_is_current_action( 'following' ) ) {
 		$set = true;
 	}
@@ -56,8 +58,8 @@ function bp_follow_add_activity_scope_filter( $qs, $object ) {
 		return $qs;
 	}
 
-	// set internal marker noting that our activity scope is applied
-	buddypress()->follow->activity_scope_set = 1;
+	// set internal marker noting that our activity scope is applied.
+	$bp->follow->activity_scope_set = 1;
 
 	$qs = wp_parse_args( $qs );
 
@@ -65,7 +67,7 @@ function bp_follow_add_activity_scope_filter( $qs, $object ) {
 		'user_id' => bp_displayed_user_id() ? bp_displayed_user_id() : bp_loggedin_user_id(),
 	) );
 
-	// if $following_ids is empty, pass a negative number so no activity can be found
+	// if $following_ids is empty, pass a negative number so no activity can be found.
 	$following_ids = empty( $following_ids ) ? -1 : $following_ids;
 
 	$qs['user_id'] = $following_ids;

@@ -220,7 +220,9 @@ class BP_Follow {
 	 * @return string
 	 */
 	protected static function get_select_sql( $column = '' ) {
-		return sprintf( 'SELECT %s FROM %s ', esc_sql( $column ), esc_sql( buddypress()->follow->table_name ) );
+		$bp = $GLOBALS['bp'];
+
+		return sprintf( 'SELECT %s FROM %s ', esc_sql( $column ), esc_sql( $bp->follow->table_name ) );
 	}
 
 	/**
@@ -499,7 +501,7 @@ class BP_Follow {
 	public static function delete_all_for_user( $user_id = 0 ) {
 		global $wpdb;
 
-		$bp = buddypress();
+		$bp = $GLOBALS['bp'];
 
 		$wpdb->query( $wpdb->prepare( "DELETE FROM {$bp->follow->table_name} WHERE leader_id = %d OR follower_id = %d AND follow_type = ''", $user_id, $user_id ) );
 	}

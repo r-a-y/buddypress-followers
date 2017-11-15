@@ -44,7 +44,7 @@ function bp_follow_add_follow_button( $args = '' ) {
 	function bp_follow_get_add_follow_button( $args = '' ) {
 		global $members_template;
 
-		$bp = buddypress();
+		$bp = $GLOBALS['bp'];
 
 		$r = wp_parse_args( $args, array(
 			'leader_id'     => bp_displayed_user_id(),

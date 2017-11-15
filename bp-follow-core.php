@@ -22,6 +22,8 @@ defined( 'ABSPATH' ) || exit;
 class BP_Follow_Component extends BP_Component {
 
 	/**
+	 * Revision Date.
+	 *
 	 * @var string The current revision date.
 	 */
 	public $revision_date = '2014-08-07 22:00 UTC';
@@ -30,6 +32,8 @@ class BP_Follow_Component extends BP_Component {
 	 * Constructor.
 	 */
 	public function __construct() {
+
+		$bp = $GLOBALS['bp'];
 
 		// setup misc parameters.
 		$this->params = array(
@@ -51,7 +55,7 @@ class BP_Follow_Component extends BP_Component {
 		$this->setup_hooks();
 
 		// register our component as an active component in BP.
-		buddypress()->active_components[ $this->id ] = '1';
+		$bp->active_components[ $this->id ] = '1';
 	}
 
 	/**
@@ -148,6 +152,8 @@ class BP_Follow_Component extends BP_Component {
 			define( 'BP_FOLLOWING_SLUG', 'following' );
 		}
 
+		$bp = $GLOBALS['bp'];
+
 		/**
 		 * Register other globals here since BP isn't flexible enough to add them in
 		 * the parent::setup_globals() method
@@ -166,7 +172,7 @@ class BP_Follow_Component extends BP_Component {
 		parent::setup_globals( array(
 			'notification_callback' => 'bp_follow_format_notifications',
 			'global_tables' => array(
-				'table_name' => buddypress()->table_prefix . 'bp_follow',
+				'table_name' => $bp->table_prefix . 'bp_follow',
 			),
 		) );
 	}
@@ -241,7 +247,7 @@ class BP_Follow_Component extends BP_Component {
  * @since 1.2
  */
 function bp_follow_setup_component() {
-	$bp = buddypress();
+	$bp = $GLOBALS['bp'];
 
 	$bp->follow = new BP_Follow_Component();
 

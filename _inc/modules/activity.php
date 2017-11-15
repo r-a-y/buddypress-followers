@@ -9,7 +9,7 @@ defined( 'ABSPATH' ) || exit;
  * @since 1.3.0
  */
 function bp_follow_activity_init() {
-	$bp = buddypress();
+	$bp = $GLOBALS['bp'];
 
 	$bp->follow->activity = new BP_Follow_Activity_Core();
 
@@ -46,11 +46,13 @@ class BP_Follow_Activity_Core {
 	 * Includes.
 	 */
 	protected function includes() {
-		require buddypress()->follow->path . '/modules/activity-functions.php';
+		$bp = $GLOBALS['bp'];
+
+		require $bp->follow->path . '/modules/activity-functions.php';
 
 		// Add dependant hooks for the 'activity' module.
 		if ( true === (bool) apply_filters( 'bp_follow_enable_activity', false ) ) {
-			require buddypress()->follow->path . '/modules/activity-module.php';
+			require $bp->follow->path . '/modules/activity-module.php';
 		}
 	}
 
@@ -59,7 +61,7 @@ class BP_Follow_Activity_Core {
 	 *
 	 * See {@link bp_follow_activity_can_follow()} for more info on how to register.
 	 *
-	 * @param  object $retval
+	 * @param  object $retval Return Value.
 	 * @return object
 	 */
 	public function set_follow_args_for_post_type( $retval ) {

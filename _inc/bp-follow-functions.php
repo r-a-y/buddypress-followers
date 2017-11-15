@@ -576,6 +576,8 @@ function bp_follow_notification_settings_content() {
  */
 function bp_follow_format_notifications( $action, $item_id, $secondary_item_id, $total_items, $format = 'string' ) {
 
+	$bp = $GLOBALS['bp'];
+
 	do_action( 'bp_follow_format_notifications', $action, $item_id, $secondary_item_id, $total_items, $format );
 
 	switch ( $action ) {
@@ -598,7 +600,7 @@ function bp_follow_format_notifications( $action, $item_id, $secondary_item_id, 
 						$link .= '?action=' . $action;
 					}
 				} else {
-					$link = bp_loggedin_user_domain() . buddypress()->follow->followers->slug . '/?new';
+					$link = bp_loggedin_user_domain() . $bp->follow->followers->slug . '/?new';
 				}
 			}
 

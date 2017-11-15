@@ -15,7 +15,6 @@ defined( 'ABSPATH' ) || exit;
  * @uses bp_core_load_template() Loads a template file.
  */
 function bp_follow_screen_followers() {
-	$bp = buddypress();
 
 	do_action( 'bp_follow_screen_followers' );
 
@@ -32,6 +31,7 @@ function bp_follow_screen_followers() {
  * @uses bp_core_load_template() Loads a template file.
  */
 function bp_follow_screen_following() {
+
 	do_action( 'bp_follow_screen_following' );
 
 	// ignore the template referenced here
@@ -74,7 +74,7 @@ function bp_follow_screen_activity_following() {
  * @since 1.0
  */
 function bp_follow_load_template_filter( $found_template, $templates ) {
-	$bp = buddypress();
+	$bp = $GLOBALS['bp'];
 
 	// Only filter the template location when we're on the follow component pages.
 	if ( ! bp_is_current_component( $bp->follow->followers->slug ) && ! bp_is_current_component( $bp->follow->following->slug ) )

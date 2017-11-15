@@ -23,7 +23,7 @@ defined( 'ABSPATH' ) || exit;
  * @since 1.3.0
  */
 function bp_follow_user_setup_nav( $main_nav = array(), $sub_nav = array() ) {
-	$bp = buddypress();
+	$bp = $GLOBALS['bp'];
 
 	// If we're in the admin area and we're using the WP toolbar, we don't need
 	// to run the rest of this method.
@@ -195,7 +195,7 @@ function bp_follow_group_buddybar_items() {
 		return;
 	}
 
-	$bp = buddypress();
+	$bp = $GLOBALS['bp'];
 
 	// get follow nav positions.
 	$following_position = $bp->follow->params['adminbar_myaccount_order'];
@@ -426,7 +426,7 @@ add_action( 'bp_group_members_list_item_action', 'bp_follow_add_group_member_fol
  * @since 1.3.0
  */
 function bp_follow_users_setup_global_cachegroups() {
-	$bp = buddypress();
+	$bp = $GLOBALS['bp'];
 
 	// user counts.
 	$bp->follow->global_cachegroups[] = 'bp_follow_user_followers_count';
@@ -594,6 +594,8 @@ add_action( 'bp_pre_user_query_construct', 'bp_follow_pre_user_query' );
  * @return array
  */
 function bp_follow_users_filter_activity_scope( $retval = array(), $filter = array() ) {
+	$bp = $GLOBALS['bp'];
+
 	// Determine the user_id.
 	if ( ! empty( $filter['user_id'] ) ) {
 		$user_id = $filter['user_id'];
@@ -604,7 +606,9 @@ function bp_follow_users_filter_activity_scope( $retval = array(), $filter = arr
 	}
 
 	// Determine friends of user.
-	$following_ids = bp_follow_get_following( array( 'user_id' => $user_id ) );
+	$following_ids = bp_follow_get_following( array(
+		'user_id' => $user_id,
+	) );
 	if ( empty( $following_ids ) ) {
 		$following_ids = array( 0 );
 	}
@@ -616,7 +620,7 @@ function bp_follow_users_filter_activity_scope( $retval = array(), $filter = arr
 	 *
 	 * Primarily used to alter the 'no activity found' text.
 	 */
-	buddypress()->follow->activity_scope_set = 1;
+	$bp->follow->activity_scope_set = 1;
 
 	$retval = array(
 		'relation' => 'AND',
@@ -815,8 +819,9 @@ add_filter( 'bp_legacy_theme_activity_feed_url',  'bp_follow_alter_activity_feed
  * @return bool
  */
 function bp_follow_has_activities( $has_activities ) {
+	$bp = $GLOBALS['bp'];
 
-	if ( ! empty( buddypress()->follow->activity_scope_set ) && ! $has_activities ) {
+	if ( ! empty( $bp->follow->activity_scope_set ) && ! $has_activities ) {
 		add_filter( 'gettext', 'bp_follow_no_activity_text', 10, 2 );
 	}
 
@@ -872,7 +877,7 @@ function bp_follow_no_activity_text( $translated_text, $untranslated_text ) {
  * @see bp_follow_has_activities()
  */
 function bp_follow_after_activity_loop() {
-	$bp = buddypress();
+	$bp = $GLOBALS['bp'];
 
 	if ( ! empty( $bp->follow->activity_scope_set ) ) {
 		remove_filter( 'gettext', 'bp_follow_no_activity_text', 10, 2 );
@@ -893,10 +898,12 @@ add_action( 'bp_after_activity_loop', 'bp_follow_after_activity_loop' );
  * @param array $retval Parameters for the user query.
  */
 function bp_follow_user_suggestions_args( $retval ) {
+	$bp = $GLOBALS['bp'];
+
 	// if only friends, override with followers instead.
 	if ( true === (bool) $retval['only_friends'] ) {
-		// set marker
-		buddypress()->follow->only_friends_override = 1;
+		// set marker.
+		$bp->follow->only_friends_override = 1;
 
 		// we set 'only_friends' to 0 to bypass friends component check.
 		$retval['only_friends'] = 0;
@@ -920,8 +927,10 @@ add_filter( 'bp_members_suggestions_args', 'bp_follow_user_suggestions_args' );
  * @param array $user_query User query arguments. See {@link BP_User_Query}.
  */
 function bp_follow_user_follow_suggestions( $user_query ) {
-	if ( isset( buddypress()->follow->only_friends_override ) ) {
-		unset( buddypress()->follow->only_friends_override );
+	$bp = $GLOBALS['bp'];
+
+	if ( isset( $bp->follow->only_friends_override ) ) {
+		unset( $bp->follow->only_friends_override );
 
 		// limit suggestions to followers.
 		$user_query['include'] = bp_follow_get_followers( array(
