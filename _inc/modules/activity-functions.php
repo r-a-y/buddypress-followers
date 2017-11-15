@@ -155,8 +155,8 @@ function bp_follow_activity_button( $args = array() ) {
 		'link_class'    => 'button bp-primary-action',
 		'wrapper'       => false,
 
-		// follow-related args
-		'show_follower_count' => false
+		// follow-related args.
+		'show_follower_count' => false,
 	), 'follow_activity_button' );
 
 	if ( ! $r['leader_id'] || ! $r['follower_id'] ) {
@@ -175,11 +175,11 @@ function bp_follow_activity_button( $args = array() ) {
 		$is_following = bp_follow_is_following( array(
 			'leader_id'   => $r['leader_id'],
 			'follower_id' => $r['follower_id'],
-			'follow_type' => $follow_type
+			'follow_type' => $follow_type,
 		) );
 	}
 
-	// setup some variables
+	// setup some variables.
 	if ( $is_following ) {
 		$id     = 'following';
 		$action = 'unfollow';
@@ -209,7 +209,7 @@ function bp_follow_activity_button( $args = array() ) {
 		if ( true === $r['show_follower_count'] ) {
 			$count  = bp_follow_get_the_followers_count( array(
 				'object_id'   => $r['leader_id'],
-				'follow_type' => $follow_type
+				'follow_type' => $follow_type,
 			) );
 		}
 
@@ -222,22 +222,21 @@ function bp_follow_activity_button( $args = array() ) {
 		if ( empty( $r['link_text'] ) ) {
 			$r['link_text'] = $link_text;
 		}
-
 	}
 
 	$wrapper_class = 'follow-button ' . $id;
 
 	if ( ! empty( $r['wrapper_class'] ) ) {
-		$wrapper_class .= ' '  . esc_attr( $r['wrapper_class'] );
+		$wrapper_class .= ' ' . esc_attr( $r['wrapper_class'] );
 	}
 
 	$link_class = $action;
 
 	if ( ! empty( $r['link_class'] ) ) {
-		$link_class .= ' '  . esc_attr( $r['link_class'] );
+		$link_class .= ' ' . esc_attr( $r['link_class'] );
 	}
 
-	// setup the button arguments
+	// setup the button arguments.
 	$button = array(
 		'id'                => $id,
 		'component'         => 'follow',
@@ -253,9 +252,9 @@ function bp_follow_activity_button( $args = array() ) {
 		'link_title'        => esc_attr( $r['link_title'] ),
 		'link_id'           => $action . '-' . (int) $r['leader_id'],
 		'link_class'        => $link_class,
-		'wrapper'           => ! empty( $r['wrapper'] ) ? esc_attr( $r['wrapper'] ) : false
+		'wrapper'           => ! empty( $r['wrapper'] ) ? esc_attr( $r['wrapper'] ) : false,
 	);
 
-	// Filter and output the HTML button
+	// Filter and output the HTML button.
 	bp_button( apply_filters( 'bp_follow_activity_get_follow_button', $button, $r, $is_following ) );
 }

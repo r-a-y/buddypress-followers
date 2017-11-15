@@ -22,35 +22,45 @@ function bp_follow_ajax_action_start() {
 
 	$link_class = ! empty( $_POST['link_class'] ) ? str_replace( 'follow ', '', $_POST['link_class'] ) : false;
 
-	// successful follow
-	if ( bp_follow_start_following( array( 'leader_id' => $_POST['uid'], 'follower_id' => bp_loggedin_user_id() ) ) ) {
-		// output unfollow button
+	// successful follow.
+	if ( bp_follow_start_following( array(
+		'leader_id' => $_POST['uid'],
+		'follower_id' => bp_loggedin_user_id(),
+	) ) ) {
+		// output unfollow button.
 		$output = bp_follow_get_add_follow_button( array(
 			'leader_id'   => $_POST['uid'],
 			'follower_id' => bp_loggedin_user_id(),
 			'wrapper'     => false,
-			'link_class'  => $link_class
+			'link_class'  => $link_class,
 		) );
 
 	// failed follow
 	} else {
-		// output fallback invalid button
+		// output fallback invalid button.
 		$args = array(
 			'id'         => 'invalid',
 			'link_href'  => 'javascript:;',
 			'component'  => 'follow',
 			'wrapper'    => false,
-			'link_class' => $link_class
+			'link_class' => $link_class,
 		);
 
-		if ( bp_follow_is_following( array( 'leader_id' => $_POST['uid'], 'follower_id' => bp_loggedin_user_id() ) ) ) {
+		if ( bp_follow_is_following( array(
+			'leader_id' => $_POST['uid'],
+			'follower_id' => bp_loggedin_user_id(),
+		) ) ) {
 			$output = bp_get_button( array_merge(
-				array( 'link_text' => __( 'Already following', 'buddypress-followers' ) ),
+				array(
+					'link_text' => __( 'Already following', 'buddypress-followers' ),
+				),
 				$args
 			) );
 		} else {
 			$output = bp_get_button( array_merge(
-				array( 'link_text' => __( 'Error following user', 'buddypress-followers' ) ),
+				array(
+					'link_text' => __( 'Error following user', 'buddypress-followers' ),
+				),
 				$args
 			) );
 		}
@@ -68,7 +78,9 @@ function bp_follow_ajax_action_start() {
 	 * }
 	 * @param int $leader_id The user ID of the person being followed.
 	 */
-	$output = apply_filters( 'bp_follow_ajax_action_start_response', array( 'button' => $output ), $_POST['uid'] );
+	$output = apply_filters( 'bp_follow_ajax_action_start_response', array(
+		'button' => $output,
+	), $_POST['uid'] );
 
 	wp_send_json_success( $output );
 }
@@ -87,36 +99,46 @@ function bp_follow_ajax_action_stop() {
 
 	$link_class = ! empty( $_POST['link_class'] ) ? str_replace( 'unfollow ', '', $_POST['link_class'] ) : false;
 
-	// successful unfollow
-	if ( bp_follow_stop_following( array( 'leader_id' => $_POST['uid'], 'follower_id' => bp_loggedin_user_id() ) ) ) {
-		// output follow button
+	// successful unfollow.
+	if ( bp_follow_stop_following( array(
+		'leader_id' => $_POST['uid'],
+		'follower_id' => bp_loggedin_user_id(),
+	) ) ) {
+		// output follow button.
 		$output = bp_follow_get_add_follow_button( array(
 			'leader_id'   => $_POST['uid'],
 			'follower_id' => bp_loggedin_user_id(),
 			'wrapper'     => false,
-			'link_class'  => $link_class
+			'link_class'  => $link_class,
 		) );
 
 	// failed unfollow
 	} else {
-		// output fallback invalid button
+		// output fallback invalid button.
 		$args = array(
 			'id'         => 'invalid',
 			'link_href'  => 'javascript:;',
 			'component'  => 'follow',
 			'wrapper'    => false,
-			'link_class' => $link_class
+			'link_class' => $link_class,
 		);
 
-		if ( ! bp_follow_is_following( array( 'leader_id' => $_POST['uid'], 'follower_id' => bp_loggedin_user_id() ) ) ) {
+		if ( ! bp_follow_is_following( array(
+			'leader_id' => $_POST['uid'],
+			'follower_id' => bp_loggedin_user_id(),
+		) ) ) {
 			$output = bp_get_button( array_merge(
-				array( 'link_text' => __( 'Not following', 'buddypress-followers' ) ),
+				array(
+					'link_text' => __( 'Not following', 'buddypress-followers' ),
+				),
 				$args
 			) );
 
 		} else {
 			$output = bp_get_button( array_merge(
-				array( 'link_text' => __( 'Error unfollowing user', 'buddypress-followers' ) ),
+				array(
+					'link_text' => __( 'Error unfollowing user', 'buddypress-followers' ),
+				),
 				$args
 			) );
 
@@ -135,7 +157,9 @@ function bp_follow_ajax_action_stop() {
 	 * }
 	 * @param int $leader_id The user ID of the person being unfollowed.
 	 */
-	$output = apply_filters( 'bp_follow_ajax_action_stop_response', array( 'button' => $output ), $_POST['uid'] );
+	$output = apply_filters( 'bp_follow_ajax_action_stop_response', array(
+		'button' => $output,
+	), $_POST['uid'] );
 
 	wp_send_json_success( $output );
 }

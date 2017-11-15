@@ -19,13 +19,12 @@ defined( 'ABSPATH' ) || exit;
  * @uses bp_core_redirect() Safe redirects the user to a particular URL.
  */
 function bp_follow_action_start() {
-	global $bp;
 
-	if ( ! bp_is_current_component( $bp->follow->followers->slug ) || ! bp_is_current_action( 'start' ) ) {
+	if ( ! bp_is_current_component( buddypress()->follow->followers->slug ) || ! bp_is_current_action( 'start' ) ) {
 		return;
 	}
 
-	if ( bp_displayed_user_id() == bp_loggedin_user_id() ) {
+	if ( bp_displayed_user_id() === bp_loggedin_user_id() ) {
 		return;
 	}
 
@@ -42,7 +41,7 @@ function bp_follow_action_start() {
 		}
 	}
 
-	// it's possible that wp_get_referer() returns false, so let's fallback to the displayed user's page
+	// it's possible that wp_get_referer() returns false, so let's fallback to the displayed user's page.
 	$redirect = wp_get_referer() ? wp_get_referer() : bp_displayed_user_domain();
 	bp_core_redirect( $redirect );
 }
@@ -58,13 +57,12 @@ add_action( 'bp_actions', 'bp_follow_action_start' );
  * @uses bp_core_redirect() Safe redirects the user to a particular URL.
  */
 function bp_follow_action_stop() {
-	global $bp;
 
-	if ( ! bp_is_current_component( $bp->follow->followers->slug ) || ! bp_is_current_action( 'stop' ) ) {
+	if ( ! bp_is_current_component( buddypress()->follow->followers->slug ) || ! bp_is_current_action( 'stop' ) ) {
 		return;
 	}
 
-	if ( bp_displayed_user_id() == bp_loggedin_user_id() ) {
+	if ( bp_displayed_user_id() === bp_loggedin_user_id() ) {
 		return;
 	}
 
@@ -81,7 +79,7 @@ function bp_follow_action_stop() {
 		}
 	}
 
-	// it's possible that wp_get_referer() returns false, so let's fallback to the displayed user's page
+	// it's possible that wp_get_referer() returns false, so let's fallback to the displayed user's page.
 	$redirect = wp_get_referer() ? wp_get_referer() : bp_displayed_user_domain();
 	bp_core_redirect( $redirect );
 }
@@ -90,7 +88,7 @@ add_action( 'bp_actions', 'bp_follow_action_stop' );
 /**
  * Add RSS feed support for a user's following activity.
  *
- * eg. example.com/members/USERNAME/activity/following/feed/
+ * Ex.: example.com/members/USERNAME/activity/following/feed/
  *
  * Only available in BuddyPress 1.8+.
  *
@@ -98,7 +96,7 @@ add_action( 'bp_actions', 'bp_follow_action_stop' );
  * @author r-a-y
  */
 function bp_follow_my_following_feed() {
-	// only available in BP 1.8+
+	// only available in BP 1.8+.
 	if ( ! class_exists( 'BP_Activity_Feed' ) ) {
 		return;
 	}
@@ -107,10 +105,8 @@ function bp_follow_my_following_feed() {
 		return false;
 	}
 
-	global $bp;
-
-	// setup the feed
-	$bp->activity->feed = new BP_Activity_Feed( array(
+	// setup the feed.
+	buddypress()->activity->feed = new BP_Activity_Feed( array(
 		'id'            => 'myfollowing',
 
 		/* translators: User's following activity RSS title - "[Site Name] | [User Display Name] | Following Activity" */

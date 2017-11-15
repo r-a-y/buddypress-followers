@@ -3,6 +3,9 @@
  * Follow Activity Module.
  *
  * @since 1.3.0
+ *
+ * @package BP-Follow
+ * @subpackage Activity Module
  */
 
 // Exit if accessed directly.
@@ -14,29 +17,30 @@ defined( 'ABSPATH' ) || exit;
  * @since 1.3.0
  */
 class BP_Follow_Activity_Module {
+
 	/**
 	 * Constructor.
 	 */
 	public function __construct() {
-		// Component hooks
+		// Component hooks.
 		add_action( 'bp_follow_setup_globals', array( $this, 'constants' ) );
 		add_action( 'bp_follow_setup_globals', array( $this, 'setup_global_cachegroups' ) );
 		add_action( 'bp_follow_setup_nav',     array( $this, 'setup_nav' ) );
 		add_action( 'bp_activity_admin_nav',   array( $this, 'activity_admin_nav' ) );
 
-		// Loop filtering
+		// Loop filtering.
 		add_action( 'bp_before_activity_type_tab_favorites', array( $this, 'add_activity_directory_tab' ) );
 		add_filter( 'bp_activity_set_follow_scope_args', array( $this, 'filter_activity_scope' ), 10, 2 );
 		add_filter( 'bp_has_activities',      array( $this, 'bulk_inject_follow_status' ) );
 		add_action( 'bp_activity_entry_meta', array( $this, 'add_follow_button' ) );
 
-		// Cache invalidation
+		// Cache invalidation.
 		add_action( 'bp_follow_start_following_activity', array( $this, 'clear_cache_on_follow' ) );
 		add_action( 'bp_follow_stop_following_activity',  array( $this, 'clear_cache_on_follow' ) );
 		add_action( 'bp_follow_before_remove_data',       array( $this, 'clear_cache_on_user_delete' ) );
 		add_action( 'bp_activity_after_delete',           array( $this, 'on_activity_delete' ) );
 
-		// RSS
+		// RSS.
 		add_action( 'bp_actions', array( $this, 'rss_handler' ) );
 		add_filter( 'bp_get_sitewide_activity_feed_link', array( $this, 'activity_feed_url' ) );
 		add_filter( 'bp_dtheme_activity_feed_url',        array( $this, 'activity_feed_url' ) );
@@ -60,11 +64,11 @@ class BP_Follow_Activity_Module {
 	 * Set up global cachegroups.
 	 */
 	public function setup_global_cachegroups() {
-		// Counts
+		// Counts.
 		buddypress()->follow->global_cachegroups[] = 'bp_follow_user_activity_following_count';
 		buddypress()->follow->global_cachegroups[] = 'bp_follow_activity_followers_count';
 
-		// Query
+		// Query.
 		buddypress()->follow->global_cachegroups[] = 'bp_follow_user_activity_following_query';
 		buddypress()->follow->global_cachegroups[] = 'bp_follow_activity_followers_query';
 	}
@@ -73,7 +77,7 @@ class BP_Follow_Activity_Module {
 	 * Setup profile nav.
 	 */
 	public function setup_nav() {
-		// Determine user to use
+		// Determine user to use.
 		if ( bp_displayed_user_domain() ) {
 			$user_domain = bp_displayed_user_domain();
 		} elseif ( bp_loggedin_user_domain() ) {
@@ -82,7 +86,7 @@ class BP_Follow_Activity_Module {
 			return;
 		}
 
-		// Add activity sub nav item
+		// Add activity sub nav item.
 		if ( bp_is_active( 'activity' ) && apply_filters( 'bp_follow_activity_show_activity_subnav', true ) ) {
 			bp_core_new_subnav_item( array(
 				'name'            => _x( 'Followed Activity', 'Activity subnav tab', 'buddypress-followers' ),
@@ -91,7 +95,7 @@ class BP_Follow_Activity_Module {
 				'parent_slug'     => bp_get_activity_slug(),
 				'screen_function' => 'bp_activity_screen_my_activity',
 				'position'        => 21,
-				'item_css_id'     => 'activity-follow'
+				'item_css_id'     => 'activity-follow',
 			) );
 		}
 	}
@@ -118,11 +122,11 @@ class BP_Follow_Activity_Module {
 			$inject = array();
 			$offset = 4;
 
-			$inject[$offset] = $new_item;
+			$inject[ $offset ] = $new_item;
 			$retval = array_merge(
 				array_slice( $retval, 0, $offset, true ),
 				$inject,
-				array_slice( $retval, $offset, NULL, true )
+				array_slice( $retval, $offset, null, true )
 			);
 		}
 
@@ -169,12 +173,12 @@ class BP_Follow_Activity_Module {
 
 		$activity_ids = array();
 
-		foreach( (array) $activities_template->activities as $i => $activity ) {
-			// add blog ID to array
+		foreach ( (array) $activities_template->activities as $i => $activity ) {
+			// add blog ID to array.
 			$activity_ids[] = $activity->id;
 
-			// set default follow status to false
-			$activities_template->activities[$i]->is_following = false;
+			// set default follow status to false.
+			$activities_template->activities[ $i ]->is_following = false;
 		}
 
 		if ( empty( $activity_ids ) ) {
@@ -187,9 +191,9 @@ class BP_Follow_Activity_Module {
 			return $retval;
 		}
 
-		foreach( (array) $following as $is_following ) {
-			foreach( (array) $activities_template->activities as $i => $activity ) {
-				// set follow status to true if the logged-in user is following
+		foreach ( (array) $following as $is_following ) {
+			foreach ( (array) $activities_template->activities as $i => $activity ) {
+				// set follow status to true if the logged-in user is following.
 				if ( $is_following->leader_id == $activity->id ) {
 					$activities_template->activities[$i]->is_following = true;
 				}
@@ -209,12 +213,12 @@ class BP_Follow_Activity_Module {
 	 *
 	 * @since 1.3.0
 	 *
-	 * @param array $retval Empty array by default
-	 * @param array $filter Current activity arguments
+	 * @param array $retval Empty array by default.
+	 * @param array $filter Current activity arguments.
 	 * @return array
 	 */
 	public function filter_activity_scope( $retval = array(), $filter = array() ) {
-		// Determine the user_id
+		// Determine the user_id.
 		if ( ! empty( $filter['user_id'] ) ) {
 			$user_id = $filter['user_id'];
 		} else {
@@ -223,7 +227,7 @@ class BP_Follow_Activity_Module {
 				: bp_loggedin_user_id();
 		}
 
-		// Get activity IDs that the user is following
+		// Get activity IDs that the user is following.
 		$following_ids = bp_follow_get_following( array(
 			'user_id'     => $user_id,
 			'follow_type' => 'activity',
@@ -236,34 +240,34 @@ class BP_Follow_Activity_Module {
 
 		// Should we show all items regardless of sitewide visibility?
 		$show_hidden = array();
-		if ( ! empty( $user_id ) && ( $user_id !== bp_loggedin_user_id() ) ) {
+		if ( ! empty( $user_id ) && ( bp_loggedin_user_id() !== $user_id ) ) {
 			$show_hidden = array(
 				'column' => 'hide_sitewide',
-				'value'  => 0
+				'value'  => 0,
 			);
 		}
 
 		$clause = array(
 			'relation' => 'OR',
 
-			// general blog activity items
+			// general blog activity items.
 			array(
 				'column'  => 'id',
 				'compare' => 'IN',
-				'value'   => $following_ids
+				'value'   => $following_ids,
 			),
 
-			// groupblog posts
+			// groupblog posts.
 			array(
 				'relation' => 'AND',
 				array(
 					'column' => 'type',
-					'value'  => 'activity_comment'
+					'value'  => 'activity_comment',
 				),
 				array(
 					'column'  => 'item_id',
 					'compare' => 'IN',
-					'value'   => $following_ids
+					'value'   => $following_ids,
 				),
 			),
 		);
@@ -273,11 +277,13 @@ class BP_Follow_Activity_Module {
 			$clause,
 			$show_hidden,
 
-			// overrides
+			// overrides.
 			'override' => array(
 				'display_comments' => 'stream',
-				'filter'      => array( 'user_id' => 0 ),
-				'show_hidden' => true
+				'filter'      => array(
+					'user_id' => 0,
+				),
+				'show_hidden' => true,
 			),
 		);
 
@@ -303,13 +309,13 @@ class BP_Follow_Activity_Module {
 	 * @param BP_Follow $follow
 	 */
 	public function clear_cache_on_follow( BP_Follow $follow ) {
-		// clear followers count for activity
+		// clear followers count for activity.
 		wp_cache_delete( $follow->leader_id,   'bp_follow_activity_followers_count' );
 
-		// clear following activity count for user
+		// clear following activity count for user.
 		wp_cache_delete( $follow->follower_id, 'bp_follow_user_activity_following_count' );
 
-		// clear queried followers / following
+		// clear queried followers / following.
 		wp_cache_delete( $follow->leader_id,   'bp_follow_activity_followers_query' );
 		wp_cache_delete( $follow->follower_id, 'bp_follow_user_activity_following_query' );
 	}
@@ -317,16 +323,16 @@ class BP_Follow_Activity_Module {
 	/**
 	 * Clear activity cache when a user is deleted.
 	 *
-	 * @param int $user_id The user ID being deleted
+	 * @param int $user_id The user ID being deleted.
 	 */
 	public function clear_cache_on_user_delete( $user_id = 0 ) {
-		// delete user's blog follow count
+		// delete user's blog follow count.
 		wp_cache_delete( $user_id, 'bp_follow_user_activity_following_count' );
 
-		// delete queried blogs that user was following
+		// delete queried blogs that user was following.
 		wp_cache_delete( $user_id, 'bp_follow_user_activity_following_query' );
 
-		// delete each blog's followers count that the user was following
+		// delete each blog's followers count that the user was following.
 		$aids = BP_Follow::get_following( $user_id, 'activity' );
 		if ( ! empty( $aids ) ) {
 			foreach ( $aids as $aid ) {
@@ -342,7 +348,7 @@ class BP_Follow_Activity_Module {
 		// Pluck the activity IDs out of the $activities array.
 		$activity_ids = wp_parse_id_list( wp_list_pluck( $activities, 'id' ) );
 
-		// See if any of the deleted activity IDs were being followed
+		// See if any of the deleted activity IDs were being followed.
 		$sql  = 'SELECT leader_id, follower_id FROM ' . esc_sql( buddypress()->follow->table_name ) . ' ';
 		$sql .= 'WHERE leader_id IN (' . implode( ',', wp_parse_id_list( $activity_ids ) ) . ') ';
 		$sql .= "AND follow_type = 'activity'";
@@ -350,24 +356,24 @@ class BP_Follow_Activity_Module {
 		$followed_ids = $GLOBALS['wpdb']->get_results( $sql );
 
 		foreach ( $followed_ids as $activity ) {
-			// clear followers count for activity item
+			// clear followers count for activity item.
 			wp_cache_delete( $activity->leader_id, 'bp_follow_activity_followers_count' );
 
-			// clear queried followers for activity item
+			// clear queried followers for activity item.
 			wp_cache_delete( $activity->leader_id, 'bp_follow_activity_followers_query' );
 
-			// delete user's activity follow count
+			// delete user's activity follow count.
 			wp_cache_delete( $activity->follower_id, 'bp_follow_user_activity_following_count' );
 
-			// delete queried activity that user was following
+			// delete queried activity that user was following.
 			wp_cache_delete( $activity->follower_id, 'bp_follow_user_activity_following_query' );
 
 			// Delete the follow entry
-			// @todo Need a mass bulk-delete method
+			// @todo Need a mass bulk-delete method.
 			bp_follow_stop_following( array(
 				'leader_id'   => $activity->leader_id,
 				'follower_id' => $activity->follower_id,
-				'follow_type' => 'activity'
+				'follow_type' => 'activity',
 			) );
 		}
 	}
@@ -391,7 +397,7 @@ class BP_Follow_Activity_Module {
 			return $retval;
 		}
 
-		// This filters the RSS link when on a user's "Activity > Papers" page
+		// This filters the RSS link when on a user's "Activity > Papers" page.
 		if ( 'bp_get_activities_member_rss_link' === current_filter() && '' == $retval && bp_is_current_action( constant( 'BP_FOLLOW_ACTIVITY_USER_ACTIVITY_SLUG' ) ) ) {
 			return esc_url( bp_displayed_user_domain() . bp_get_activity_slug() . '/' . constant( 'BP_FOLLOW_ACTIVITY_USER_ACTIVITY_SLUG' ) . '/feed/' );
 		}
@@ -402,10 +408,10 @@ class BP_Follow_Activity_Module {
 			return $retval;
 		}
 
-		// get the activity scope
+		// get the activity scope.
 		$scope = ! empty( $_COOKIE['bp-activity-scope'] ) ? $_COOKIE['bp-activity-scope'] : false;
 
-		if ( $scope == 'follow' && bp_loggedin_user_id() ) {
+		if ( 'follow' === $scope && bp_loggedin_user_id() ) {
 			$retval = bp_loggedin_user_domain() . bp_get_activity_slug() . '/' . constant( 'BP_FOLLOW_ACTIVITY_USER_ACTIVITY_SLUG' ) . '/feed/';
 		}
 
@@ -430,10 +436,10 @@ class BP_Follow_Activity_Module {
 
 		$args = array(
 			'user_id' => bp_displayed_user_id(),
-			'scope'   => 'follow'
+			'scope'   => 'follow',
 		);
 
-		// setup the feed
+		// setup the feed.
 		buddypress()->activity->feed = new BP_Activity_Feed( array(
 			'id'            => 'followedactivity',
 

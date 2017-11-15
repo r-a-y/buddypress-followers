@@ -51,15 +51,18 @@ function bp_follow_add_follow_button( $args = '' ) {
 			'link_title'    => '',
 			'wrapper_class' => '',
 			'link_class'    => '',
-			'wrapper'       => 'div'
+			'wrapper'       => 'div',
 		) );
 
-		if ( ! $r['leader_id'] || ! $r['follower_id'] )
+		if ( ! $r['leader_id'] || ! $r['follower_id'] ) {
 			return false;
+		}
+
+		$logged_user_id = bp_loggedin_user_id();
 
 		// if we're checking during a members loop, then follow status is already
 		// queried via bp_follow_inject_member_follow_status()
-		if ( ! empty( $members_template->in_the_loop ) && $r['follower_id'] == bp_loggedin_user_id() && $r['leader_id'] == bp_get_member_user_id() ) {
+		if ( ! empty( $members_template->in_the_loop ) && $r['follower_id'] === $logged_user_id && $r['leader_id'] === $logged_user_id ) {
 			$is_following = $members_template->member->is_following;
 
 		// else we manually query the follow status
@@ -70,8 +73,8 @@ function bp_follow_add_follow_button( $args = '' ) {
 			) );
 		}
 
-		// if the logged-in user is the leader, use already-queried variables
-		if ( bp_loggedin_user_id() && $r['leader_id'] == bp_loggedin_user_id() ) {
+		// if the logged-in user is the leader, use already-queried variables.
+		if ( $logged_user_id && $logged_user_id === $r['leader_id'] ) {
 			$leader_domain   = bp_loggedin_user_domain();
 			$leader_fullname = bp_get_loggedin_user_fullname();
 
@@ -81,7 +84,7 @@ function bp_follow_add_follow_button( $args = '' ) {
 			$leader_fullname = bp_core_get_user_displayname( $r['leader_id'] );
 		}
 
-		// setup some variables
+		// setup some variables.
 		if ( $is_following ) {
 			$id        = 'following';
 			$action    = 'stop';
@@ -120,12 +123,12 @@ function bp_follow_add_follow_button( $args = '' ) {
 		$block_self = empty( $members_template->member ) ? true : false;
 
 		// if we're using AJAX and a user is on their own profile, we need to set
-		// block_self to false so the button shows up
+		// block_self to false so the button shows up.
 		if ( bp_follow_is_doing_ajax() && bp_is_my_profile() ) {
 			$block_self = false;
 		}
 
-		// setup the button arguments
+		// setup the button arguments.
 		$button = array(
 			'id'                => $id,
 			'component'         => 'follow',
@@ -138,9 +141,9 @@ function bp_follow_add_follow_button( $args = '' ) {
 			'link_title'        => esc_attr( $r['link_title'] ),
 			'link_id'           => $class . '-' . (int) $r['leader_id'],
 			'link_class'        => $link_class,
-			'wrapper'           => ! empty( $r['wrapper'] ) ? esc_attr( $r['wrapper'] ) : false
+			'wrapper'           => ! empty( $r['wrapper'] ) ? esc_attr( $r['wrapper'] ) : false,
 		);
 
-		// Filter and return the HTML button
+		// Filter and return the HTML button.
 		return bp_get_button( apply_filters( 'bp_follow_get_add_follow_button', $button, $r['leader_id'], $r['follower_id'] ) );
 	}

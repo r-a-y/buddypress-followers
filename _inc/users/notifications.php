@@ -40,7 +40,7 @@ add_action( 'bp_follow_remove_data', 'bp_follow_remove_notifications_for_user' )
  * @param object $follow The BP_Follow object.
  */
 function bp_follow_notifications_add_on_follow( BP_Follow $follow ) {
-	// this only applies to users
+	// this only applies to users.
 	if ( ! empty( $follow->follow_type ) ) {
 		return;
 	}
@@ -53,7 +53,7 @@ function bp_follow_notifications_add_on_follow( BP_Follow $follow ) {
 			'item_id'           => $follow->follower_id,
 			'user_id'           => $follow->leader_id,
 			'component_name'    => buddypress()->follow->id,
-			'component_action'  => 'new_follow'
+			'component_action'  => 'new_follow',
 		) );
 
 	// BP < 1.9 - add notifications the old way
@@ -71,7 +71,7 @@ function bp_follow_notifications_add_on_follow( BP_Follow $follow ) {
 	// Add an email notification
 	bp_follow_new_follow_email_notification( array(
 		'leader_id'   => $follow->leader_id,
-		'follower_id' => $follow->follower_id
+		'follower_id' => $follow->follower_id,
 	) );
 }
 add_action( 'bp_follow_start_following', 'bp_follow_notifications_add_on_follow' );
@@ -109,12 +109,12 @@ function bp_follow_notifications_mark_follower_profile_as_read() {
 		return;
 	}
 
-	// mark notification as read
+	// mark notification as read.
 	if ( bp_is_active( 'notifications' ) ) {
 		bp_notifications_mark_notifications_by_item_id( bp_loggedin_user_id(), bp_displayed_user_id(), buddypress()->follow->id, 'new_follow' );
 
 	// check if we're not on BP 1.9
-	// if so, delete notification since marked functionality doesn't exist
+	// if so, delete notification since marked functionality doesn't exist.
 	} elseif ( ! class_exists( 'BP_Core_Login_Widget' ) ) {
 		global $bp;
 
@@ -175,7 +175,7 @@ add_action( 'bp_follow_screen_followers', 'bp_follow_notifications_delete_on_fol
 function bp_follow_notifications_remove_queryarg_from_userlink( $retval ) {
 	if ( bp_is_current_action( 'read' ) ) {
 		// if notifications loop has finished rendering, stop now!
-		// this is so follow notifications in the adminbar are unaffected
+		// this is so follow notifications in the adminbar are unaffected.
 		if ( did_action( 'bp_after_member_body' ) ) {
 			return $retval;
 		}
@@ -198,21 +198,21 @@ add_filter( 'bp_follow_new_followers_notification', 'bp_follow_notifications_rem
  * @return array
  */
 function bp_follow_filter_unread_notifications( $retval ) {
-	// make sure we're on a user's notification page
+	// make sure we're on a user's notification page.
 	if ( ! bp_is_user_notifications() ) {
 		return $retval;
 	}
 
-	// make sure we're doing this for the main notifications loop
+	// make sure we're doing this for the main notifications loop.
 	if ( ! did_action( 'bp_before_member_body' ) ) {
 		return $retval;
 	}
 
-	// filter notifications by action
+	// filter notifications by action.
 	if ( ! empty( $_GET['action'] ) ) {
 		$retval['component_action'] = sanitize_title( $_GET['action'] );
 
-		// remove this filter to prevent any other notification loop getting filtered
+		// remove this filter to prevent any other notification loop getting filtered.
 		remove_filter( 'bp_after_has_notifications_parse_args', 'bp_follow_filter_unread_notifications' );
 	}
 
@@ -258,7 +258,7 @@ function bp_follow_new_follow_email_notification( $args = '' ) {
 
 	$r = wp_parse_args( $args, array(
 		'leader_id'   => bp_displayed_user_id(),
-		'follower_id' => bp_loggedin_user_id()
+		'follower_id' => bp_loggedin_user_id(),
 	) );
 
 	// Don't send email for yourself!
@@ -266,20 +266,20 @@ function bp_follow_new_follow_email_notification( $args = '' ) {
 		return false;
 	}
 
-	if ( 'no' == bp_get_user_meta( (int) $r['leader_id'], 'notification_starts_following', true ) ) {
+	if ( 'no' === bp_get_user_meta( (int) $r['leader_id'], 'notification_starts_following', true ) ) {
 		return false;
 	}
 
-	// Check to see if this leader has already been notified of this follower before
+	// Check to see if this leader has already been notified of this follower before.
 	$has_notified = bp_get_user_meta( $r['follower_id'], 'bp_follow_has_notified', true );
 	$has_notified = empty( $has_notified ) ? array() : $has_notified;
 
-	// Already notified so don't send another email
-	if ( in_array( $r['leader_id'], $has_notified ) ) {
+	// Already notified so don't send another email.
+	if ( in_array( $r['leader_id'], $has_notified, true ) ) {
 		return false;
 	}
 
-	// Not been notified before, update usermeta and continue to mail
+	// Not been notified before, update usermeta and continue to mail.
 	$has_notified[] = $r['leader_id'];
 	bp_update_user_meta( $r['follower_id'], 'bp_follow_has_notified', $has_notified );
 
@@ -288,7 +288,7 @@ function bp_follow_new_follow_email_notification( $args = '' ) {
 
 	$leader_ud = bp_core_get_core_userdata( $r['leader_id'] );
 
-	// Set up and send the message
+	// Set up and send the message.
 	$to = $leader_ud->user_email;
 
 	$subject = '[' . wp_specialchars_decode( bp_get_option( 'blogname' ), ENT_QUOTES ) . '] ' . sprintf( __( '%s is now following you', 'buddypress-followers' ), $follower_name );
@@ -298,7 +298,7 @@ function bp_follow_new_follow_email_notification( $args = '' ) {
 
 To view %s\'s profile: %s', 'buddypress-followers' ), $follower_name, $follower_name, $follower_link );
 
-	// Add notifications link if settings component is enabled
+	// Add notifications link if settings component is enabled.
 	if ( bp_is_active( 'settings' ) ) {
 		$settings_link = bp_core_get_user_domain( $r['leader_id'] ) . BP_SETTINGS_SLUG . '/notifications/';
 		$message .= sprintf( __( '
@@ -308,7 +308,7 @@ To disable these notifications please log in and go to:
 %s', 'buddypress-followers' ), $settings_link );
 	}
 
-	// Send the message
+	// Send the message.
 	$to      = apply_filters( 'bp_follow_notification_to', $to );
 	$subject = apply_filters( 'bp_follow_notification_subject', $subject, $follower_name );
 	$message = apply_filters( 'bp_follow_notification_message', wp_specialchars_decode( $message, ENT_QUOTES ), $follower_name, $follower_link );

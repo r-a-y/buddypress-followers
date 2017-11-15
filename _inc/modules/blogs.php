@@ -9,9 +9,8 @@ defined( 'ABSPATH' ) || exit;
  * @since 1.3.0
  */
 function bp_follow_blogs_init() {
-	global $bp;
 
-	$bp->follow->blogs = new BP_Follow_Blogs;
+	buddypress()->follow->blogs = new BP_Follow_Blogs();
 
 	do_action( 'bp_follow_blogs_loaded' );
 }
@@ -27,43 +26,43 @@ class BP_Follow_Blogs {
 	 * Constructor.
 	 */
 	public function __construct() {
-		// includes
+		// includes.
 		$this->includes();
 
-		// component hooks
+		// component hooks.
 		add_action( 'bp_follow_setup_globals', array( $this, 'constants' ) );
 		add_action( 'bp_follow_setup_globals', array( $this, 'setup_global_cachegroups' ) );
 		add_action( 'bp_follow_setup_nav',     array( $this, 'setup_nav' ) );
 		add_action( 'bp_activity_admin_nav',   array( $this, 'activity_admin_nav' ) );
 		add_filter( 'bp_blogs_admin_nav',      array( $this, 'blogs_admin_nav' ) );
 
-		// screen hooks
+		// screen hooks.
 		add_action( 'bp_after_member_blogs_content', 'BP_Follow_Blogs_Screens::user_blogs_inline_js' );
 		add_action( 'bp_actions',                    'BP_Follow_Blogs_Screens::action_handler' );
 		add_action( 'bp_actions',                    'BP_Follow_Blogs_Screens::rss_handler' );
 
-		// directory tabs
+		// directory tabs.
 		add_action( 'bp_before_activity_type_tab_favorites', array( $this, 'add_activity_directory_tab' ) );
 		add_action( 'bp_blogs_directory_blog_types',         array( $this, 'add_blog_directory_tab' ) );
 
-		// loop filtering
+		// loop filtering.
 		add_filter( 'bp_activity_set_followblogs_scope_args', array( $this, 'filter_activity_scope' ), 10, 2 );
 		add_filter( 'bp_ajax_querystring', array( $this, 'add_blogs_scope_filter' ),    20, 2 );
 		add_filter( 'bp_has_blogs',        array( $this, 'bulk_inject_blog_follow_status' ) );
 
-		// button injection
+		// button injection.
 		add_action( 'bp_directory_blogs_actions', array( $this, 'add_follow_button_to_loop' ),   20 );
 		add_action( 'wp_footer',                  array( $this, 'add_follow_button_to_footer' ), 999 );
 
-		// blog deletion
+		// blog deletion.
 		add_action( 'bp_blogs_remove_blog', array( $this, 'on_blog_delete' ) );
 
-		// cache invalidation
+		// cache invalidation.
 		add_action( 'bp_follow_start_following_blogs', array( $this, 'clear_cache_on_follow' ) );
 		add_action( 'bp_follow_stop_following_blogs',  array( $this, 'clear_cache_on_follow' ) );
 		add_action( 'bp_follow_before_remove_data',    array( $this, 'clear_cache_on_user_delete' ) );
 
-		// rss feed link
+		// rss feed link.
 		add_filter( 'bp_get_sitewide_activity_feed_link', array( $this, 'activity_feed_url' ) );
 		add_filter( 'bp_dtheme_activity_feed_url',        array( $this, 'activity_feed_url' ) );
 		add_filter( 'bp_legacy_theme_activity_feed_url',  array( $this, 'activity_feed_url' ) );
@@ -99,11 +98,11 @@ class BP_Follow_Blogs {
 	public function setup_global_cachegroups() {
 		$bp = buddypress();
 
-		// blog counts
+		// blog counts.
 		$bp->follow->global_cachegroups[] = 'bp_follow_user_blogs_following_count';
 		$bp->follow->global_cachegroups[] = 'bp_follow_blogs_followers_count';
 
-		// blog data query
+		// blog data query.
 		$bp->follow->global_cachegroups[] = 'bp_follow_user_blogs_following_query';
 		$bp->follow->global_cachegroups[] = 'bp_follow_blogs_followers_query';
 	}
@@ -112,9 +111,8 @@ class BP_Follow_Blogs {
 	 * Setup profile nav.
 	 */
 	public function setup_nav() {
-		global $bp;
 
-		// Determine user to use
+		// Determine user to use.
 		if ( bp_displayed_user_domain() ) {
 			$user_domain = bp_displayed_user_domain();
 		} elseif ( bp_loggedin_user_domain() ) {
@@ -130,7 +128,7 @@ class BP_Follow_Blogs {
 			'parent_slug'     => bp_get_blogs_slug(),
 			'screen_function' => 'BP_Follow_Blogs_Screens::user_blogs_screen',
 			'position'        => 20,
-			'item_css_id'     => 'blogs-following'
+			'item_css_id'     => 'blogs-following',
 		) );
 
 		// Add activity sub nav item
@@ -142,7 +140,7 @@ class BP_Follow_Blogs {
 				'parent_slug'     => bp_get_activity_slug(),
 				'screen_function' => 'BP_Follow_Blogs_Screens::user_activity_screen',
 				'position'        => 22,
-				'item_css_id'     => 'activity-followblogs'
+				'item_css_id'     => 'activity-followblogs',
 			) );
 		}
 	}
@@ -150,7 +148,7 @@ class BP_Follow_Blogs {
 	/**
 	 * Inject "Followed Sites" nav item to WP adminbar's "Activity" main nav.
 	 *
-	 * @param array $retval
+	 * @param array $retval Return Value.
 	 * @return array
 	 */
 	public function activity_admin_nav( $retval ) {
@@ -169,7 +167,7 @@ class BP_Follow_Blogs {
 			$inject = array();
 			$offset = 4;
 
-			$inject[$offset] = $new_item;
+			$inject[ $offset ] = $new_item;
 			$retval = array_merge(
 				array_slice( $retval, 0, $offset, true ),
 				$inject,
@@ -183,7 +181,7 @@ class BP_Follow_Blogs {
 	/**
 	 * Inject "Followed Sites" nav item to WP adminbar's "Sites" main nav.
 	 *
-	 * @param array $retval
+	 * @param array $retval Return Value.
 	 * @return array
 	 */
 	public function blogs_admin_nav( $retval ) {
@@ -201,11 +199,11 @@ class BP_Follow_Blogs {
 		$inject = array();
 		$last   = end( $retval );
 
-		// inject item in between "My Sites" and "Create a Site" subnav items
+		// inject item in between "My Sites" and "Create a Site" subnav items.
 		if ( 'my-account-blogs-create' === $last['id'] ) {
 			$offset = key( $retval );
 
-			$inject[$offset] = $new_item;
+			$inject[ $offset ] = $new_item;
 
 			$retval = array_merge( array_slice( $retval, 0, $offset, true ), $inject, array_slice( $retval, $offset, NULL, true ) );
 
@@ -278,12 +276,12 @@ class BP_Follow_Blogs {
 	 *
 	 * @since 1.3.0
 	 *
-	 * @param array $retval Empty array by default
-	 * @param array $filter Current activity arguments
+	 * @param array $retval Empty array by default.
+	 * @param array $filter Current activity arguments.
 	 * @return array
 	 */
 	function filter_activity_scope( $retval = array(), $filter = array() ) {
-		// Determine the user_id
+		// Determine the user_id.
 		if ( ! empty( $filter['user_id'] ) ) {
 			$user_id = $filter['user_id'];
 		} else {
@@ -292,7 +290,7 @@ class BP_Follow_Blogs {
 				: bp_loggedin_user_id();
 		}
 
-		// Get blogs that the user is following
+		// Get blogs that the user is following.
 		$following_ids = bp_follow_get_following( array(
 			'user_id'     => $user_id,
 			'follow_type' => 'blogs',
@@ -303,55 +301,55 @@ class BP_Follow_Blogs {
 
 		// Should we show all items regardless of sitewide visibility?
 		$show_hidden = array();
-		if ( ! empty( $user_id ) && ( $user_id !== bp_loggedin_user_id() ) ) {
+		if ( ! empty( $user_id ) && ( bp_loggedin_user_id() !== $user_id ) ) {
 			$show_hidden = array(
 				'column' => 'hide_sitewide',
-				'value'  => 0
+				'value'  => 0,
 			);
 		}
 
-		// support BP Groupblog
-		if ( function_exists( 'bp_groupblog_init' ) && $following_ids !== array( 0 ) ) {
+		// support BP Groupblog.
+		if ( function_exists( 'bp_groupblog_init' ) && array( 0 ) !== $following_ids ) {
 			global $wpdb;
 
 			$bp = buddypress();
 
-			// comma-delimit the blog IDs
+			// comma-delimit the blog IDs.
 			$delimited_ids = implode( ',', $following_ids );
 			$group_ids_connected_to_blogs = $wpdb->get_col( "SELECT group_id FROM {$bp->groups->table_name_groupmeta} WHERE meta_key = 'groupblog_blog_id' AND meta_value IN ( " . $delimited_ids . " )" );
 
 			$clause = array(
 				'relation' => 'OR',
 
-				// general blog activity items
+				// general blog activity items.
 				array(
 					'relation' => 'AND',
 					array(
 						'column' => 'component',
-						'value'  => buddypress()->blogs->id
+						'value'  => buddypress()->blogs->id,
 					),
 					array(
 						'column'  => 'item_id',
 						'compare' => 'IN',
-						'value'   => (array) $following_ids
+						'value'   => (array) $following_ids,
 					),
 				),
 
-				// groupblog posts
+				// groupblog posts.
 				array(
 					'relation' => 'AND',
 					array(
 						'column' => 'component',
-						'value'  => buddypress()->groups->id
+						'value'  => buddypress()->groups->id,
 					),
 					array(
 						'column'  => 'item_id',
 						'compare' => 'IN',
-						'value'   => (array) $group_ids_connected_to_blogs
+						'value'   => (array) $group_ids_connected_to_blogs,
 					),
 					array(
 						'column'  => 'type',
-						'value'   => 'new_groupblog_post'
+						'value'   => 'new_groupblog_post',
 					),
 				),
 			);
@@ -362,12 +360,12 @@ class BP_Follow_Blogs {
 				'relation' => 'AND',
 				array(
 					'column' => 'component',
-					'value'  => buddypress()->blogs->id
+					'value'  => buddypress()->blogs->id,
 				),
 				array(
 					'column'  => 'item_id',
 					'compare' => 'IN',
-					'value'   => (array) $following_ids
+					'value'   => (array) $following_ids,
 				),
 			);
 		}
@@ -377,10 +375,12 @@ class BP_Follow_Blogs {
 			$clause,
 			$show_hidden,
 
-			// overrides
+			// overrides.
 			'override' => array(
-				'filter'      => array( 'user_id' => 0 ),
-				'show_hidden' => true
+				'filter'      => array(
+					'user_id' => 0,
+				),
+				'show_hidden' => true,
 			),
 		);
 
@@ -394,20 +394,20 @@ class BP_Follow_Blogs {
 	 *  - a user's "Followed Sites" page
 	 *  - the Sites directory and clicking on the "Following" tab
 	 *
-	 * @param str $qs The querystring for the BP loop
-	 * @param str $object The current object for the querystring
+	 * @param str $qs The querystring for the BP loop.
+	 * @param str $object The current object for the querystring.
 	 * @return str Modified querystring
 	 */
 	function add_blogs_scope_filter( $qs, $object ) {
 		// not on the blogs object? stop now!
-		if ( $object != 'blogs' ) {
+		if ( 'blogs' !== $object ) {
 			return $qs;
 		}
 
-		// parse querystring into an array
+		// parse querystring into an array.
 		$r = wp_parse_args( $qs );
 
-		// set scope if a user is on a user's "Followed Sites" page
+		// set scope if a user is on a user's "Followed Sites" page.
 		if ( bp_is_user_blogs() && bp_is_current_action( constant( 'BP_FOLLOW_BLOGS_USER_FOLLOWING_SLUG' ) ) ) {
 			$r['scope'] = 'following';
 		}
@@ -416,14 +416,14 @@ class BP_Follow_Blogs {
 			return $qs;
 		}
 
-		// get blog IDs that the user is following
+		// get blog IDs that the user is following.
 		$following_ids = bp_get_following_ids( array(
 			'user_id'     => bp_displayed_user_id() ? bp_displayed_user_id() : bp_loggedin_user_id(),
 			'follow_type' => 'blogs',
 		) );
 
 		// if $following_ids is empty, pass the largest bigint(20) value to ensure
-		// no blogs are matched
+		// no blogs are matched.
 		$following_ids = empty( $following_ids ) ? '18446744073709551615' : $following_ids;
 
 		$args = array(
@@ -431,12 +431,12 @@ class BP_Follow_Blogs {
 			'include_blog_ids' => $following_ids,
 		);
 
-		// make sure we add a separator if we have an existing querystring
+		// make sure we add a separator if we have an existing querystring.
 		if ( ! empty( $qs ) ) {
 			$qs .= '&';
 		}
 
-		// add our follow parameters to the end of the querystring
+		// add our follow parameters to the end of the querystring.
 		$qs .= build_query( $args );
 
 		return $qs;
@@ -460,12 +460,12 @@ class BP_Follow_Blogs {
 
 		$blog_ids = array();
 
-		foreach( (array) $blogs_template->blogs as $i => $blog ) {
-			// add blog ID to array
+		foreach ( (array) $blogs_template->blogs as $i => $blog ) {
+			// add blog ID to array.
 			$blog_ids[] = $blog->blog_id;
 
-			// set default follow status to false
-			$blogs_template->blogs[$i]->is_following = false;
+			// set default follow status to false.
+			$blogs_template->blogs[ $i ]->is_following = false;
 		}
 
 		if ( empty( $blog_ids ) ) {
@@ -478,11 +478,11 @@ class BP_Follow_Blogs {
 			return $has_blogs;
 		}
 
-		foreach( (array) $following as $is_following ) {
-			foreach( (array) $blogs_template->blogs as $i => $blog ) {
-				// set follow status to true if the logged-in user is following
-				if ( $is_following->leader_id == $blog->blog_id ) {
-					$blogs_template->blogs[$i]->is_following = true;
+		foreach ( (array) $following as $is_following ) {
+			foreach ( (array) $blogs_template->blogs as $i => $blog ) {
+				// set follow status to true if the logged-in user is following.
+				if ( $is_following->leader_id === $blog->blog_id ) {
+					$blogs_template->blogs[ $i ]->is_following = true;
 				}
 			}
 		}
@@ -533,17 +533,17 @@ class BP_Follow_Blogs {
 			return;
 		}
 
-		// If blog is not recordable, do not show button
+		// If blog is not recordable, do not show button.
 		if ( ! bp_blogs_is_blog_recordable( get_current_blog_id(), bp_loggedin_user_id() ) ) {
 			return;
 		}
 
-		// disable the footer button using this filter if needed
+		// disable the footer button using this filter if needed.
 		if ( false === self::show_footer_button() ) {
 			return;
 		}
 
-		// remove inline CSS later... still testing
+		// remove inline CSS later... still testing.
 	?>
 
 		<style type="text/css">
@@ -625,7 +625,7 @@ class BP_Follow_Blogs {
 			'link_title'    => '',
 			'wrapper_class' => '',
 			'link_class'    => '',
-			'wrapper'       => 'div'
+			'wrapper'       => 'div',
 		) );
 
 		if ( ! $r['leader_id'] || ! $r['follower_id'] ) {
@@ -634,7 +634,7 @@ class BP_Follow_Blogs {
 
 		// if we're checking during a blog loop, then follow status is already
 		// queried via bulk_inject_follow_blog_status()
-		if ( ! empty( $blogs_template->in_the_loop ) && $r['follower_id'] == bp_loggedin_user_id() && $r['leader_id'] == bp_get_blog_id() ) {
+		if ( ! empty( $blogs_template->in_the_loop ) && bp_loggedin_user_id() === $r['follower_id'] && bp_get_blog_id() === $r['leader_id'] ) {
 			$is_following = $blogs_template->blog->is_following;
 
 		// else we manually query the follow status
@@ -646,7 +646,7 @@ class BP_Follow_Blogs {
 			) );
 		}
 
-		// setup some variables
+		// setup some variables.
 		if ( $is_following ) {
 			$id        = 'following';
 			$action    = 'unfollow';
@@ -672,22 +672,21 @@ class BP_Follow_Blogs {
 			if ( empty( $r['link_text'] ) ) {
 				$r['link_text'] = $link_text;
 			}
-
 		}
 
 		$wrapper_class = 'follow-button ' . $id;
 
 		if ( ! empty( $r['wrapper_class'] ) ) {
-			$wrapper_class .= ' '  . esc_attr( $r['wrapper_class'] );
+			$wrapper_class .= ' ' . esc_attr( $r['wrapper_class'] );
 		}
 
 		$link_class = $action;
 
 		if ( ! empty( $r['link_class'] ) ) {
-			$link_class .= ' '  . esc_attr( $r['link_class'] );
+			$link_class .= ' ' . esc_attr( $r['link_class'] );
 		}
 
-		// setup the button arguments
+		// setup the button arguments.
 		$button = array(
 			'id'                => $id,
 			'component'         => 'follow',
@@ -704,10 +703,10 @@ class BP_Follow_Blogs {
 			'link_title'        => esc_attr( $r['link_title'] ),
 			'link_id'           => $action . '-' . (int) $r['leader_id'],
 			'link_class'        => $link_class,
-			'wrapper'           => ! empty( $r['wrapper'] ) ? esc_attr( $r['wrapper'] ) : false
+			'wrapper'           => ! empty( $r['wrapper'] ) ? esc_attr( $r['wrapper'] ) : false,
 		);
 
-		// Filter and return the HTML button
+		// Filter and return the HTML button.
 		return bp_get_button( apply_filters( 'bp_follow_blogs_get_follow_button', $button, $r, $is_following ) );
 	}
 
@@ -734,17 +733,17 @@ class BP_Follow_Blogs {
 	 * @param BP_Follow $follow
 	 */
 	public function clear_cache_on_follow( BP_Follow $follow ) {
-		// clear followers count for blog
+		// clear followers count for blog.
 		wp_cache_delete( $follow->leader_id,   'bp_follow_blogs_followers_count' );
 
-		// clear following blogs count for user
+		// clear following blogs count for user.
 		wp_cache_delete( $follow->follower_id, 'bp_follow_user_blogs_following_count' );
 
-		// clear queried followers / following
+		// clear queried followers / following.
 		wp_cache_delete( $follow->leader_id,   'bp_follow_blogs_followers_query' );
 		wp_cache_delete( $follow->follower_id, 'bp_follow_user_blogs_following_query' );
 
-		// clear follow relationship
+		// clear follow relationship.
 		wp_cache_delete( "{$follow->leader_id}:{$follow->follower_id}:blogs", 'bp_follow_data' );
 	}
 
@@ -754,19 +753,19 @@ class BP_Follow_Blogs {
 	 * @param int $user_id The user ID being deleted
 	 */
 	public function clear_cache_on_user_delete( $user_id = 0 ) {
-		// delete user's blog follow count
+		// delete user's blog follow count.
 		wp_cache_delete( $user_id, 'bp_follow_user_blogs_following_count' );
 
-		// delete queried blogs that user was following
+		// delete queried blogs that user was following.
 		wp_cache_delete( $user_id, 'bp_follow_user_blogs_following_query' );
 
-		// delete each blog's followers count that the user was following
+		// delete each blog's followers count that the user was following.
 		$blogs = BP_Follow::get_following( $user_id, 'blogs' );
 		if ( ! empty( $blogs ) ) {
 			foreach ( $blogs as $blog_id ) {
 				wp_cache_delete( $blog_id, 'bp_follow_blogs_followers_count' );
 
-				// clear follow relationship
+				// clear follow relationship.
 				wp_cache_delete( "{$blog_id}:{$user_id}:blogs", 'bp_follow_data' );
 			}
 		}
@@ -778,19 +777,19 @@ class BP_Follow_Blogs {
 	 * @param int $blog_id The ID of the blog being deleted
 	 */
 	public function clear_cache_on_blog_delete( $blog_id ) {
-		// clear followers count for blog
+		// clear followers count for blog.
 		wp_cache_delete( $blog_id, 'bp_follow_blogs_followers_count' );
 
-		// clear queried followers for blog
+		// clear queried followers for blog.
 		wp_cache_delete( $blog_id, 'bp_follow_blogs_followers_query' );
 
-		// delete each user's blog following count for those that followed the blog
+		// delete each user's blog following count for those that followed the blog.
 		$users = BP_Follow::get_followers( $blog_id, 'blogs' );
 		if ( ! empty( $users ) ) {
 			foreach ( $users as $user ) {
 				wp_cache_delete( $user, 'bp_follow_user_blogs_following_count' );
 
-				// clear follow relationship
+				// clear follow relationship.
 				wp_cache_delete( "{$blog_id}:{$user}:blogs", 'bp_follow_data' );
 			}
 		}
@@ -816,15 +815,15 @@ class BP_Follow_Blogs {
 		}
 
 		// this is done b/c we're filtering 'bp_get_sitewide_activity_feed_link' and
-		// we only want to alter the feed link for the "RSS" tab
+		// we only want to alter the feed link for the "RSS" tab.
 		if ( ! defined( 'DOING_AJAX' ) && ! did_action( 'bp_before_directory_activity' ) ) {
 			return $retval;
 		}
 
-		// get the activity scope
+		// get the activity scope.
 		$scope = ! empty( $_COOKIE['bp-activity-scope'] ) ? $_COOKIE['bp-activity-scope'] : false;
 
-		if ( $scope == 'followblogs' && bp_loggedin_user_id() ) {
+		if ( 'followblogs' === $scope && bp_loggedin_user_id() ) {
 			$retval = bp_loggedin_user_domain() . bp_get_activity_slug() . '/' . constant( 'BP_FOLLOW_BLOGS_USER_ACTIVITY_SLUG' ) . '/feed/';
 		}
 
@@ -847,7 +846,7 @@ class BP_Follow_Blogs_Screens {
 	public static function user_blogs_screen() {
 		add_action( 'bp_template_content', array( __CLASS__, 'user_blogs_screen_content' ) );
 
-		// this is for bp-default themes
+		// this is for bp-default themes.
 		bp_core_load_template( 'members/single/home' );
 	}
 
@@ -859,7 +858,7 @@ class BP_Follow_Blogs_Screens {
 	?>
 
 		<div class="blogs follow-blogs" role="main">
-			<?php bp_get_template_part( 'blogs/blogs-loop' ) ?>
+			<?php bp_get_template_part( 'blogs/blogs-loop' ); ?>
 		</div><!-- .blogs.follow-blogs -->
 
 	<?php
@@ -894,7 +893,7 @@ class BP_Follow_Blogs_Screens {
 	public static function user_activity_screen() {
 		do_action( 'bp_follow_blogs_screen_user_activity' );
 
-		// this is for bp-default themes
+		// this is for bp-default themes.
 		bp_core_load_template( 'members/single/home' );
 	}
 
@@ -916,12 +915,12 @@ class BP_Follow_Blogs_Screens {
 			return;
 		}
 
-		// get blog IDs that the user is following
+		// get blog IDs that the user is following.
 		$following_ids = bp_get_following_ids( array(
 			'follow_type' => 'blogs',
 		) );
 
-		// if $following_ids is empty, pass a negative number so no blogs can be found
+		// if $following_ids is empty, pass a negative number so no blogs can be found.
 		$following_ids = empty( $following_ids ) ? -1 : $following_ids;
 
 		$args = array(
@@ -930,7 +929,7 @@ class BP_Follow_Blogs_Screens {
 			'primary_id' => $following_ids,
 		);
 
-		// setup the feed
+		// setup the feed.
 		buddypress()->activity->feed = new BP_Activity_Feed( array(
 			'id'            => 'followedsites',
 
@@ -972,7 +971,7 @@ class BP_Follow_Blogs_Screens {
 		if ( ! $save( array(
 			'leader_id'   => (int) $_GET['blog_id'],
 			'follower_id' => bp_loggedin_user_id(),
-			'follow_type' => 'blogs'
+			'follow_type' => 'blogs',
 		) ) ) {
 			if ( 'follow' == $action ) {
 				$message = __( 'You are already following that blog.', 'buddypress-followers' );
@@ -986,9 +985,9 @@ class BP_Follow_Blogs_Screens {
 		} else {
 			$blog_name = bp_blogs_get_blogmeta( (int) $_GET['blog_id'], 'name' );
 
-			// blog has never been recorded into BP; record it now
+			// blog has never been recorded into BP; record it now.
 			if ( '' === $blog_name && apply_filters( 'bp_follow_blogs_record_blog', true, (int) $_GET['blog_id'] ) ) {
-				// get the admin of the blog
+				// get the admin of the blog.
 				$admin = get_users( array(
 					'blog_id' => get_current_blog_id(),
 					'role'    => 'administrator',
@@ -997,16 +996,16 @@ class BP_Follow_Blogs_Screens {
 					'fields'  => array( 'ID' ),
 				) );
 
-				// record the blog
+				// record the blog.
 				$record_site = bp_blogs_record_blog( (int) $_GET['blog_id'], $admin[0]->ID, true );
 
-				// now refetch the blog name from blogmeta
+				// now refetch the blog name from blogmeta.
 				if ( false !== $record_site ) {
 					$blog_name = bp_blogs_get_blogmeta( (int) $_GET['blog_id'], 'name' );
 				}
 			}
 
-			if ( 'follow' == $action ) {
+			if ( 'follow' === $action ) {
 				if ( ! empty( $blog_name ) ) {
 					$message = sprintf( __( 'You are now following the site, %s.', 'buddypress-followers' ), $blog_name );
 				} else {
@@ -1023,7 +1022,7 @@ class BP_Follow_Blogs_Screens {
 			bp_core_add_message( $message );
 		}
 
-		// it's possible that wp_get_referer() returns false, so let's fallback to the displayed user's page
+		// it's possible that wp_get_referer() returns false, so let's fallback to the displayed user's page.
 		$redirect = wp_get_referer() ? wp_get_referer() : bp_displayed_user_domain() . bp_get_blogs_slug() . '/' . constant( 'BP_FOLLOW_BLOGS_USER_FOLLOWING_SLUG' ) . '/';
 		bp_core_redirect( $redirect );
 	}
