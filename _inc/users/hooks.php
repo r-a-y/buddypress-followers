@@ -367,7 +367,6 @@ add_filter( 'bp_group_has_members', 'bp_follow_inject_group_member_follow_status
 /**
  * Add a "Follow User/Stop Following" button to the profile header for a user.
  *
- * @global $bp The global BuddyPress settings variable created in bp_core_setup_globals()
  * @uses bp_follow_is_following() Check the following status for a user
  * @uses bp_is_my_profile() Return true if you are looking at your own profile when logged in.
  * @uses is_user_logged_in() Return true if you are logged in.
@@ -385,7 +384,6 @@ add_action( 'bp_member_header_actions', 'bp_follow_add_profile_follow_button' );
  * Add a "Follow User/Stop Following" button to each member shown in the
  * members loop.
  *
- * @global $bp The global BuddyPress settings variable created in bp_core_setup_globals()
  * @global $members_template The members template object containing all fetched members in the loop
  * @uses is_user_logged_in() Return true if you are logged in.
  */
@@ -407,7 +405,6 @@ add_action( 'bp_directory_members_actions', 'bp_follow_add_listing_follow_button
  * @author r-a-y
  * @since 1.1
  *
- * @global $bp The global BuddyPress settings variable created in bp_core_setup_globals()
  * @global $members_template The members template object containing all fetched members in the loop
  */
 function bp_follow_add_group_member_follow_button() {
@@ -514,7 +511,6 @@ add_action( 'bp_follow_before_remove_data', 'bp_follow_clear_cache_on_user_delet
  * This is so the logged-in user can filter the activity stream to only users
  * that the current user is following.
  *
- * @global $bp The global BuddyPress settings variable created in bp_core_setup_globals()
  * @uses bp_follow_total_follow_counts() Get the following/followers counts for a user.
  */
 function bp_follow_add_activity_tab() {

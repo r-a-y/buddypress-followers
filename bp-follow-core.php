@@ -28,11 +28,8 @@ class BP_Follow_Component extends BP_Component {
 
 	/**
 	 * Constructor.
-	 *
-	 * @global obj $bp BuddyPress instance
 	 */
 	public function __construct() {
-		global $bp;
 
 		// setup misc parameters.
 		$this->params = array(
@@ -54,7 +51,7 @@ class BP_Follow_Component extends BP_Component {
 		$this->setup_hooks();
 
 		// register our component as an active component in BP.
-		$bp->active_components[ $this->id ] = '1';
+		buddypress()->active_components[ $this->id ] = '1';
 	}
 
 	/**
@@ -141,7 +138,6 @@ class BP_Follow_Component extends BP_Component {
 	 * @since 1.3.0 Add 'global_cachegroups' property
 	 */
 	public function setup_globals( $args = array() ) {
-		global $bp;
 
 		// Constants.
 		if ( ! defined( 'BP_FOLLOWERS_SLUG' ) ) {
@@ -169,8 +165,8 @@ class BP_Follow_Component extends BP_Component {
 
 		parent::setup_globals( array(
 			'notification_callback' => 'bp_follow_format_notifications',
-			'global_tables'         => array(
-				'table_name' => $bp->table_prefix . 'bp_follow',
+			'global_tables' => array(
+				'table_name' => buddypress()->table_prefix . 'bp_follow',
 			),
 		) );
 	}
@@ -245,7 +241,7 @@ class BP_Follow_Component extends BP_Component {
  * @since 1.2
  */
 function bp_follow_setup_component() {
-	global $bp;
+	$bp = buddypress();
 
 	$bp->follow = new BP_Follow_Component();
 

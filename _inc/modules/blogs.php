@@ -718,7 +718,9 @@ class BP_Follow_Blogs {
 	 * @param int $blog_id The ID of the blog being deleted.
 	 */
 	public function on_blog_delete( $blog_id ) {
-		global $bp, $wpdb;
+		global $wpdb;
+
+		$bp = buddypress();
 
 		$this->clear_cache_on_blog_delete( $blog_id );
 

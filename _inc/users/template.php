@@ -42,7 +42,9 @@ function bp_follow_add_follow_button( $args = '' ) {
 	 * @since 1.1
 	 */
 	function bp_follow_get_add_follow_button( $args = '' ) {
-		global $bp, $members_template;
+		global $members_template;
+
+		$bp = buddypress();
 
 		$r = wp_parse_args( $args, array(
 			'leader_id'     => bp_displayed_user_id(),
@@ -69,7 +71,7 @@ function bp_follow_add_follow_button( $args = '' ) {
 		} else {
 			$is_following = bp_follow_is_following( array(
 				'leader_id'   => $r['leader_id'],
-				'follower_id' => $r['follower_id']
+				'follower_id' => $r['follower_id'],
 			) );
 		}
 
@@ -110,16 +112,16 @@ function bp_follow_add_follow_button( $args = '' ) {
 		$wrapper_class = 'follow-button ' . $id;
 
 		if ( ! empty( $r['wrapper_class'] ) ) {
-			$wrapper_class .= ' '  . esc_attr( $r['wrapper_class'] );
+			$wrapper_class .= ' ' . esc_attr( $r['wrapper_class'] );
 		}
 
 		$link_class = $class;
 
 		if ( ! empty( $r['link_class'] ) ) {
-			$link_class .= ' '  . esc_attr( $r['link_class'] );
+			$link_class .= ' ' . esc_attr( $r['link_class'] );
 		}
 
-		// make sure we can view the button if a user is on their own page
+		// make sure we can view the button if a user is on their own page.
 		$block_self = empty( $members_template->member ) ? true : false;
 
 		// if we're using AJAX and a user is on their own profile, we need to set

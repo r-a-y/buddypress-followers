@@ -497,7 +497,9 @@ class BP_Follow {
 	 * @param int $user_id The user ID.
 	 */
 	public static function delete_all_for_user( $user_id = 0 ) {
-		global $bp, $wpdb;
+		global $wpdb;
+
+		$bp = buddypress();
 
 		$wpdb->query( $wpdb->prepare( "DELETE FROM {$bp->follow->table_name} WHERE leader_id = %d OR follower_id = %d AND follow_type = ''", $user_id, $user_id ) );
 	}

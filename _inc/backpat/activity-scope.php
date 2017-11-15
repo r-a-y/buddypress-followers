@@ -30,7 +30,6 @@ defined( 'ABSPATH' ) || exit;
  * @return array
  */
 function bp_follow_add_activity_scope_filter( $qs, $object ) {
-	global $bp;
 
 	// not on the activity object? stop now!
 	if ( $object != 'activity' ) {
@@ -58,7 +57,7 @@ function bp_follow_add_activity_scope_filter( $qs, $object ) {
 	}
 
 	// set internal marker noting that our activity scope is applied
-	$bp->follow->activity_scope_set = 1;
+	buddypress()->follow->activity_scope_set = 1;
 
 	$qs = wp_parse_args( $qs );
 

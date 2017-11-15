@@ -117,7 +117,7 @@ add_filter( 'bp_ajax_querystring', 'bp_follow_blogs_add_activity_scope_filter', 
  * @return array
  */
 function bp_follow_blogs_groupblog_activity_where_conditions( $retval, $r ) {
-	global $bp;
+	$bp = buddypress();
 
 	// support heartbeat in groupblog query.
 	$extra = '';

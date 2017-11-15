@@ -573,8 +573,6 @@ function bp_follow_notification_settings_content() {
 
 /**
  * Format on screen notifications into something readable by users.
- *
- * @global $bp The global BuddyPress settings variable created in bp_core_setup_globals()
  */
 function bp_follow_format_notifications( $action, $item_id, $secondary_item_id, $total_items, $format = 'string' ) {
 

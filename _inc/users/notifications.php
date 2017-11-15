@@ -25,9 +25,7 @@ function bp_follow_remove_notifications_for_user( $user_id = 0 ) {
 
 	// BP < 1.9 - delete notifications the old way
 	} elseif ( ! class_exists( 'BP_Core_Login_Widget' ) ) {
-		global $bp;
-
-		bp_core_delete_notifications_from_user( $user_id, $bp->follow->id, 'new_follow' );
+		bp_core_delete_notifications_from_user( $user_id, buddypress()->follow->id, 'new_follow' );
 	}
 }
 add_action( 'bp_follow_remove_data', 'bp_follow_remove_notifications_for_user' );
@@ -40,6 +38,8 @@ add_action( 'bp_follow_remove_data', 'bp_follow_remove_notifications_for_user' )
  * @param object $follow The BP_Follow object.
  */
 function bp_follow_notifications_add_on_follow( BP_Follow $follow ) {
+	$bp = buddypress();
+
 	// this only applies to users.
 	if ( ! empty( $follow->follow_type ) ) {
 		return;
@@ -52,14 +52,12 @@ function bp_follow_notifications_add_on_follow( BP_Follow $follow ) {
 		bp_notifications_add_notification( array(
 			'item_id'           => $follow->follower_id,
 			'user_id'           => $follow->leader_id,
-			'component_name'    => buddypress()->follow->id,
+			'component_name'    => $bp->follow->id,
 			'component_action'  => 'new_follow',
 		) );
 
 	// BP < 1.9 - add notifications the old way
 	} elseif ( ! class_exists( 'BP_Core_Login_Widget' ) ) {
-		global $bp;
-
 		bp_core_add_notification(
 			$follow->follower_id,
 			$follow->leader_id,
@@ -84,14 +82,14 @@ add_action( 'bp_follow_start_following', 'bp_follow_notifications_add_on_follow'
  * @param object $follow The BP_Follow object.
  */
 function bp_follow_notifications_remove_on_unfollow( BP_Follow $follow ) {
+	$bp = buddypress();
+
 	// BP 1.9+
 	if ( bp_is_active( 'notifications' ) ) {
-		bp_notifications_delete_notifications_by_item_id( $follow->leader_id, $follow->follower_id, buddypress()->follow->id, 'new_follow' );
+		bp_notifications_delete_notifications_by_item_id( $follow->leader_id, $follow->follower_id, $bp->follow->id, 'new_follow' );
 
-	// BP < 1.9 - delete notifications the old way
+	// BP < 1.9 - delete notifications the old way.
 	} elseif ( ! class_exists( 'BP_Core_Login_Widget' ) ) {
-		global $bp;
-
 		bp_core_delete_notifications_by_item_id( $follow->leader_id, $follow->follower_id, $bp->follow->id, 'new_follow' );
 	}
 }
@@ -109,15 +107,15 @@ function bp_follow_notifications_mark_follower_profile_as_read() {
 		return;
 	}
 
+	$bp = buddypress();
+
 	// mark notification as read.
 	if ( bp_is_active( 'notifications' ) ) {
-		bp_notifications_mark_notifications_by_item_id( bp_loggedin_user_id(), bp_displayed_user_id(), buddypress()->follow->id, 'new_follow' );
+		bp_notifications_mark_notifications_by_item_id( bp_loggedin_user_id(), bp_displayed_user_id(), $bp->follow->id, 'new_follow' );
 
 	// check if we're not on BP 1.9
 	// if so, delete notification since marked functionality doesn't exist.
 	} elseif ( ! class_exists( 'BP_Core_Login_Widget' ) ) {
-		global $bp;
-
 		bp_core_delete_notifications_by_item_id( bp_loggedin_user_id(), bp_displayed_user_id(), $bp->follow->id, 'new_follow' );
 	}
 }
@@ -149,14 +147,14 @@ function bp_follow_notifications_delete_on_followers_page() {
 		return;
 	}
 
+	$bp = buddypress();
+
 	// BP 1.9+
 	if ( bp_is_active( 'notifications' ) ) {
 		bp_notifications_delete_notifications_by_type( bp_loggedin_user_id(), $bp->follow->id, 'new_follow' );
 
 	// BP < 1.9
 	} elseif ( ! class_exists( 'BP_Core_Login_Widget' ) ) {
-		global $bp;
-
 		bp_core_delete_notifications_by_type( bp_loggedin_user_id(), $bp->follow->id, 'new_follow' );
 	}
 }
@@ -224,17 +222,16 @@ add_filter( 'bp_after_has_notifications_parse_args', 'bp_follow_filter_unread_no
 
 /**
  * Adds user configurable notification settings for the component.
- *
- * @global $bp The global BuddyPress settings variable created in bp_core_setup_globals()
  */
 function bp_follow_user_screen_notification_settings() {
-	if ( !$notify = bp_get_user_meta( bp_displayed_user_id(), 'notification_starts_following', true ) )
-		$notify = 'yes';
+	$notify = ( ! notify )
+		? 'yes'
+		: bp_get_user_meta( bp_displayed_user_id(), 'notification_starts_following', true );
 ?>
 
 	<tr>
 		<td></td>
-		<td><?php _e( 'A member starts following your activity', 'buddypress-followers' ) ?></td>
+		<td><?php esc_html( 'A member starts following your activity', 'buddypress-followers' ) ?></td>
 		<td class="yes"><input type="radio" name="notifications[notification_starts_following]" value="yes" <?php checked( $notify, 'yes', true ) ?>/></td>
 		<td class="no"><input type="radio" name="notifications[notification_starts_following]" value="no" <?php checked( $notify, 'no', true ) ?>/></td>
 	</tr>
@@ -252,7 +249,6 @@ add_action( 'bp_follow_screen_notification_settings', 'bp_follow_user_screen_not
  * @uses bp_core_get_user_domain() Get the profile url for a user
  * @uses bp_core_get_core_userdata() Get the core userdata for a user without extra usermeta
  * @uses wp_mail() Send an email using the built in WP mail class
- * @global $bp The global BuddyPress settings variable created in bp_core_setup_globals()
  */
 function bp_follow_new_follow_email_notification( $args = '' ) {
 
