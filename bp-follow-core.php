@@ -21,6 +21,8 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  */
 class BP_Follow_Component extends BP_Component {
 
+	public $version = '1.2.2';
+	
 	/**
 	 * @var string The current revision date.
 	 */
@@ -233,7 +235,7 @@ class BP_Follow_Component extends BP_Component {
 			return;
 		}
 
-		wp_enqueue_script( 'bp-follow-js', constant( 'BP_FOLLOW_URL' ) . '_inc/bp-follow.js', array( 'jquery' ), strtotime( $this->revision_date ) );
+		wp_enqueue_script( 'bp-follow-js', constant( 'BP_FOLLOW_URL' ) . '_inc/bp-follow.js', array( 'jquery' ), $this->version );
 	}
 }
 
