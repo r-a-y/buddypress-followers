@@ -6,8 +6,8 @@
  * @subpackage Core
  */
 
-// Exit if accessed directly
-if ( ! defined( 'ABSPATH' ) ) exit;
+// Exit if accessed directly.
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Core class for BP Follow.
@@ -22,21 +22,22 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 class BP_Follow_Component extends BP_Component {
 
 	/**
+	 * Revision Date.
+	 *
 	 * @var string The current revision date.
 	 */
 	public $revision_date = '2014-08-07 22:00 UTC';
 
 	/**
 	 * Constructor.
-	 *
-	 * @global obj $bp BuddyPress instance
 	 */
 	public function __construct() {
-		global $bp;
 
-		// setup misc parameters
+		$bp = $GLOBALS['bp'];
+
+		// setup misc parameters.
 		$this->params = array(
-			'adminbar_myaccount_order' => apply_filters( 'bp_follow_following_nav_position', 61 )
+			'adminbar_myaccount_order' => apply_filters( 'bp_follow_following_nav_position', 61 ),
 		);
 
 		// let's start the show!
@@ -47,14 +48,14 @@ class BP_Follow_Component extends BP_Component {
 			$this->params
 		);
 
-		// include our files
+		// include our files.
 		$this->includes();
 
-		// setup hooks
+		// setup hooks.
 		$this->setup_hooks();
 
-		// register our component as an active component in BP
-		$bp->active_components[$this->id] = '1';
+		// register our component as an active component in BP.
+		$bp->active_components[ $this->id ] = '1';
 	}
 
 	/**
@@ -78,7 +79,7 @@ class BP_Follow_Component extends BP_Component {
 		require( $this->path . '/bp-follow-classes.php' );
 		require( $this->path . '/bp-follow-functions.php' );
 
-		// users module
+		// users module.
 		if ( true === (bool) apply_filters( 'bp_follow_enable_users', true ) ) {
 			require( $this->path . '/users/hooks.php' );
 			require( $this->path . '/users/template.php' );
@@ -119,17 +120,17 @@ class BP_Follow_Component extends BP_Component {
 			}, $priority );
 		}
 
-		// blogs module - on multisite and BP 2.0+ only
+		// blogs module - on multisite and BP 2.0+ only.
 		if ( function_exists( 'bp_add_option' ) && bp_is_active( 'blogs' ) && is_multisite() && bp_is_network_activated() && apply_filters( 'bp_follow_enable_blogs', true ) ) {
 			require( $this->path . '/modules/blogs.php' );
 		}
 
-		// activity module - BP 2.2+ only
+		// activity module - BP 2.2+ only.
 		if ( class_exists( 'BP_Activity_Query' ) && bp_is_active( 'activity' ) ) {
 			require( $this->path . '/modules/activity.php' );
 		}
 
-		// updater
+		// updater.
 		if ( defined( 'WP_NETWORK_ADMIN' ) ) {
 			require( $this->path . '/bp-follow-updater.php' );
 		}
@@ -141,9 +142,8 @@ class BP_Follow_Component extends BP_Component {
 	 * @since 1.3.0 Add 'global_cachegroups' property
 	 */
 	public function setup_globals( $args = array() ) {
-		global $bp;
 
-		// Constants
+		// Constants.
 		if ( ! defined( 'BP_FOLLOWERS_SLUG' ) ) {
 			define( 'BP_FOLLOWERS_SLUG', 'followers' );
 		}
@@ -152,16 +152,18 @@ class BP_Follow_Component extends BP_Component {
 			define( 'BP_FOLLOWING_SLUG', 'following' );
 		}
 
+		$bp = $GLOBALS['bp'];
+
 		/**
 		 * Register other globals here since BP isn't flexible enough to add them in
 		 * the parent::setup_globals() method
 		 */
-		// global cachegroups
+		// global cachegroups.
 		$this->global_cachegroups = array( 'bp_follow_data' );
 
-		// slugs; would rather do away with this, but keeping it for backpat
-		$this->followers = new stdClass;
-		$this->following = new stdClass;
+		// slugs; would rather do away with this, but keeping it for backpat.
+		$this->followers = new stdClass();
+		$this->following = new stdClass();
 		$this->followers->slug = constant( 'BP_FOLLOWERS_SLUG' );
 		$this->following->slug = constant( 'BP_FOLLOWING_SLUG' );
 
@@ -169,9 +171,9 @@ class BP_Follow_Component extends BP_Component {
 
 		parent::setup_globals( array(
 			'notification_callback' => 'bp_follow_format_notifications',
-			'global_tables'         => array(
+			'global_tables' => array(
 				'table_name' => $bp->table_prefix . 'bp_follow',
-			)
+			),
 		) );
 	}
 
@@ -179,13 +181,13 @@ class BP_Follow_Component extends BP_Component {
 	 * Setup hooks.
 	 */
 	public function setup_hooks() {
-		// register global cachegroups
+		// register global cachegroups.
 		add_action( 'bp_init', array( $this, 'register_global_cachegroups' ), 5 );
 
-		// register notification settings
+		// register notification settings.
 		add_action( 'bp_init', array( $this, 'register_notification_settings' ) );
 
-		// javascript hook
+		// javascript hook.
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ), 11 );
 	}
 
@@ -223,13 +225,13 @@ class BP_Follow_Component extends BP_Component {
 	 * The JS is used to add AJAX functionality when clicking on the follow button.
 	 */
 	public function enqueue_scripts() {
-		// Do not enqueue if no user is logged in
+		// Do not enqueue if no user is logged in.
 		if ( ! is_user_logged_in() ) {
 			return;
 		}
 
-		// Do not enqueue on multisite if not on multiblog and not on root blog
-		if( ! bp_is_multiblog_mode() && ! bp_is_root_blog() ) {
+		// Do not enqueue on multisite if not on multiblog and not on root blog.
+		if ( ! bp_is_multiblog_mode() && ! bp_is_root_blog() ) {
 			return;
 		}
 
@@ -245,16 +247,16 @@ class BP_Follow_Component extends BP_Component {
  * @since 1.2
  */
 function bp_follow_setup_component() {
-	global $bp;
+	$bp = $GLOBALS['bp'];
 
-	$bp->follow = new BP_Follow_Component;
+	$bp->follow = new BP_Follow_Component();
 
 	// Load up the updater if we're in the admin area
 	//
 	// Checking the WP_NETWORK_ADMIN define is a more, reliable check to determine
-	// if we're in the admin area
+	// if we're in the admin area.
 	if ( defined( 'WP_NETWORK_ADMIN' ) ) {
-		$bp->follow->updater = new BP_Follow_Updater;
+		$bp->follow->updater = new BP_Follow_Updater();
 	}
 
 	do_action( 'bp_follow_loaded' );

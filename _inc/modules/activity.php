@@ -1,19 +1,22 @@
 <?php
 
+// Exit if accessed directly.
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Follow Activity Loader.
  *
  * @since 1.3.0
  */
 function bp_follow_activity_init() {
-	global $bp;
+	$bp = $GLOBALS['bp'];
 
-	$bp->follow->activity = new BP_Follow_Activity_Core;
+	$bp->follow->activity = new BP_Follow_Activity_Core();
 
 	// Default 'Follow Activity' to false during dev period
 	// @todo Fill out other areas - notifications, etc.
 	if ( true === (bool) apply_filters( 'bp_follow_enable_activity', false ) ) {
-		$bp->follow->activity->module = new BP_Follow_Activity_Module;
+		$bp->follow->activity->module = new BP_Follow_Activity_Module();
 	}
 
 	do_action( 'bp_follow_activity_loaded' );
@@ -30,10 +33,10 @@ class BP_Follow_Activity_Core {
 	 * Constructor.
 	 */
 	public function __construct() {
-		// includes
+		// includes.
 		$this->includes();
 
-		// Activity API
+		// Activity API.
 		add_filter( 'bp_activity_get_post_type_tracking_args', array( $this, 'set_follow_args_for_post_type' ) );
 		add_filter( 'bp_activity_set_action', array( $this, 'set_follow_args' ), 999 );
 		add_action( 'bp_actions', array( $this, 'action_listener' ) );
@@ -43,11 +46,13 @@ class BP_Follow_Activity_Core {
 	 * Includes.
 	 */
 	protected function includes() {
-		require buddypress()->follow->path . '/modules/activity-functions.php';
+		$bp = $GLOBALS['bp'];
 
-		// Add dependant hooks for the 'activity' module
+		require $bp->follow->path . '/modules/activity-functions.php';
+
+		// Add dependant hooks for the 'activity' module.
 		if ( true === (bool) apply_filters( 'bp_follow_enable_activity', false ) ) {
-			require buddypress()->follow->path . '/modules/activity-module.php';
+			require $bp->follow->path . '/modules/activity-module.php';
 		}
 	}
 
@@ -56,7 +61,7 @@ class BP_Follow_Activity_Core {
 	 *
 	 * See {@link bp_follow_activity_can_follow()} for more info on how to register.
 	 *
-	 * @param  object $retval
+	 * @param  object $retval Return Value.
 	 * @return object
 	 */
 	public function set_follow_args_for_post_type( $retval ) {
@@ -110,8 +115,9 @@ class BP_Follow_Activity_Core {
 			return false;
 		}
 
-		if ( empty( $activity_id ) && bp_action_variable( 0 ) )
+		if ( empty( $activity_id ) && bp_action_variable( 0 ) ) {
 			$activity_id = (int) bp_action_variable( 0 );
+		}
 
 		// Not viewing a specific activity item.
 		if ( empty( $activity_id ) ) {
@@ -126,11 +132,11 @@ class BP_Follow_Activity_Core {
 		$save = bp_is_current_action( 'follow' ) ? 'bp_follow_start_following' : 'bp_follow_stop_following';
 		$follow_type = bp_follow_activity_get_type( $activity_id );
 
-		// Failure on action
+		// Failure on action.
 		if ( ! $save( array(
 			'leader_id'   => $activity_id,
 			'follower_id' => bp_loggedin_user_id(),
-			'follow_type' => $follow_type
+			'follow_type' => $follow_type,
 		) ) ) {
 			$message_type = 'error';
 
@@ -168,7 +174,7 @@ class BP_Follow_Activity_Core {
 		$message = apply_filters( "bp_follow_activity_message_{$follow_type}", $message, $action, $activity_id, $message_type );
 		bp_core_add_message( $message, $message_type );
 
-		// Redirect
+		// Redirect.
 		$redirect = wp_get_referer() ? wp_get_referer() : bp_get_activity_directory_permalink();
 		bp_core_redirect( $redirect );
 		die();

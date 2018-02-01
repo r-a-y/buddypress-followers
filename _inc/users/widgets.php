@@ -6,8 +6,8 @@
  * @subpackage Widgets
  */
 
-// Exit if accessed directly
-if ( !defined( 'ABSPATH' ) ) exit;
+// Exit if accessed directly.
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Add a "Users I'm following" widget for the logged-in user
@@ -19,7 +19,7 @@ class BP_Follow_Following_Widget extends WP_Widget {
 	 * Constructor.
 	 */
 	function __construct() {
-		// Set up optional widget args
+		// Set up optional widget args.
 		$widget_ops = array(
 			'classname'   => 'widget_bp_follow_following_widget widget buddypress',
 			'description' => __( "Show a list of member avatars that the logged-in user is following.", 'buddypress-followers' )
@@ -37,7 +37,7 @@ class BP_Follow_Following_Widget extends WP_Widget {
 	 * Displays the widget.
 	 */
 	function widget( $args, $instance ) {
-		// do not do anything if user isn't logged in
+		// do not do anything if user isn't logged in.
 		if ( ! is_user_logged_in() )
 			return;
 
@@ -50,7 +50,7 @@ class BP_Follow_Following_Widget extends WP_Widget {
 			return false;
 		}
 
-		// show the users the logged-in user is following
+		// show the users the logged-in user is following.
 		if ( bp_has_members( array(
 			'include'         => $following,
 			'max'             => $instance['max_users'],

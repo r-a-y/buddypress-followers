@@ -1,4 +1,13 @@
 <?php
+/**
+ * BP Follow Updater
+ *
+ * @package BP-Follow
+ * @subpackage Updater
+ */
+
+// Exit if accessed directly.
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Updater class.
@@ -6,6 +15,7 @@
  * @since 1.3.0
  */
 class BP_Follow_Updater {
+
 	/**
 	 * Constructor.
 	 *
@@ -40,12 +50,12 @@ class BP_Follow_Updater {
 		$installed_date = (int) self::get_installed_revision_date();
 
 		// May 5, 2014    - added 'follow_type' DB column
-		// August 7, 2014 - added 'date_recorded' DB column
+		// August 7, 2014 - added 'date_recorded' DB column.
 		if ( $installed_date < 1399352400 || $installed_date < 1407448800 ) {
 			$this->install();
 		}
 
-		// bump revision date in DB
+		// bump revision date in DB.
 		self::bump_revision_date();
 	}
 
@@ -55,11 +65,16 @@ class BP_Follow_Updater {
 	 * Installs the BP Follow DB table.
 	 */
 	protected function install() {
-		global $bp, $wpdb;
+		global $wpdb;
 
-		$charset_collate = ! empty( $wpdb->charset ) ? "DEFAULT CHARACTER SET $wpdb->charset" : '';
+		$bp = $GLOBALS['bp'];
 
-		if ( ! $table_prefix = $bp->table_prefix ) {
+		$charset_collate = ! empty( $wpdb->charset )
+			? "DEFAULT CHARACTER SET $wpdb->charset"
+			: '';
+
+		$table_prefix = $bp->table_prefix;
+		if ( ! $table_prefix ) {
 			$table_prefix = apply_filters( 'bp_core_get_table_prefix', $wpdb->base_prefix );
 		}
 
@@ -86,11 +101,11 @@ class BP_Follow_Updater {
 	 * @return int The current revision date (eg. 2014-01-01 01:00 UTC).
 	 */
 	public static function get_current_revision_date() {
+		$bp = $GLOBALS['bp'];
+
 		if ( false === self::is_loaded() ) {
 			return false;
 		}
-
-		global $bp;
 
 		return $bp->follow->revision_date;
 	}
@@ -125,7 +140,7 @@ class BP_Follow_Updater {
 	 * @return bool
 	 */
 	public static function is_loaded() {
-		global $bp;
+		$bp = $GLOBALS['bp'];
 
 		if ( empty( $bp->follow ) ) {
 			return false;

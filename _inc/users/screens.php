@@ -6,8 +6,8 @@
  * @subpackage Screens
  */
 
-// Exit if accessed directly
-if ( !defined( 'ABSPATH' ) ) exit;
+// Exit if accessed directly.
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Catches any visits to the "Followers (X)" tab on a users profile.
@@ -15,14 +15,13 @@ if ( !defined( 'ABSPATH' ) ) exit;
  * @uses bp_core_load_template() Loads a template file.
  */
 function bp_follow_screen_followers() {
-	global $bp;
 
 	do_action( 'bp_follow_screen_followers' );
 
 	// ignore the template referenced here
 	// 'members/single/followers' is for older themes already using this template
 	//
-	// view bp_follow_load_template_filter() for more info
+	// view bp_follow_load_template_filter() for more info.
 	bp_core_load_template( 'members/single/followers' );
 }
 
@@ -32,12 +31,13 @@ function bp_follow_screen_followers() {
  * @uses bp_core_load_template() Loads a template file.
  */
 function bp_follow_screen_following() {
+
 	do_action( 'bp_follow_screen_following' );
 
 	// ignore the template referenced here
 	// 'members/single/following' is for older themes already using this template
 	//
-	// view bp_follow_load_template_filter() for more info
+	// view bp_follow_load_template_filter() for more info.
 	bp_core_load_template( 'members/single/following' );
 }
 
@@ -74,7 +74,7 @@ function bp_follow_screen_activity_following() {
  * @since 1.0
  */
 function bp_follow_load_template_filter( $found_template, $templates ) {
-	global $bp;
+	$bp = $GLOBALS['bp'];
 
 	// Only filter the template location when we're on the follow component pages.
 	if ( ! bp_is_current_component( $bp->follow->followers->slug ) && ! bp_is_current_component( $bp->follow->following->slug ) )
@@ -95,7 +95,7 @@ function bp_follow_load_template_filter( $found_template, $templates ) {
 		// register our theme compat directory
 		//
 		// this tells BP to look for templates in our plugin directory last
-		// when the template isn't found in the parent / child theme
+		// when the template isn't found in the parent / child theme.
 		bp_register_template_stack( 'bp_follow_get_template_directory', 14 );
 
 		// locate_template() will attempt to find the plugins.php template in the
@@ -105,22 +105,22 @@ function bp_follow_load_template_filter( $found_template, $templates ) {
 		// inject our content into BP
 		//
 		// note: this is only really relevant for bp-default themes as theme compat
-		// will kick in on its own when this template isn't found
+		// will kick in on its own when this template isn't found.
 		$found_template = locate_template( 'members/single/plugins.php', false, false );
 
 		// add AJAX support to the members loop
-		// can disable with the 'bp_follow_allow_ajax_on_follow_pages' filter
+		// can disable with the 'bp_follow_allow_ajax_on_follow_pages' filter.
 		if ( apply_filters( 'bp_follow_allow_ajax_on_follow_pages', true ) ) {
 			// add the "Order by" dropdown filter
 			add_action( 'bp_member_plugin_options_nav',    'bp_follow_add_members_dropdown_filter' );
 
-			// add ability to use AJAX
+			// add ability to use AJAX.
 			add_action( 'bp_after_member_plugin_template', 'bp_follow_add_ajax_to_members_loop' );
 		}
 
 		// add our hook to inject content into BP
 		//
-		// note the new template name for our template part
+		// note the new template name for our template part.
 		add_action( 'bp_template_content', create_function( '', "
 			bp_get_template_part( 'members/single/follow' );
 		" ) );
