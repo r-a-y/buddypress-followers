@@ -194,7 +194,7 @@ function bp_follow_add_members_dropdown_filter() {
 
 		<?php // the ID for this is important as AJAX relies on it! ?>
 		<label for="members-<?php echo bp_current_action(); ?>-orderby"><?php _e( 'Order By:', 'buddypress-followers' ); ?></label>
-		<select id="members-<?php echo bp_current_action(); ?>-orderby">
+		<select id="members-<?php echo bp_current_action(); ?>-orderby" data-bp-filter="members">
 			<?php if ( class_exists( 'BP_User_Query' ) ) : ?>
 				<option value="newest-follows"><?php _e( 'Newest Follows', 'buddypress-followers' ); ?></option>
 				<option value="oldest-follows"><?php _e( 'Oldest Follows', 'buddypress-followers' ); ?></option>
