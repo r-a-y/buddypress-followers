@@ -194,7 +194,7 @@ function bp_follow_add_members_dropdown_filter() {
 
 		<?php // the ID for this is important as AJAX relies on it! ?>
 		<label for="members-<?php echo bp_current_action(); ?>-orderby"><?php _e( 'Order By:', 'bp-follow' ); ?></label>
-		<select id="members-<?php echo bp_current_action(); ?>-orderby">
+		<select id="members-<?php echo bp_current_action(); ?>-orderby" data-bp-filter="members">
 			<option value="active"><?php _e( 'Last Active', 'bp-follow' ); ?></option>
 			<option value="newest"><?php _e( 'Newest Registered', 'bp-follow' ); ?></option>
 
