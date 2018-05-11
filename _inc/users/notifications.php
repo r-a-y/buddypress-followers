@@ -226,14 +226,15 @@ add_filter( 'bp_after_has_notifications_parse_args', 'bp_follow_filter_unread_no
  * Adds user configurable notification settings for the component.
  */
 function bp_follow_user_screen_notification_settings() {
-	$notify = ( ! notify )
-		? 'yes'
-		: bp_get_user_meta( bp_displayed_user_id(), 'notification_starts_following', true );
+	if ( ! $notify = bp_get_user_meta( bp_displayed_user_id(), 'notification_starts_following', true ) ) {
+		$notify = 'yes';
+	}
+
 ?>
 
 	<tr>
 		<td></td>
-		<td><?php esc_html( 'A member starts following your activity', 'buddypress-followers' ) ?></td>
+		<td><?php esc_html_e( 'A member starts following your activity', 'buddypress-followers' ) ?></td>
 		<td class="yes"><input type="radio" name="notifications[notification_starts_following]" value="yes" <?php checked( $notify, 'yes', true ) ?>/></td>
 		<td class="no"><input type="radio" name="notifications[notification_starts_following]" value="no" <?php checked( $notify, 'no', true ) ?>/></td>
 	</tr>
