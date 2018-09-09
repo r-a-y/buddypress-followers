@@ -1,0 +1,336 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: buddypress-followers\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-02-05 15:40-0800\n"
+"PO-Revision-Date: 2018-09-01 10:25+0500\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Last-Translator: Airat Halitov <translate@airat.biz>\n"
+"Language-Team: Airat Halitov <translate@airat.biz>\n"
+"Language: ru_RU\n"
+"X-Generator: Poedit 1.8.7.1\n"
+
+#: bp-follow-core.php:45 _inc/users/notifications.php:239
+msgid "Follow"
+msgstr "Подписки"
+
+#: loader.php:38
+#, php-format
+msgid ""
+"Hey! BP Follow v1.2 requires BuddyPress 1.5 or higher.  If you are still "
+"using BuddyPress 1.2 and you don't plan on upgrading, use <a href='%s'>BP "
+"Follow v1.1.1 instead</a>."
+msgstr ""
+"Привет! BP Follow v1.2 требует BuddyPress 1.5 или выше. Если вы до сих пор "
+"используете BuddyPress 1.2 и не планируете обновляться, используйте вместо "
+"этого плагина <a href='%s'>BP Follow v1.1.1</a>."
+
+#: _inc/bp-follow-functions.php:372 _inc/users/notifications.php:302
+#, php-format
+msgid "%s is now following you"
+msgstr "%s теперь подписан(а) на вас"
+
+#: _inc/bp-follow-functions.php:376
+#, php-format
+msgid "%d more users are now following you"
+msgstr "%d пользовател(ей) подписаны на вас"
+
+#: _inc/modules/blogs.php:99
+msgctxt "Sites subnav tab"
+msgid "Followed Sites"
+msgstr "Подписки на сайты"
+
+#: _inc/modules/blogs.php:111
+msgctxt "Activity subnav tab"
+msgid "Followed Sites"
+msgstr "Подписки на сайты"
+
+#: _inc/modules/blogs.php:137
+msgctxt "Adminbar activity subnav"
+msgid "Followed Sites"
+msgstr "Подписки на сайты"
+
+#: _inc/modules/blogs.php:169
+msgctxt "Adminbar blogs subnav"
+msgid "Followed Sites"
+msgstr "Подписки на сайты"
+
+#: _inc/modules/blogs.php:214
+#, php-format
+msgid "Followed Sites <span>%d</span>"
+msgstr "Подписки на сайты <span>%d</span>"
+
+#: _inc/modules/blogs.php:238 _inc/users/hooks.php:44 _inc/users/hooks.php:494
+#: _inc/users/hooks.php:517
+#, php-format
+msgid "Following <span>%d</span>"
+msgstr "Подписки <span>%d</span>"
+
+#: _inc/modules/blogs.php:575
+msgctxt "Footer button"
+msgid "Followed Sites"
+msgstr "Подписки на сайты"
+
+#: _inc/modules/blogs.php:627 _inc/users/template.php:89
+msgctxt "Button"
+msgid "Unfollow"
+msgstr "Отписаться"
+
+#: _inc/modules/blogs.php:630
+msgctxt "Button"
+msgid "Unfollow Site"
+msgstr "Отписаться от сайта"
+
+#: _inc/modules/blogs.php:640 _inc/users/template.php:99
+msgctxt "Button"
+msgid "Follow"
+msgstr "Подписаться"
+
+#: _inc/modules/blogs.php:643
+msgctxt "Button"
+msgid "Follow Site"
+msgstr "Подписаться на сайт"
+
+#: _inc/modules/blogs.php:912
+#, php-format
+msgid "%1$s | %2$s | Followed Site Activity"
+msgstr "%1$s | %2$s | Лента подписок сайтов"
+
+#: _inc/modules/blogs.php:915
+#, php-format
+msgid "Activity feed for sites that %s is following."
+msgstr "Лента активности для сайтов, на которые подписан %s."
+
+#: _inc/modules/blogs.php:952
+msgid "You are already following that blog."
+msgstr "Вы уже подписаны на этот блог."
+
+#: _inc/modules/blogs.php:954
+msgid "You are not following that blog."
+msgstr "Вы не подписаны на этот блог."
+
+#: _inc/modules/blogs.php:985
+#, php-format
+msgid "You are now following the site, %s."
+msgstr "Вы подписаны на сайт %s."
+
+#: _inc/modules/blogs.php:987
+msgid "You are now following that site."
+msgstr "Вы подписаны на этот сайт."
+
+#: _inc/modules/blogs.php:991
+#, php-format
+msgid "You are no longer following the site, %s."
+msgstr "Вы больше не подписаны на сайт %s."
+
+#: _inc/modules/blogs.php:993
+msgid "You are no longer following that site."
+msgstr "Вы больше не подписаны на этот сайт."
+
+#: _inc/users/actions.php:35
+#, php-format
+msgid "You are already following %s."
+msgstr "Вы уже подписаны на %s."
+
+#: _inc/users/actions.php:39
+#, php-format
+msgid "There was a problem when trying to follow %s, please try again."
+msgstr "Проблемы с подпиской на %s, попробуйте еще раз."
+
+#: _inc/users/actions.php:41
+#, php-format
+msgid "You are now following %s."
+msgstr "Вы подписаны на %s."
+
+#: _inc/users/actions.php:74
+#, php-format
+msgid "You are not following %s."
+msgstr "Вы отписались от %s."
+
+#: _inc/users/actions.php:78
+#, php-format
+msgid "There was a problem when trying to stop following %s, please try again."
+msgstr "Проблемы с попыткой отписаться от %s, попробуйте еще раз."
+
+#: _inc/users/actions.php:80
+#, php-format
+msgid "You are no longer following %s."
+msgstr "Вы больше не подписаны на %s."
+
+#: _inc/users/actions.php:117
+#, php-format
+msgid "%1$s | %2$s | Following Activity"
+msgstr "%1$s | %2$s | Лента подписок"
+
+#: _inc/users/actions.php:120
+#, php-format
+msgid "Activity feed for people that %s is following."
+msgstr "Лента новостей для людей, которые подписаны на %s."
+
+#: _inc/users/actions.php:167
+msgid "Already following"
+msgstr "Уже подписаны"
+
+#: _inc/users/actions.php:172
+msgid "Error following user"
+msgstr "Ошибка подписки на пользователя"
+
+#: _inc/users/actions.php:220
+msgid "Not following"
+msgstr "Не подписаны"
+
+#: _inc/users/actions.php:226
+msgid "Error unfollowing user"
+msgstr "Ошибка отписки от пользователя"
+
+#: _inc/users/hooks.php:55
+#, php-format
+msgid "Followers <span>%d</span>"
+msgstr "Подписчики <span>%d</span>"
+
+#: _inc/users/hooks.php:69
+msgctxt "Activity subnav tab"
+msgid "Following"
+msgstr "Подписки"
+
+#: _inc/users/hooks.php:103 _inc/users/hooks.php:209
+msgctxt "Adminbar main nav"
+msgid "Follow"
+msgstr "Подписки"
+
+#: _inc/users/hooks.php:111 _inc/users/hooks.php:220
+msgctxt "Adminbar follow subnav"
+msgid "Following"
+msgstr "Подписки"
+
+#: _inc/users/hooks.php:119 _inc/users/hooks.php:231
+msgctxt "Adminbar follow subnav"
+msgid "Followers"
+msgstr "Подписчики"
+
+#: _inc/users/hooks.php:148
+msgctxt "Adminbar activity subnav"
+msgid "Following"
+msgstr "Подписки"
+
+#: _inc/users/hooks.php:494
+msgid "The public activity for everyone you are following on this site."
+msgstr "Лента активности всех, на кого вы подписаны на этом сайте."
+
+#: _inc/users/hooks.php:852
+msgid "You are following some users, but they haven't posted yet."
+msgstr ""
+"Вы подписаны на некоторых пользователей, но они еще ничего не публиковали."
+
+#: _inc/users/hooks.php:854
+msgid "You are not following anyone yet."
+msgstr "Вы еще ни на кого не подписаны."
+
+#: _inc/users/hooks.php:862
+msgid "This user is following some users, but they haven't posted yet."
+msgstr ""
+"Этот пользователь подписан на некоторых людей, но они еще ничего не "
+"публиковали."
+
+#: _inc/users/hooks.php:864
+msgid "This user isn't following anyone yet."
+msgstr "Этот пользователь еще ни на кого не подписался."
+
+#: _inc/users/notifications.php:240
+msgid "Yes"
+msgstr "Да"
+
+#: _inc/users/notifications.php:241
+msgid "No"
+msgstr "Нет"
+
+#: _inc/users/notifications.php:248
+msgid "A member starts following your activity"
+msgstr "Пользователь подписался на вас"
+
+#: _inc/users/notifications.php:305
+#, php-format
+msgid ""
+"%s is now following your activity.\n"
+"\n"
+"To view %s's profile: %s"
+msgstr ""
+"%s подписался(лась) на вас.\n"
+"\n"
+"Посмотреть профиль %s: %s"
+
+#: _inc/users/notifications.php:312
+#, php-format
+msgid ""
+"\n"
+"\n"
+"---------------------\n"
+"To disable these notifications please log in and go to:\n"
+"%s"
+msgstr ""
+"\n"
+"\n"
+"---------------------\n"
+"Чтобы отключить эти уведомления, пройдите по ссылке:\n"
+"%s"
+
+#: _inc/users/screens.php:196
+msgid "Order By:"
+msgstr "Сортироват по:"
+
+#: _inc/users/screens.php:199
+msgid "Newest Follows"
+msgstr "Новые подписки"
+
+#: _inc/users/screens.php:200
+msgid "Oldest Follows"
+msgstr "Старые подписки"
+
+#: _inc/users/screens.php:202
+msgid "Last Active"
+msgstr "Активность"
+
+#: _inc/users/screens.php:203
+msgid "Newest Registered"
+msgstr "Новые"
+
+#: _inc/users/screens.php:206
+msgid "Alphabetical"
+msgstr "По алфавиту"
+
+#: _inc/users/widgets.php:25
+msgid "Show a list of member avatars that the logged-in user is following."
+msgstr ""
+"Отображает список аватаров пользователей, которые подписаны на "
+"авторизованного пользователя."
+
+#: _inc/users/widgets.php:31
+msgid "(BP Follow) Users I'm Following"
+msgstr "(BP Follow) Люди, на которых я подписан"
+
+#: _inc/users/widgets.php:99
+msgid "Users I'm Following"
+msgstr "Люди, на которых я подписан"
+
+#: _inc/users/widgets.php:104
+msgid "Title:"
+msgstr "Заголовок:"
+
+#: _inc/users/widgets.php:107
+msgid "Max members to show:"
+msgstr "Максимальное число людей для отображения:"
+
+#: _inc/users/widgets.php:108
+msgid ""
+"Note: This widget is only displayed if a member is logged in and if the "
+"logged-in user is following some users."
+msgstr ""
+"Примечание: Этот виджет отображается только если человек авторизован и "
+"подписан на кого-либо."
