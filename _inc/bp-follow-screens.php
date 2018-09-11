@@ -121,9 +121,9 @@ function bp_follow_load_template_filter( $found_template, $templates ) {
 		// add our hook to inject content into BP
 		//
 		// note the new template name for our template part
-		add_action( 'bp_template_content', create_function( '', "
+		add_action( 'bp_template_content', function() {
 			bp_get_template_part( 'members/single/follow' );
-		" ) );
+		} );
 	}
 
 	return apply_filters( 'bp_follow_load_template_filter', $found_template );
