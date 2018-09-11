@@ -37,9 +37,9 @@ function bp_follow_init() {
 	} else {
 		$older_version_notice = sprintf( __( "Hey! BP Follow v1.2 requires BuddyPress 1.5 or higher.  If you are still using BuddyPress 1.2 and you don't plan on upgrading, use <a href='%s'>BP Follow v1.1.1 instead</a>.", 'buddypress-followers' ), 'https://github.com/r-a-y/buddypress-followers/archive/1.1.x.zip' );
 
-		add_action( 'admin_notices', create_function( '', "
-			echo '<div class=\"error\"><p>" . $older_version_notice . "</p></div>';
-		" ) );
+		add_action( 'admin_notices', function() use ( $older_version_notice ) {
+			echo '<div class="error"><p>' . $older_version_notice . '</p></div>';
+		} );
 	}
 }
 add_action( 'bp_include', 'bp_follow_init' );
