@@ -40,7 +40,7 @@ function bp_follow_user_setup_nav( $main_nav = array(), $sub_nav = array() ) {
 	/** FOLLOWERS NAV ************************************************/
 
 	bp_core_new_nav_item( array(
-		'name'                => sprintf( __( 'Following <span>%d</span>', 'buddypress-followers' ), bp_follow_get_the_following_count( array( 'user_id' => $user_id ) ) ),
+		'name'                => sprintf( __( 'Following <span class="count">%d</span>', 'buddypress-followers' ), bp_follow_get_the_following_count( array( 'user_id' => $user_id ) ) ),
 		'slug'                => $bp->follow->following->slug,
 		'position'            => $bp->follow->params['adminbar_myaccount_order'],
 		'screen_function'     => 'bp_follow_screen_following',
@@ -51,7 +51,7 @@ function bp_follow_user_setup_nav( $main_nav = array(), $sub_nav = array() ) {
 	/** FOLLOWING NAV ************************************************/
 
 	bp_core_new_nav_item( array(
-		'name'                => sprintf( __( 'Followers <span>%d</span>', 'buddypress-followers' ), bp_follow_get_the_followers_count( array( 'user_id' => $user_id ) ) ),
+		'name'                => sprintf( __( 'Followers <span class="count">%d</span>', 'buddypress-followers' ), bp_follow_get_the_followers_count( array( 'user_id' => $user_id ) ) ),
 		'slug'                => $bp->follow->followers->slug,
 		'position'            => apply_filters( 'bp_follow_followers_nav_position', 62 ),
 		'screen_function'     => 'bp_follow_screen_followers',
