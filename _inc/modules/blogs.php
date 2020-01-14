@@ -486,7 +486,7 @@ class BP_Follow_Blogs {
 		foreach ( (array) $following as $is_following ) {
 			foreach ( (array) $blogs_template->blogs as $i => $blog ) {
 				// set follow status to true if the logged-in user is following.
-				if ( $is_following->leader_id === $blog->blog_id ) {
+				if ( (int) $is_following->leader_id === (int) $blog->blog_id ) {
 					$blogs_template->blogs[ $i ]->is_following = true;
 				}
 			}
