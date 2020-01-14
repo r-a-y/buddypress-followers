@@ -146,6 +146,13 @@ function bp_follow_add_follow_button( $args = '' ) {
 			'wrapper'           => ! empty( $r['wrapper'] ) ? esc_attr( $r['wrapper'] ) : false,
 		);
 
+		// BP Nouveau-specific button arguments.
+		if ( function_exists( 'bp_nouveau' ) && ! empty( $members_template->in_the_loop ) ) {
+			$button['parent_element'] = 'li';
+			$button['wrapper_class']  = '';
+			$button['link_class']    .= ' button';
+		}
+
 		// Filter and return the HTML button.
 		return bp_get_button( apply_filters( 'bp_follow_get_add_follow_button', $button, $r['leader_id'], $r['follower_id'] ) );
 	}
