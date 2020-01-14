@@ -711,6 +711,13 @@ class BP_Follow_Blogs {
 			'wrapper'           => ! empty( $r['wrapper'] ) ? esc_attr( $r['wrapper'] ) : false,
 		);
 
+		// BP Nouveau-specific button arguments.
+		if ( function_exists( 'bp_nouveau' ) && ! empty( $blogs_template->in_the_loop ) ) {
+			$button['parent_element'] = 'li';
+			$button['wrapper_class']  = '';
+			$button['link_class']    .= ' button';
+		}
+
 		// Filter and return the HTML button.
 		return bp_get_button( apply_filters( 'bp_follow_blogs_get_follow_button', $button, $r, $is_following ) );
 	}
