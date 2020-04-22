@@ -147,9 +147,10 @@ function bp_follow_add_follow_button( $args = '' ) {
 		);
 
 		// BP Nouveau-specific button arguments.
-		if ( function_exists( 'bp_nouveau' ) && ! empty( $members_template->in_the_loop ) ) {
-			$button['parent_element'] = 'li';
-			$button['wrapper_class']  = '';
+		if ( function_exists( 'bp_nouveau' ) ) {
+			if ( $button['wrapper'] && ! bp_is_group() ) {
+				$button['parent_element'] = 'li';
+			}
 			$button['link_class']    .= ' button';
 		}
 
