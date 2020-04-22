@@ -1,5 +1,6 @@
-if ( typeof jq == "undefined" ) {
-	var jq = jQuery;
+var jq, profileHeader;
+if ( typeof jq === "undefined" ) {
+	jq = jQuery;
 }
 
 jq( function() {
