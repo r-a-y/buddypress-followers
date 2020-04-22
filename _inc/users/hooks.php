@@ -682,13 +682,19 @@ function bp_follow_add_member_scope_filter( $qs, $object ) {
 		return $qs;
 	}
 
+	// Parse querystring into array.
+	$r = wp_parse_args( $qs );
+
 	$set = false;
 
 	// members directory
 	// can't use bp_is_members_directory() yet since that's a BP 2.0 function.
 	if ( ! bp_is_user() && bp_is_members_component() ) {
+		// Check for existing scope.
+		$scope = ! empty( $r['scope'] ) && 'following' === $r['scope'] ? true : false;
+
 		// check if members scope is following before manipulating.
-		if ( isset( $_COOKIE['bp-members-scope'] ) && 'following' === $_COOKIE['bp-members-scope'] ) {
+		if ( $scope || ( isset( $_COOKIE['bp-members-scope'] ) && 'following' === $_COOKIE['bp-members-scope'] ) ) {
 			$set = true;
 			$action = 'following';
 		}
