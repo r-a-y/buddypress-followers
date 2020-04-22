@@ -63,7 +63,7 @@ function bp_follow_button_action( scope, context ) {
 	function(response) {
 		jq( link.parent()).fadeOut(200, function() {
 			// toggle classes
-			if ( action == 'unfollow' ) {
+			if ( action === 'unfollow' ) {
 				link.parent().removeClass( 'following' ).addClass( 'not-following' );
 			} else {
 				link.parent().removeClass( 'not-following' ).addClass( 'following' );
@@ -74,7 +74,7 @@ function bp_follow_button_action( scope, context ) {
 
 			// increase / decrease counts
 			var count_wrapper = false;
-			if ( context == 'profile' ) {
+			if ( context === 'profile' ) {
 				count_wrapper = jq("#user-members-followers span");
 
 			} else if ( context == 'member-loop' ) {
@@ -91,7 +91,7 @@ function bp_follow_button_action( scope, context ) {
 			if ( count_wrapper.length ) {
 				if ( action == 'unfollow' ) {
 					count_wrapper.text( ( count_wrapper.text() >> 0 ) - 1 );
-				} else if ( action == 'follow' ) {
+				} else if ( action === 'follow' ) {
 					count_wrapper.text( ( count_wrapper.text() >> 0 ) + 1 );
 				}
 			}
