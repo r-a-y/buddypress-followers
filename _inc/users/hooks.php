@@ -713,34 +713,28 @@ function bp_follow_add_member_scope_filter( $qs, $object ) {
 	// filter the members loop based on the current page.
 	switch ( $action ) {
 		case 'following':
-			// parse querystring into an array.
-			$qs = wp_parse_args( $qs );
-
-			$qs['include'] = bp_get_following_ids( array(
+			$r['include'] = bp_follow_get_following( array(
 				'user_id' => bp_displayed_user_id() ? bp_displayed_user_id() : bp_loggedin_user_id(),
 			) );
-			$qs['per_page'] = apply_filters( 'bp_follow_per_page', 20 );
-
-			return $qs;
 
 			break;
 
 		case 'followers':
-			// parse querystring into an array.
-			$qs = wp_parse_args( $qs );
-
-			$qs['include'] = bp_get_follower_ids();
-			$qs['per_page'] = apply_filters( 'bp_follow_per_page', 20 );
-
-			return $qs;
-
-			break;
-
-		default:
-			return $qs;
+			$r['include'] = bp_follow_get_followers();
 
 			break;
 	}
+
+	/**
+	 * Number of users to display on a user's Following or Followers page.
+	 *
+	 * @since 1.2.2
+	 *
+	 * @param int $retval
+	 */
+	$r['per_page'] = apply_filters( 'bp_follow_per_page', 20 );
+
+	return $r;
 }
 add_filter( 'bp_ajax_querystring', 'bp_follow_add_member_scope_filter', 20, 2 );
 
