@@ -4,7 +4,7 @@ if ( typeof jq === "undefined" ) {
 }
 
 jq( function() {
-	var profileHeader, memberLoop, groupMemberLoop,
+	var memberLoop, groupMemberLoop,
 		buttonSelector = 'a';
 
 	if ( jq( 'body.bp-nouveau' ).length ) {
