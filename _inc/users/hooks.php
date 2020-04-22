@@ -562,17 +562,28 @@ add_action( 'bp_members_directory_member_types', 'bp_follow_add_following_tab' )
  *
  * @since 1.3.0
  *
- * @param BP_User_Query $query
+ * @param BP_User_Query $q
  */
-function bp_follow_pre_user_query( $query ) {
+function bp_follow_pre_user_query( $q ) {
+	if ( 'oldest-follows' !== $q->query_vars['type'] && 'newest-follows' !== $q->query_vars['type'] ) {
+		return;
+	}
+
+	$q->total_users = count( $q->query_vars['include'] );
+
 	// oldest follows.
-	if ( 'oldest-follows' === $query->query_vars['type'] ) {
+	if ( 'oldest-follows' === $q->query_vars['type'] ) {
 		// flip the order.
-		$query->query_vars['user_ids'] = array_reverse( wp_parse_id_list( $query->query_vars['include'] ) );
+		$q->query_vars['user_ids'] = array_reverse( wp_parse_id_list( $q->query_vars['include'] ) );
 
 	// newest follows.
-	} elseif ( 'newest-follows' === $query->query_vars['type'] ) {
-		$query->query_vars['user_ids'] = $query->query_vars['include'];
+	} elseif ( 'newest-follows' === $q->query_vars['type'] ) {
+		$q->query_vars['user_ids'] = $q->query_vars['include'];
+	}
+
+	// Manual pagination. Eek!
+	if ( ! empty( $q->query_vars['page'] ) && $q->query_vars['page'] > 1 ) {
+		$q->query_vars['user_ids'] = array_splice( $q->query_vars['user_ids'], $q->query_vars['per_page'] * ( $q->query_vars['page'] - 1 ), $q->query_vars['per_page'] );
 	}
 }
 add_action( 'bp_pre_user_query_construct', 'bp_follow_pre_user_query' );
