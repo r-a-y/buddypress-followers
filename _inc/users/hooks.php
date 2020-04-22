@@ -582,7 +582,7 @@ function bp_follow_pre_user_query( $q ) {
 	}
 
 	// Manual pagination. Eek!
-	if ( ! empty( $q->query_vars['page'] ) && $q->query_vars['page'] > 1 ) {
+	if ( ! empty( $q->query_vars['page'] ) ) {
 		$q->query_vars['user_ids'] = array_splice( $q->query_vars['user_ids'], $q->query_vars['per_page'] * ( $q->query_vars['page'] - 1 ), $q->query_vars['per_page'] );
 	}
 }
