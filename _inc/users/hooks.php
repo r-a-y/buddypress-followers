@@ -739,6 +739,30 @@ function bp_follow_add_member_scope_filter( $qs, $object ) {
 add_filter( 'bp_ajax_querystring', 'bp_follow_add_member_scope_filter', 20, 2 );
 
 /**
+ * Set pagination parameters when on a user Follow page for Nouveau.
+ *
+ * Nouveau has its own pagination routine...
+ *
+ * @since 1.3.0
+ *
+ * @param  array  $r    Current pagination arguments.
+ * @param  string $type Pagination type.
+ * @return array
+ */
+function bp_follow_set_pagination_for_nouveau( $r, $type ) {
+	if ( $GLOBALS['bp']->follow->following->slug !== $type && $GLOBALS['bp']->follow->followers->slug !== $type ) {
+		return $r;
+	}
+
+	return array(
+		'pag_count' => bp_get_members_pagination_count(),
+		'pag_links' => bp_get_members_pagination_links(),
+		'page_arg'  => $GLOBALS['members_template']->pag_arg
+	);
+}
+add_filter( 'bp_nouveau_pagination_params', 'bp_follow_set_pagination_for_nouveau', 10, 2 );
+
+/**
  * Set some default parameters for a member loop.
  *
  * If we're on a user's following or followers page, set the member filter
