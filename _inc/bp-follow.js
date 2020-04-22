@@ -3,21 +3,30 @@ if ( typeof jq == "undefined" ) {
 }
 
 jq( function() {
-	var profileHeader   = jq("#item-buttons");
-	var memberLoop      = jq("#members-list").parent();
-	var groupMemberLoop = jq("#member-list").parent();
+	var profileHeader, memberLoop, groupMemberLoop,
+		buttonSelector = 'a';
 
-	profileHeader.on("click", ".follow-button a", function() {
+	if ( jq( 'body.bp-nouveau' ).length ) {
+		profileHeader   = jq("ul.member-header-actions"),
+		memberLoop      = jq("#members-dir-list").parent();
+		groupMemberLoop = jq("#members-group-list").parent();
+	} else {
+		profileHeader   = jq("#item-buttons"),
+		memberLoop      = jq("#members-list").parent(),
+		groupMemberLoop = jq("#member-list").parent();
+	}
+
+	profileHeader.on("click", ".follow-button " + buttonSelector, function() {
 		bp_follow_button_action( jq(this), 'profile' );
 		return false;
 	});
 
-	memberLoop.on("click", ".follow-button a", function() {
+	memberLoop.on("click", ".follow-button " + buttonSelector, function() {
 		bp_follow_button_action( jq(this), 'member-loop' );
 		return false;
 	});
 
-	groupMemberLoop.on("click", ".follow-button a", function() {
+	groupMemberLoop.on("click", ".follow-button " + buttonSelector, function() {
 		bp_follow_button_action( jq(this) );
 		return false;
 	});
