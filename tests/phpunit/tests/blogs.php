@@ -10,7 +10,7 @@ class BP_Follow_Test_Blogs extends BP_UnitTestCase {
 	 */
 	public function test_follow_and_delete_blog() {
 		if ( ! is_multisite() ) {
-			return;
+			$this->markTestSkipped();
 		}
 
 		// create user and blog
@@ -55,7 +55,7 @@ class BP_Follow_Test_Blogs extends BP_UnitTestCase {
 	 */
 	public function test_follow_blog_and_groupblog() {
 		if ( ! is_multisite() ) {
-			return;
+			$this->markTestSkipped();
 		}
 
 		// save the current user and override logged-in user

@@ -55,7 +55,7 @@ function _bp_follow_install() {
 	$wpdb->query( "DROP TABLE IF EXISTS {$table_prefix}bp_follow" );
 
 	// Set DB tables to InnoDB
-	$wpdb->query( 'SET storage_engine = INNODB' );
+	//$wpdb->query( 'SET storage_engine = INNODB' );
 
 	// Fake that we're in the admin area so BP Follow's did_action() check passes
 	$wp_actions['admin_init'] = 1;
