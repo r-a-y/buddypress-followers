@@ -158,6 +158,7 @@ class BP_Follow {
 		// update existing entry.
 		if ( $this->id ) {
 			$result = $wpdb->query( $wpdb->prepare(
+				"UPDATE {$bp->follow->table_name} SET leader_id = %d, follower_id = %d, follow_type = %s, date_recorded = %s WHERE id = %d",
 				$this->leader_id,
 				$this->follower_id,
 				$this->follow_type,
