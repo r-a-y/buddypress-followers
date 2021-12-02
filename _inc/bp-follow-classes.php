@@ -248,11 +248,19 @@ class BP_Follow {
 		if ( ! empty( $params['leader_id'] ) ) {
 			$leader_ids = implode( ',', wp_parse_id_list( $params['leader_id'] ) );
 			$where_conditions['leader_id'] = "leader_id IN ({$leader_ids})";
+
+		// If null, return no results.
+		} elseif ( array_key_exists( 'leader_id', $params ) && is_null( $params['leader_id'] ) ) {
+			$where_conditions['no_results'] = '1 = 0';
 		}
 
 		if ( ! empty( $params['follower_id'] ) ) {
 			$follower_ids = implode( ',', wp_parse_id_list( $params['follower_id'] ) );
 			$where_conditions['follower_id'] = "follower_id IN ({$follower_ids})";
+
+		// If null, return no results.
+		} elseif ( array_key_exists( 'follower_id', $params ) && is_null( $params['follower_id'] ) ) {
+			$where_conditions['no_results'] = '1 = 0';
 		}
 
 		if ( isset( $params['follow_type'] ) ) {

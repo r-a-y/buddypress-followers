@@ -62,4 +62,44 @@ class BP_Follow_Test_Core_Class extends BP_UnitTestCase {
 		) );
 		$this->assertEquals( array( $u2 ), $query );
 	}
+
+	/**
+	 * @group null
+	 */
+	public function test_null_value_for_leader_id_should_return_no_results() {
+		$u1 = $this->factory->user->create();
+		$u2 = $this->factory->user->create();
+
+		// follow all users at different dates
+		bp_follow_start_following(
+			array(
+				'leader_id'   => $u2,
+				'follower_id' => $u1,
+			)
+		);
+
+		$query = BP_Follow::get_followers( NULL	);
+
+		$this->assertEmpty( $query );
+	}
+
+	/**
+	 * @group null
+	 */
+	public function test_null_value_for_follower_id_should_return_no_results() {
+		$u1 = $this->factory->user->create();
+		$u2 = $this->factory->user->create();
+
+		// follow all users at different dates
+		bp_follow_start_following(
+			array(
+				'leader_id'   => $u2,
+				'follower_id' => $u1,
+			)
+		);
+
+		$query = BP_Follow::get_following( NULL	);
+
+		$this->assertEmpty( $query );
+	}
 }
