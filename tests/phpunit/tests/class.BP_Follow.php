@@ -70,7 +70,6 @@ class BP_Follow_Test_Core_Class extends BP_UnitTestCase {
 		$u1 = $this->factory->user->create();
 		$u2 = $this->factory->user->create();
 
-		// follow all users at different dates
 		bp_follow_start_following(
 			array(
 				'leader_id'   => $u2,
@@ -78,7 +77,7 @@ class BP_Follow_Test_Core_Class extends BP_UnitTestCase {
 			)
 		);
 
-		$query = BP_Follow::get_followers( NULL	);
+		$query = BP_Follow::get_followers( NULL );
 
 		$this->assertEmpty( $query );
 	}
@@ -90,7 +89,6 @@ class BP_Follow_Test_Core_Class extends BP_UnitTestCase {
 		$u1 = $this->factory->user->create();
 		$u2 = $this->factory->user->create();
 
-		// follow all users at different dates
 		bp_follow_start_following(
 			array(
 				'leader_id'   => $u2,
@@ -98,7 +96,7 @@ class BP_Follow_Test_Core_Class extends BP_UnitTestCase {
 			)
 		);
 
-		$query = BP_Follow::get_following( NULL	);
+		$query = BP_Follow::get_following( NULL );
 
 		$this->assertEmpty( $query );
 	}
