@@ -739,6 +739,87 @@ class BP_Follow_Blogs {
 		$wpdb->query( $wpdb->prepare( "DELETE FROM {$bp->follow->table_name} WHERE leader_id = %d AND follow_type = 'blogs'", $blog_id ) );
 	}
 
+	/**
+	 * Save routine.
+	 *
+	 * @param array $r {
+	 *     An array of arguments.
+	 *     @type string $action  Type of follow action. Either 'follow' or 'unfollow'.
+	 *     @type int    $blog_id Blog ID to follow or unfollow.
+	 *     @type int    $user_id User ID initiating the follow request.
+	 *     @type string $nonce   Nonce for the follow request.
+	 * }
+	 * @return bool|WP_Error Boolean true on success; WP_Error on failure.
+	 */
+	public static function save( $r = [] ) {
+		if ( empty( $r['action'] ) || empty( $r['nonce'] ) || empty( $r['blog_id'] ) ) {
+			return new WP_Error( 'empty', __( 'Missing required arguments', 'buddypress-followers' ) );
+		}
+
+		$action  = 'follow';
+		$save    = 'bp_follow_start_following';
+		$blog_id = (int) $r['blog_id'];
+		$user_id = ! empty( $r['user_id'] ) ? (int) $r['user_id'] : bp_loggedin_user_id();
+
+		if ( empty( $user_id ) ) {
+			return new WP_Error( 'no_user_id', __( 'Missing user ID', 'buddypress-followers' ) );
+		}
+
+		if ( 'unfollow' === $r['action'] ) {
+			$action = 'unfollow';
+			$save   = 'bp_follow_stop_following';
+		}
+
+		if ( ! wp_verify_nonce( $r['nonce'], "bp_follow_blog_{$action}" ) ) {
+			return new WP_Error( 'nonce', __( 'Nonce failure', 'buddypress-followers' ) );
+		}
+
+		if ( ! $save( array(
+			'leader_id'   => $blog_id,
+			'follower_id' => $user_id,
+			'follow_type' => 'blogs',
+		) ) ) {
+			if ( 'follow' === $action ) {
+				$error_code = 'already_following';
+				$message    = __( 'You are already following that blog.', 'buddypress-followers' );
+
+				if ( (int) $user_id !== bp_loggedin_user_id() ) {
+					$message = sprintf( __( '%s is already following that blog.', 'buddypress-followers' ), bp_core_get_user_displayname( $user_id ) );
+				}
+			} else {
+				$error_code = 'not_following';
+				$message    = __( 'You are not following that blog.', 'buddypress-followers' );
+
+				if ( (int) $user_id !== bp_loggedin_user_id() ) {
+					$message = sprintf( __( '%s is not following that blog.', 'buddypress-followers' ), bp_core_get_user_displayname( $user_id ) );
+				}
+			}
+
+			return new WP_Error( $error_code, $message );
+
+		// success on follow action
+		} else {
+			$blog_name = bp_blogs_get_blogmeta( $blog_id, 'name' );
+
+			// blog has never been recorded into BP; record it now.
+			if ( '' === $blog_name && apply_filters( 'bp_follow_blogs_record_blog', true, $blog_id ) ) {
+				// get the admin of the blog.
+				$admin = get_users( array(
+					'blog_id' => $blog_id,
+					'role'    => 'administrator',
+					'orderby' => 'ID',
+					'number'  => 1,
+					'fields'  => array( 'ID' ),
+				) );
+
+				// record the blog.
+				bp_blogs_record_blog( $blog_id, $admin[0]->ID, true );
+			}
+
+			return true;
+		}
+	}
+
 	/** CACHE **************************************************************/
 
 	/**
@@ -973,53 +1054,27 @@ class BP_Follow_Blogs_Screens {
 		if ( ! empty( $_GET['bpfb-follow'] ) || ! empty( $_GET['bpfb-unfollow'] ) ) {
 			$nonce   = ! empty( $_GET['bpfb-follow'] ) ? $_GET['bpfb-follow'] : $_GET['bpfb-unfollow'];
 			$action  = ! empty( $_GET['bpfb-follow'] ) ? 'follow' : 'unfollow';
-			$save    = ! empty( $_GET['bpfb-follow'] ) ? 'bp_follow_start_following' : 'bp_follow_stop_following';
 		}
 
 		if ( ! $action ) {
 			return;
 		}
 
-		if ( ! wp_verify_nonce( $nonce, "bp_follow_blog_{$action}" ) ) {
-			return;
-		}
+		$save = BP_Follow_Blogs::save( [
+			'action' => $action,
+			'nonce'  => $nonce,
+			'blog_id' => (int) $_GET['blog_id']
+		] );
 
-		if ( ! $save( array(
-			'leader_id'   => (int) $_GET['blog_id'],
-			'follower_id' => bp_loggedin_user_id(),
-			'follow_type' => 'blogs',
-		) ) ) {
-			if ( 'follow' == $action ) {
-				$message = __( 'You are already following that blog.', 'buddypress-followers' );
+		if ( is_wp_error( $save ) ) {
+			if ( 'already_following' === $save->get_error_code() || 'not_following' === $save->get_error_code() ) {
+				bp_core_add_message( $save->get_error_message(), 'error' );
 			} else {
-				$message = __( 'You are not following that blog.', 'buddypress-followers' );
+				return;
 			}
 
-			bp_core_add_message( $message, 'error' );
-
-		// success on follow action
 		} else {
 			$blog_name = bp_blogs_get_blogmeta( (int) $_GET['blog_id'], 'name' );
-
-			// blog has never been recorded into BP; record it now.
-			if ( '' === $blog_name && apply_filters( 'bp_follow_blogs_record_blog', true, (int) $_GET['blog_id'] ) ) {
-				// get the admin of the blog.
-				$admin = get_users( array(
-					'blog_id' => get_current_blog_id(),
-					'role'    => 'administrator',
-					'orderby' => 'ID',
-					'number'  => 1,
-					'fields'  => array( 'ID' ),
-				) );
-
-				// record the blog.
-				$record_site = bp_blogs_record_blog( (int) $_GET['blog_id'], $admin[0]->ID, true );
-
-				// now refetch the blog name from blogmeta.
-				if ( false !== $record_site ) {
-					$blog_name = bp_blogs_get_blogmeta( (int) $_GET['blog_id'], 'name' );
-				}
-			}
 
 			if ( 'follow' === $action ) {
 				if ( ! empty( $blog_name ) ) {
