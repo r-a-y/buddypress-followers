@@ -41,6 +41,7 @@ class BP_Follow_Blogs {
 		add_action( 'bp_after_member_blogs_content', 'BP_Follow_Blogs_Screens::user_blogs_inline_js' );
 		add_action( 'bp_actions',                    'BP_Follow_Blogs_Screens::action_handler' );
 		add_action( 'bp_actions',                    'BP_Follow_Blogs_Screens::rss_handler' );
+		add_action( 'wp_ajax_bp_follow_blogs',       'BP_Follow_Blogs_Screens::ajax_handler' );
 
 		// directory tabs.
 		add_action( 'bp_before_activity_type_tab_favorites', array( $this, 'add_activity_directory_tab' ) );
@@ -53,7 +54,7 @@ class BP_Follow_Blogs {
 
 		// button injection.
 		add_action( 'bp_directory_blogs_actions', array( $this, 'add_follow_button_to_loop' ),   20 );
-		add_action( 'wp_footer',                  array( $this, 'add_follow_button_to_footer' ), 999 );
+		add_action( 'wp_footer',                  array( $this, 'add_follow_button_to_footer' ) );
 
 		// blog deletion.
 		add_action( 'bp_blogs_remove_blog', array( $this, 'on_blog_delete' ) );
@@ -595,8 +596,10 @@ class BP_Follow_Blogs {
 
 		<div id="bpf-blogs-ftr">
 			<?php echo self::get_button( array(
-				'leader_id' => get_current_blog_id(),
-				'wrapper'   => false,
+				'leader_id'     => get_current_blog_id(),
+				'follow_text'   => _x( 'Follow Site', 'Button', 'buddypress-followers' ),
+				'unfollow_text' => _x( 'Unfollow Site', 'Button', 'buddypress-followers' ),
+				'wrapper'       => false,
 			) ); ?>
 
  			<?php
@@ -626,15 +629,23 @@ class BP_Follow_Blogs {
 		$r = wp_parse_args( $args, array(
 			'leader_id'     => ! empty( $blogs_template->in_the_loop ) ? bp_get_blog_id() : get_current_blog_id(),
 			'follower_id'   => bp_loggedin_user_id(),
+			'follow_text'   => _x( 'Follow', 'Button', 'buddypress-followers' ),
+			'unfollow_text' => _x( 'Unfollow', 'Button', 'buddypress-followers' ),
 			'link_text'     => '',
 			'link_title'    => '',
-			'wrapper_class' => '',
+			'wrapper_class' => 'blog-button',
 			'link_class'    => '',
+			'button_attr'   => [],
 			'wrapper'       => 'div',
 		) );
 
 		if ( ! $r['leader_id'] || ! $r['follower_id'] ) {
 			return false;
+		}
+
+		// Enqueue JS only if BP 2.7+.
+		if ( class_exists( 'BP_Core_HTML_Element' ) ) {
+			wp_enqueue_script( 'bp-follow-blogs', BP_FOLLOW_URL . '_inc/modules/blogs.js', [ 'jquery' ], false, true );
 		}
 
 		// if we're checking during a blog loop, then follow status is already
@@ -651,33 +662,32 @@ class BP_Follow_Blogs {
 			) );
 		}
 
+		$button_attr = [
+			'data-follow-blog-id' => $r['leader_id'],
+		];
+
 		// setup some variables.
 		if ( $is_following ) {
 			$id        = 'following';
 			$action    = 'unfollow';
-			$link_text = _x( 'Unfollow', 'Button', 'buddypress-followers' );
-
-			if ( empty( $blogs_template->in_the_loop ) ) {
-				$link_text = _x( 'Unfollow Site', 'Button', 'buddypress-followers' );
-			}
 
 			if ( empty( $r['link_text'] ) ) {
-				$r['link_text'] = $link_text;
+				$r['link_text'] = $r['unfollow_text'];
 			}
 
 		} else {
 			$id        = 'not-following';
 			$action    = 'follow';
-			$link_text = _x( 'Follow', 'Button', 'buddypress-followers' );
-
-			if ( empty( $blogs_template->in_the_loop ) ) {
-				$link_text = _x( 'Follow Site', 'Button', 'buddypress-followers' );
-			}
 
 			if ( empty( $r['link_text'] ) ) {
-				$r['link_text'] = $link_text;
+				$r['link_text'] = $r['follow_text'];
 			}
 		}
+
+		$button_attr['data-follow-action'] = $action;
+		$button_attr['data-follow-nonce']  = wp_create_nonce( "bp_follow_blog_{$action}" );
+		$button_attr['data-follow-text']   = $r['follow_text'];
+		$button_attr['data-unfollow-text'] = $r['unfollow_text'];
 
 		$wrapper_class = 'follow-button ' . $id;
 
@@ -709,6 +719,7 @@ class BP_Follow_Blogs {
 			'link_id'           => $action . '-' . (int) $r['leader_id'],
 			'link_class'        => $link_class,
 			'wrapper'           => ! empty( $r['wrapper'] ) ? esc_attr( $r['wrapper'] ) : false,
+			'button_attr'       => $button_attr
 		);
 
 		// BP Nouveau-specific button arguments.
@@ -1098,4 +1109,41 @@ class BP_Follow_Blogs_Screens {
 		bp_core_redirect( $redirect );
 	}
 
+	/**
+	 * AJAX handler.
+	 */
+	public static function ajax_handler() {
+		$data = json_decode( stripslashes( $_POST['followData'] ) );
+		if ( empty( $data ) ) {
+			wp_send_json_error();
+		}
+
+		$save = BP_Follow_Blogs::save( [
+			'action'  => $data->followAction,
+			'nonce'   => $data->followNonce,
+			'blog_id' => $data->followBlogId
+		] );
+
+		// Error during follow action. Render invalid button for AJAX response.
+		if ( is_wp_error( $save ) ) {
+			$button = bp_get_button( [
+				'id'        => 'invalid',
+				'link_href' => 'javascript:;',
+				'component' => 'follow',
+				'wrapper'   => false,
+				'link_text' => esc_html__( 'Error', 'buddypress-followers' )
+			] );
+
+		// Success! Render follow button for AJAX response.
+		} else {
+			$button = BP_Follow_Blogs::get_button( [
+				'leader_id'     => $data->followBlogId,
+				'follow_text'   => $data->followText,
+				'unfollow_text' => $data->unfollowText,
+				'wrapper'       => false
+			] );
+		}
+
+		wp_send_json_success( [ 'button' => $button ] );
+	}
 }
