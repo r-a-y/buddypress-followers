@@ -55,6 +55,7 @@ class BP_Follow_Blogs {
 		// button injection.
 		add_action( 'bp_directory_blogs_actions', array( $this, 'add_follow_button_to_loop' ),   20 );
 		add_action( 'wp_footer',                  array( $this, 'add_follow_button_to_footer' ) );
+		add_action( 'wp_enqueue_scripts',         array( $this, 'enqueue_script' ) );
 
 		// blog deletion.
 		add_action( 'bp_blogs_remove_blog', array( $this, 'on_blog_delete' ) );
@@ -499,6 +500,23 @@ class BP_Follow_Blogs {
 	/** BUTTON ********************************************************/
 
 	/**
+	 * Registers and enqueues our JS.
+	 */
+	public function enqueue_script() {
+		if ( ! is_user_logged_in() ) {
+			return;
+		}
+
+		// Register our script.
+		wp_register_script( 'bp-follow-blogs', BP_FOLLOW_URL . '_inc/modules/blogs.js', [ 'jquery' ], false, true );
+
+		// Nouveau requires early enqueuing on BP blog pages.
+		if ( function_exists( 'bp_nouveau' ) && bp_is_blogs_component() ) {
+			wp_enqueue_script( 'bp-follow-blogs' );
+		}
+	}
+
+	/**
 	 * Add a follow button to the blog loop.
 	 */
 	public function add_follow_button_to_loop() {
@@ -645,7 +663,7 @@ class BP_Follow_Blogs {
 
 		// Enqueue JS only if BP 2.7+.
 		if ( class_exists( 'BP_Core_HTML_Element' ) ) {
-			wp_enqueue_script( 'bp-follow-blogs', BP_FOLLOW_URL . '_inc/modules/blogs.js', [ 'jquery' ], false, true );
+			wp_enqueue_script( 'bp-follow-blogs' );
 		}
 
 		// if we're checking during a blog loop, then follow status is already

@@ -3,7 +3,7 @@
 jQuery(($) => {
   const blogDirs = $('.blogs.dir-list')
   const blogFooter = $('#bpf-blogs-ftr')
-  const userBlogs = $('#blogs-list')
+  const userBlogs = $('body.bp-user.my-blogs #item-body div.blogs')
 
   if (blogDirs.length) {
     blogDirs.on('click', 'a[data-follow-blog-id]', function () {
