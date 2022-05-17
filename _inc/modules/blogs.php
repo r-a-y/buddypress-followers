@@ -541,6 +541,11 @@ class BP_Follow_Blogs {
 			$retval = false;
 		}
 
+		// Bail if JSON request. Mostly for block widget render calls.
+		if ( function_exists( 'wp_is_json_request' ) && wp_is_json_request() ) {
+			$retval = false;
+		}
+
 		return apply_filters( 'bp_follow_blogs_show_footer_button', $retval );
 	}
 
