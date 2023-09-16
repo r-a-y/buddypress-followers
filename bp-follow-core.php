@@ -78,6 +78,13 @@ class BP_Follow_Component extends BP_Component {
 	public $table_name = '';
 
 	/**
+	 * Whether activity scope is set or not.
+	 *
+	 * @var int 1 if activity scope is set, 0 otherwise.
+	 */
+	public $activity_scope_set = 0;
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
