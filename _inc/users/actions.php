@@ -116,7 +116,7 @@ function bp_follow_my_following_feed() {
 		/* translators: User's following activity RSS title - "[Site Name] | [User Display Name] | Following Activity" */
 		'title'         => sprintf( __( '%1$s | %2$s | Following Activity', 'buddypress-followers' ), bp_get_site_name(), bp_get_displayed_user_fullname() ),
 
-		'link'          => trailingslashit( bp_displayed_user_domain() . bp_get_activity_slug() . '/' . constant( 'BP_FOLLOWING_SLUG' ) ),
+		'link'          => bp_follow_get_user_url( bp_displayed_user_id(), array( bp_get_activity_slug(), constant( 'BP_FOLLOWING_SLUG' ) ) ),
 		'description'   => sprintf( __( "Activity feed for people that %s is following.", 'buddypress' ), bp_get_displayed_user_fullname() ),
 		'activity_args' => array(
 			'user_id'  => bp_get_following_ids(),

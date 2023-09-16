@@ -10,6 +10,41 @@
 defined( 'ABSPATH' ) || exit;
 
 /**
+ * Builds a user's BP URL.
+ *
+ * @since 1.3.0
+ *
+ * @param int $user_id The user ID.
+ * @param array $path_chunks A list of path chunks.
+ * @return string The user's BP URL.
+ */
+function bp_follow_get_user_url( $user_id = 0, $path_chunks = array() ) {
+	$user_url = '';
+
+	if ( ! $user_id ) {
+		return $user_url;
+	}
+
+	if ( function_exists( 'bp_core_get_query_parser' ) ) {
+		$user_url = bp_members_get_user_url( $user_id, bp_members_get_path_chunks( $path_chunks ) );
+	} else {
+		$user_url = bp_core_get_user_domain( $user_id );
+
+		if ( $path_chunks ) {
+			$action_variables = end( $path_chunks );
+			if ( is_array( $action_variables ) ) {
+				array_pop( $path_chunks );
+				$path_chunks = array_merge( $path_chunks, $action_variables );
+			}
+
+			$user_url = trailingslashit( $user_url ) . trailingslashit( implode( '/', $path_chunks ) );
+		}
+	}
+
+	return $user_url;
+}
+
+/**
  * Start following an item.
  *
  * @since 1.0.0
@@ -587,7 +622,7 @@ function bp_follow_format_notifications( $action, $item_id, $secondary_item_id, 
 
 			if ( 1 === $total_items ) {
 				$text = sprintf( __( '%s is now following you', 'buddypress-followers' ), bp_core_get_user_displayname( $item_id ) );
-				$link = bp_core_get_user_domain( $item_id ) . '?bpf_read';
+				$link = add_query_arg( 'bpf_read', 1, bp_follow_get_user_url( $item_id ) );
 
 			} else {
 				$text = sprintf( __( '%d more users are now following you', 'buddypress-followers' ), $total_items );
@@ -597,10 +632,10 @@ function bp_follow_format_notifications( $action, $item_id, $secondary_item_id, 
 
 					// filter notifications by 'new_follow' action.
 					if ( version_compare( BP_VERSION, '2.0.9' ) >= 0 ) {
-						$link .= '?action=' . $action;
+						$link = add_query_arg( 'action', $action, $link );
 					}
 				} else {
-					$link = bp_loggedin_user_domain() . $bp->follow->followers->slug . '/?new';
+					$link = add_query_arg( 'new', 1, bp_follow_get_user_url( bp_loggedin_user_id(), array( $bp->follow->followers->slug ) ) );
 				}
 			}
 

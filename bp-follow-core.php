@@ -29,6 +29,62 @@ class BP_Follow_Component extends BP_Component {
 	public $revision_date = '2014-08-07 22:00 UTC';
 
 	/**
+	 * Component parameters.
+	 *
+	 * @var array Misc parameters.
+	 */
+	public $params = array();
+
+	/**
+	 * Updater class.
+	 *
+	 * @var BP_Follow_Updater Updater class.
+	 */
+	public $updater;
+
+	/**
+	 * Follow Activity Class.
+	 *
+	 * @var BP_Follow_Activity_Core Follow Activity Class.
+	 */
+	public $activity;
+
+	/**
+	 * Global cache groups.
+	 *
+	 * @var array Global cache groups.
+	 */
+	public $global_cachegroups = array();
+
+	/**
+	 * Used to globalize data about followers.
+	 *
+	 * @var object Globalized data about followers.
+	 */
+	public $followers;
+
+	/**
+	 * Used to globalize data about following.
+	 *
+	 * @var object Globalized data about following.
+	 */
+	public $following;
+
+	/**
+	 * Name of the component's DB table.
+	 *
+	 * @var string Name of the component's DB table.
+	 */
+	public $table_name = '';
+
+	/**
+	 * Whether activity scope is set or not.
+	 *
+	 * @var int 1 if activity scope is set, 0 otherwise.
+	 */
+	public $activity_scope_set = 0;
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {

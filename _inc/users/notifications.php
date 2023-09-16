@@ -248,8 +248,10 @@ add_action( 'bp_follow_screen_notification_settings', 'bp_follow_user_screen_not
 /**
  * Send an email to the leader when someone follows them.
  *
+ * @todo Use BP_Email.
+ *
  * @uses bp_core_get_user_displayname() Get the display name for a user
- * @uses bp_core_get_user_domain() Get the profile url for a user
+ * @uses bp_follow_get_user_url() Get the profile url for a user
  * @uses bp_core_get_core_userdata() Get the core userdata for a user without extra usermeta
  * @uses wp_mail() Send an email using the built in WP mail class
  */
@@ -283,7 +285,7 @@ function bp_follow_new_follow_email_notification( $args = '' ) {
 	bp_update_user_meta( $r['follower_id'], 'bp_follow_has_notified', $has_notified );
 
 	$follower_name = wp_specialchars_decode( bp_core_get_user_displayname( $r['follower_id'] ), ENT_QUOTES );
-	$follower_link = bp_core_get_user_domain( $r['follower_id'] ) . '?bpf_read';
+	$follower_link = add_query_arg( 'bpf_read', 1, bp_follow_get_user_url( $r['follower_id'] ) );
 
 	$leader_ud = bp_core_get_core_userdata( $r['leader_id'] );
 
@@ -299,7 +301,11 @@ To view %s\'s profile: %s', 'buddypress-followers' ), $follower_name, $follower_
 
 	// Add notifications link if settings component is enabled.
 	if ( bp_is_active( 'settings' ) ) {
-		$settings_link = bp_core_get_user_domain( $r['leader_id'] ) . BP_SETTINGS_SLUG . '/notifications/';
+		$settings_link = bp_follow_get_user_url(
+			$r['leader_id'],
+			array( bp_get_settings_slug(), bp_get_notifications_slug() )
+		);
+
 		$message .= sprintf( __( '
 
 ---------------------

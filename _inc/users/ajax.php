@@ -10,6 +10,21 @@
 defined( 'ABSPATH' ) || exit;
 
 /**
+ * Registers the BP Follow Ajax actions.
+ *
+ * @since 1.3.0
+ */
+function bp_follow_register_ajax_action() {
+	if ( ! function_exists( 'bp_ajax_register_action' ) ) {
+		return;
+	}
+
+	bp_ajax_register_action( 'bp_follow' );
+	bp_ajax_register_action( 'bp_unfollow' );
+}
+add_action( 'bp_init', 'bp_follow_register_ajax_action' );
+
+/**
  * AJAX callback when clicking on the "Follow" button to follow a user.
  *
  * @uses check_admin_referer() Checks to make sure the WP security nonce matches.

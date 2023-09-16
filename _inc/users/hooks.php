@@ -34,45 +34,59 @@ function bp_follow_user_setup_nav( $main_nav = array(), $sub_nav = array() ) {
 	// Need to change the user ID, so if we're not on a member page, $counts variable is still calculated.
 	$user_id = bp_is_user() ? bp_displayed_user_id() : bp_loggedin_user_id();
 
-	// BuddyBar compatibility.
-	$domain = bp_displayed_user_domain() ? bp_displayed_user_domain() : bp_loggedin_user_domain();
+	/** FOLLOWING NAV ************************************************/
+
+	bp_core_new_nav_item(
+		array(
+			'name'                => sprintf(
+				__( 'Following %s', 'buddypress-followers' ),
+				sprintf(
+					'<span class="count">%s</span>',
+					esc_html( bp_core_number_format( bp_follow_get_the_following_count( array( 'user_id' => $user_id ) ) ) )
+				)
+			),
+			'slug'                => $bp->follow->following->slug,
+			'position'            => $bp->follow->params['adminbar_myaccount_order'],
+			'screen_function'     => 'bp_follow_screen_following',
+			'default_subnav_slug' => 'following',
+			'item_css_id'         => 'members-following',
+		)
+	);
 
 	/** FOLLOWERS NAV ************************************************/
 
-	bp_core_new_nav_item( array(
-		'name'                => sprintf( __( 'Following <span class="count">%d</span>', 'buddypress-followers' ), bp_follow_get_the_following_count( array( 'user_id' => $user_id ) ) ),
-		'slug'                => $bp->follow->following->slug,
-		'position'            => $bp->follow->params['adminbar_myaccount_order'],
-		'screen_function'     => 'bp_follow_screen_following',
-		'default_subnav_slug' => 'following',
-		'item_css_id'         => 'members-following',
-	) );
-
-	/** FOLLOWING NAV ************************************************/
-
-	bp_core_new_nav_item( array(
-		'name'                => sprintf( __( 'Followers <span class="count">%d</span>', 'buddypress-followers' ), bp_follow_get_the_followers_count( array( 'user_id' => $user_id ) ) ),
-		'slug'                => $bp->follow->followers->slug,
-		'position'            => apply_filters( 'bp_follow_followers_nav_position', 62 ),
-		'screen_function'     => 'bp_follow_screen_followers',
-		'default_subnav_slug' => 'followers',
-		'item_css_id'         => 'members-followers',
-	) );
+	bp_core_new_nav_item(
+		array(
+			'name'                => sprintf(
+				__( 'Followers %s', 'buddypress-followers' ),
+				sprintf(
+					'<span class="count">%s</span>',
+					esc_html( bp_core_number_format( bp_follow_get_the_followers_count( array( 'user_id' => $user_id ) ) ) )
+				)
+			),
+			'slug'                => $bp->follow->followers->slug,
+			'position'            => apply_filters( 'bp_follow_followers_nav_position', 62 ),
+			'screen_function'     => 'bp_follow_screen_followers',
+			'default_subnav_slug' => 'followers',
+			'item_css_id'         => 'members-followers',
+		)
+	);
 
 	/** ACTIVITY SUBNAV **********************************************/
 
 	// Add activity sub nav item.
 	if ( bp_is_active( 'activity' ) && apply_filters( 'bp_follow_show_activity_subnav', true ) ) {
-
-		bp_core_new_subnav_item( array(
-			'name'            => _x( 'Following', 'Activity subnav tab', 'buddypress-followers' ),
-			'slug'            => constant( 'BP_FOLLOWING_SLUG' ),
-			'parent_url'      => trailingslashit( $domain . bp_get_activity_slug() ),
-			'parent_slug'     => bp_get_activity_slug(),
-			'screen_function' => 'bp_follow_screen_activity_following',
-			'position'        => 21,
-			'item_css_id'     => 'activity-following',
-		) );
+		bp_core_new_subnav_item(
+			array(
+				'name'            => _x( 'Following', 'Activity subnav tab', 'buddypress-followers' ),
+				'slug'            => constant( 'BP_FOLLOWING_SLUG' ),
+				'parent_url'      => bp_follow_get_user_url( $user_id, array( bp_get_activity_slug() ) ),
+				'parent_slug'     => bp_get_activity_slug(),
+				'screen_function' => 'bp_follow_screen_activity_following',
+				'position'        => 21,
+				'item_css_id'     => 'activity-following',
+			)
+		);
 	}
 
 	// BuddyBar compatibility.
@@ -96,12 +110,14 @@ function bp_follow_user_setup_toolbar() {
 
 	global $wp_admin_bar, $bp;
 
+	$following_url = bp_follow_get_user_url( bp_loggedin_user_id(), array( $bp->follow->following->slug ) );
+
 	// "Follow" parent nav menu
 	$wp_admin_nav[] = array(
 		'parent' => $bp->my_account_menu_id,
 		'id'     => 'my-account-' . $bp->follow->id,
 		'title'  => _x( 'Follow', 'Adminbar main nav', 'buddypress-followers' ),
-		'href'   => trailingslashit( bp_loggedin_user_domain() . $bp->follow->following->slug ),
+		'href'   => $following_url,
 	);
 
 	// "Following" subnav item
@@ -109,7 +125,7 @@ function bp_follow_user_setup_toolbar() {
 		'parent' => 'my-account-' . $bp->follow->id,
 		'id'     => 'my-account-' . $bp->follow->id . '-following',
 		'title'  => _x( 'Following', 'Adminbar follow subnav', 'buddypress-followers' ),
-		'href'   => trailingslashit( bp_loggedin_user_domain() . $bp->follow->following->slug ),
+		'href'   => $following_url,
 	);
 
 	// "Followers" subnav item
@@ -117,7 +133,7 @@ function bp_follow_user_setup_toolbar() {
 		'parent' => 'my-account-' . $bp->follow->id,
 		'id'     => 'my-account-' . $bp->follow->id . '-followers',
 		'title'  => _x( 'Followers', 'Adminbar follow subnav', 'buddypress-followers' ),
-		'href'   => trailingslashit( bp_loggedin_user_domain() . $bp->follow->followers->slug ),
+		'href'   => bp_follow_get_user_url( bp_loggedin_user_id(), array( $bp->follow->followers->slug ) ),
 	);
 
 	// Add each admin menu.
@@ -147,7 +163,7 @@ function bp_follow_user_activity_admin_nav_toolbar( $retval ) {
 			'parent' => 'my-account-activity',
 			'id'     => 'my-account-activity-following',
 			'title'  => _x( 'Following', 'Adminbar activity subnav', 'buddypress-followers' ),
-			'href'   => trailingslashit( bp_loggedin_user_domain() . bp_get_activity_slug() . '/' . constant( 'BP_FOLLOWING_SLUG' ) ),
+			'href'   => bp_follow_get_user_url( bp_loggedin_user_id(), array( bp_get_activity_slug(), constant( 'BP_FOLLOWING_SLUG' ) ) ),
 		);
 
 		$inject = array();
@@ -207,10 +223,12 @@ function bp_follow_group_buddybar_items() {
 	unset( $bp->bp_options_nav['following'] );
 	unset( $bp->bp_options_nav['followers'] );
 
+	$following_url = bp_follow_get_user_url( bp_loggedin_user_id(), array( $bp->follow->following->slug ) );
+
 	// Add the "Follow" nav menu.
 	$bp->bp_nav[ $following_position ] = array(
 		'name'                    => _x( 'Follow', 'Adminbar main nav', 'buddypress-followers' ),
-		'link'                    => trailingslashit( bp_loggedin_user_domain() . $bp->follow->following->slug ),
+		'link'                    => $following_url,
 		'slug'                    => 'follow',
 		'css_id'                  => 'follow',
 		'position'                => $following_position,
@@ -221,7 +239,7 @@ function bp_follow_group_buddybar_items() {
 	// "Following" subnav item
 	$bp->bp_options_nav['follow'][10] = array(
 		'name'            => _x( 'Following', 'Adminbar follow subnav', 'buddypress-followers' ),
-		'link'            => trailingslashit( bp_loggedin_user_domain() . $bp->follow->following->slug ),
+		'link'            => $following_url,
 		'slug'            => $bp->follow->following->slug,
 		'css_id'          => 'following',
 		'position'        => 10,
@@ -232,7 +250,7 @@ function bp_follow_group_buddybar_items() {
 	// "Followers" subnav item
 	$bp->bp_options_nav['follow'][20] = array(
 		'name'            => _x( 'Followers', 'Adminbar follow subnav', 'buddypress-followers' ),
-		'link'            => trailingslashit( bp_loggedin_user_domain() . $bp->follow->followers->slug ),
+		'link'            => bp_follow_get_user_url( bp_loggedin_user_id(), array( $bp->follow->followers->slug ) ),
 		'slug'            => $bp->follow->followers->slug,
 		'css_id'          => 'followers',
 		'position'        => 20,
@@ -520,9 +538,11 @@ function bp_follow_add_activity_tab() {
 	if ( empty( $count ) ) {
 		return;
 	}
+
+	$follow_activity_url = bp_follow_get_user_url( bp_loggedin_user_id(), array( bp_get_activity_slug(), constant( 'BP_FOLLOWING_SLUG' ) ) );
 ?>
 
-	<li id="activity-following"><a href="<?php echo bp_loggedin_user_domain() . BP_ACTIVITY_SLUG . '/' . BP_FOLLOWING_SLUG . '/' ?>" title="<?php esc_html_e( 'The public activity for everyone you are following on this site.', 'buddypress-followers' ) ?>"><?php printf( __( 'Following <span>%d</span>', 'buddypress-followers' ), esc_html( $count ) ) ?></a></li>
+	<li id="activity-following"><a href="<?php echo esc_url( $follow_activity_url ); ?>" title="<?php esc_html_e( 'The public activity for everyone you are following on this site.', 'buddypress-followers' ) ?>"><?php printf( esc_html__( 'Following %s', 'buddypress-followers' ), '<span>' . esc_html( bp_core_number_format( $count ) ) . '</span>' ); ?></a></li>
 
 <?php
 }
@@ -547,9 +567,11 @@ function bp_follow_add_following_tab() {
 	if ( empty( $count ) ) {
 		return;
 	}
+
+	$following_url = bp_follow_get_user_url( bp_loggedin_user_id(), array( constant( 'BP_FOLLOWING_SLUG' ) ) );
 ?>
 
-	<li id="members-following"><a href="<?php echo bp_loggedin_user_domain() . BP_FOLLOWING_SLUG ?>"><?php printf( __( 'Following <span>%d</span>', 'buddypress-followers' ), esc_html( $count ) ) ?></a></li>
+	<li id="members-following"><a href="<?php echo esc_url( $following_url ); ?>"><?php printf( esc_html__( 'Following %s', 'buddypress-followers' ), '<span>' . esc_html( bp_core_number_format( $count ) ) . '</span>' ); ?></a></li>
 
 <?php
 }
@@ -725,6 +747,10 @@ function bp_follow_add_member_scope_filter( $qs, $object ) {
 			break;
 	}
 
+	if ( in_array( $action, array( 'following', 'followers' ), true ) && ! $r['include'] ) {
+		$r['include'] = array( 0 );
+	}
+
 	/**
 	 * Number of users to display on a user's Following or Followers page.
 	 *
@@ -833,7 +859,7 @@ function bp_follow_alter_activity_feed_url( $retval ) {
 	$scope = ! empty( $_COOKIE['bp-activity-scope'] ) ? $_COOKIE['bp-activity-scope'] : false;
 
 	if ( 'following' === $scope && bp_loggedin_user_id() ) {
-		$retval = bp_loggedin_user_domain() . bp_get_activity_slug() . '/' . constant( 'BP_FOLLOWING_SLUG' ) . '/feed/';
+		$retval = bp_follow_get_user_url( bp_loggedin_user_id(), array( bp_get_activity_slug(), constant( 'BP_FOLLOWING_SLUG' ), array( 'feed' ) ) );
 	}
 
 	return $retval;

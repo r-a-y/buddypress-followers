@@ -9,6 +9,46 @@
 defined( 'ABSPATH' ) || exit;
 
 /**
+ * Builds the activity directory url.
+ *
+ * @since 1.3.0
+ *
+ * @param array $path_chunks Path to add to the activity directory url.
+ * @return string The activity directory url.
+ */
+function bp_follow_activity_get_directory_url( $path_chunks = array() ) {
+	if ( function_exists( 'bp_rewrites_get_url' ) ) {
+		$args = array(
+			'component_id' => 'activity',
+		);
+
+		if ( $path_chunks ) {
+			$args['single_item_action'] = array_shift( $path_chunks );
+
+			if ( $path_chunks ) {
+				$args['single_item_action_variables'] = array_shift( $path_chunks );
+			}
+		}
+
+		$url = bp_rewrites_get_url( $args );
+	} else {
+		$url = bp_get_activity_directory_permalink();
+
+		if ( $path_chunks ) {
+			$action_variables = end( $path_chunks );
+			if ( is_array( $action_variables ) ) {
+				array_pop( $path_chunks );
+				$path_chunks = array_merge( $path_chunks, $action_variables );
+			}
+
+			$url = trailingslashit( $url ) . trailingslashit( implode( '/', $path_chunks ) );
+		}
+	}
+
+	return $url;
+}
+
+/**
  * Check if the current activity item in the activity loop can be followed.
  *
  * There are two ways to register your activity item to be followed. Please
@@ -245,7 +285,7 @@ function bp_follow_activity_button( $args = array() ) {
 		'wrapper_class'     => $wrapper_class,
 		'wrapper_id'        => 'follow-button-' . (int) $r['leader_id'],
 		'link_href'         => wp_nonce_url(
-			trailingslashit( bp_get_activity_directory_permalink() . $action . '/' . esc_attr( $r['leader_id'] ) ),
+			bp_follow_activity_get_directory_url( array( $action, array( esc_attr( $r['leader_id'] ) ) ) ),
 			"bp_follow_activity_{$action}"
 		),
 		'link_text'         => $r['link_text'],

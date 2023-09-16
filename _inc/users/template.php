@@ -77,12 +77,10 @@ function bp_follow_add_follow_button( $args = '' ) {
 
 		// if the logged-in user is the leader, use already-queried variables.
 		if ( $logged_user_id && $logged_user_id === $r['leader_id'] ) {
-			$leader_domain   = bp_loggedin_user_domain();
 			$leader_fullname = bp_get_loggedin_user_fullname();
 
 		// else we do a lookup for the user domain and display name of the leader.
 		} else {
-			$leader_domain   = bp_core_get_user_domain( $r['leader_id'] );
 			$leader_fullname = bp_core_get_user_displayname( $r['leader_id'] );
 		}
 
@@ -138,7 +136,7 @@ function bp_follow_add_follow_button( $args = '' ) {
 			'block_self'        => $block_self,
 			'wrapper_class'     => $wrapper_class,
 			'wrapper_id'        => 'follow-button-' . (int) $r['leader_id'],
-			'link_href'         => wp_nonce_url( $leader_domain . $bp->follow->followers->slug . '/' . $action .'/', $action . '_following' ),
+			'link_href'         => wp_nonce_url( bp_follow_get_user_url( $r['leader_id'], array( $bp->follow->followers->slug, $action ) ), $action . '_following' ),
 			'link_text'         => esc_attr( $r['link_text'] ),
 			'link_title'        => esc_attr( $r['link_title'] ),
 			'link_id'           => $class . '-' . (int) $r['leader_id'],
