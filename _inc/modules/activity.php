@@ -29,6 +29,14 @@ add_action( 'bp_follow_loaded', 'bp_follow_activity_init' );
  * @since 1.3.0
  */
 class BP_Follow_Activity_Core {
+
+	/**
+	 * Follow Activity Module Class.
+	 *
+	 * @var BP_Follow_Activity_Module Follow Activity Module class.
+	 */
+	public $module;
+
 	/**
 	 * Constructor.
 	 */
