@@ -50,6 +50,13 @@ class BP_Follow_Component extends BP_Component {
 	public $activity;
 
 	/**
+	 * Follow Blogs Class.
+	 *
+	 * @var BP_Follow_Blogs Follow Blogs Class.
+	 */
+	public $blogs;
+
+	/**
 	 * Global cache groups.
 	 *
 	 * @var array Global cache groups.
