@@ -171,14 +171,14 @@ class BP_Follow_Component extends BP_Component {
 			add_action( $load_hook, function() {
 				// Actions
 				if ( bp_is_current_component( $this->followers->slug ) || bp_is_action_variable( 'feed', 0 ) ) {
-					require $this->path . '/users/actions.php';
+					require_once $this->path . '/users/actions.php';
 				}
 
 				// Screens
 				if ( bp_is_current_component( $this->following->slug ) || bp_is_current_component( $this->followers->slug ) ||
 					( bp_is_current_component( 'activity' ) && bp_is_current_action( $this->following->slug ) )
 				) {
-					require $this->path . '/users/screens.php';
+					require_once $this->path . '/users/screens.php';
 				}
 			}, $priority );
 		}
