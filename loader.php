@@ -46,24 +46,14 @@ add_action( 'bp_include', 'bp_follow_init' );
 
 /**
  * Custom textdomain loader.
- *
- * Checks WP_LANG_DIR for the .mo file first, then WP_LANG_DIR/plugins/, then
- * the plugin's language folder.
- *
- * Allows for a custom language file other than those packaged with the plugin.
+ * Checks `WP_LANG_DIR/plugins/` for the .mo file first, then fallbacks to plugin's language folder.
  *
  * @since 1.1.0
- *
+ * @since 1.3.0 removed custom .mo file checks
  * @return bool True if textdomain loaded; false if not.
  */
 function bp_follow_localization() {
-	$domain = 'buddypress-followers';
-	$mofile_custom = trailingslashit( WP_LANG_DIR ) . sprintf( '%s-%s.mo', $domain, get_locale() );
-
-	if ( is_readable( $mofile_custom ) ) {
-		return load_textdomain( $domain, $mofile_custom );
-	} else {
-		return load_plugin_textdomain( $domain, false, basename( BP_FOLLOW_DIR ) . '/languages/' );
-	}
+	return load_plugin_textdomain( 'buddypress-followers', false, basename( BP_FOLLOW_DIR ) . '/languages/' );
 }
+
 add_action( 'plugins_loaded', 'bp_follow_localization' );
