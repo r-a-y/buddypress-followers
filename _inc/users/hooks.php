@@ -23,16 +23,15 @@ defined( 'ABSPATH' ) || exit;
  * @since 1.3.0
  */
 function bp_follow_user_setup_nav( $main_nav = array(), $sub_nav = array() ) {
-	$bp = $GLOBALS['bp'];
+    $bp = $GLOBALS['bp'];
 
-	// If we're in the admin area and we're using the WP toolbar, we don't need
-	// to run the rest of this method.
-	if ( defined( 'WP_NETWORK_ADMIN' ) && bp_use_wp_admin_bar() ) {
-		return;
-	}
+    // Check if the function exists before using it
+    if ( defined( 'WP_NETWORK_ADMIN' ) && function_exists( 'bp_use_wp_admin_bar' ) && bp_use_wp_admin_bar() ) {
+        return;
+    }
 
-	// Need to change the user ID, so if we're not on a member page, $counts variable is still calculated.
-	$user_id = bp_is_user() ? bp_displayed_user_id() : bp_loggedin_user_id();
+    // Need to change the user ID, so if we're not on a member page, $counts variable is still calculated.
+    $user_id = bp_is_user() ? bp_displayed_user_id() : bp_loggedin_user_id();
 
 	/** FOLLOWING NAV ************************************************/
 
