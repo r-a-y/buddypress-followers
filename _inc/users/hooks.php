@@ -25,9 +25,8 @@ defined( 'ABSPATH' ) || exit;
 function bp_follow_user_setup_nav( $main_nav = array(), $sub_nav = array() ) {
 	$bp = $GLOBALS['bp'];
 
-	// If we're in the admin area and we're using the WP toolbar, we don't need
-	// to run the rest of this method.
-	if ( defined( 'WP_NETWORK_ADMIN' ) && bp_use_wp_admin_bar() ) {
+	// If using an older version of BP, check bp_use_admin_bar().
+	if ( defined( 'WP_NETWORK_ADMIN' ) && function_exists( 'bp_use_wp_admin_bar' ) && bp_use_wp_admin_bar() ) {
 		return;
 	}
 
